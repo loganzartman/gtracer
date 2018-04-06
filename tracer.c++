@@ -38,13 +38,15 @@ int main() {
     bool running = true;
     SDL_Event event;
 
-    Sphere s0(float3(1,1,3),    2, float3(1,0,0));
+    Sphere s0(float3(1,1,3),    2,   float3(1,0,0));
     Sphere s1(float3(10,0,2),   1.5, float3(1,0,0));
-    Sphere s2(float3(0,-1,5),   1, float3(1,0,0));
-    Sphere s3(float3(5,1,5),    1, float3(1,0,0));
-    Sphere s4(float3(-10,2,10), 5, float3(1,0,0));
+    Sphere s2(float3(0,-1,5),   1,   float3(1,0,0));
+    Sphere s3(float3(5,1,5),    1,   float3(1,0,0));
 
-    Sphere spheres[SPHERES] = { s0, s1, s2, s3, s4 };
+    // light source
+    Sphere l0(float3(-10,2,10), 5,   float3(1,0,0), 0, 0, float3(3));
+
+    Sphere spheres[SPHERES] = { s0, s1, s2, s3, l0 };
 
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();

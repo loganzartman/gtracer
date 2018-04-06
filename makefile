@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -std=c++11 $(SDL_CFLAGS)
 LDFLAGS = $(SDL_LDFLAGS)
 LDLIBS = -lGL
 
-TRACER_SRC = tracer.c++
+TRACER_SRC = tracer.c++ render.c++
 TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
 all: tracer
@@ -19,7 +19,7 @@ format:
 	clang-format -i *.c++ *.hh
 
 tracer: $(TRACER_OBJ) 
-	$(CXX) tracer.o -o tracer $(LDFLAGS) $(LDLIBS)
+	$(CXX) $^ -o tracer $(LDFLAGS) $(LDLIBS)
 
 %.o: %.c++ $(wildcard %.hh)
 	$(CXX) $(CXXFLAGS) $^ -c

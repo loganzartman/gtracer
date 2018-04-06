@@ -8,17 +8,22 @@ struct Sphere {
     float3 center;
     float radius, radius2;
 
-    float3 surface_color;
+    // color of the surface itself
+    float3 surface_color; 
     float transparency, reflection;
 
-    Sphere(const float3 &c, const float &r, const float3 &sc,
-           const float &trans = 0, const float &refl = 0)
+    // the light it emits
+    float3 emission_color;
+
+    Sphere(const float3 &c, const float &r, const float3 &sc, 
+           const float &trans = 0, const float &refl = 0, const float3 &ec = 0)
         : center(c),
           radius(r),
           radius2(r * r),
           surface_color(sc),
           transparency(trans),
-          reflection(refl) {}
+          reflection(refl),
+          emission_color(ec) {}
 
     bool intersect(const float3 &r_orig, const float3 &r_dir, float &t0,
                    float &t1) const {
@@ -37,6 +42,9 @@ struct Sphere {
         // to get the radius of intersection, compute how much
         // of r_dir is in the sphere
         float rad_of_inter = sqrt(radius2 - dist2);
+
+        // t0 and t1 are parametrics of the original ray
+        // AKA how far down the ray the collision occurs
         t0 = tca - rad_of_inter;
         t1 = tca + rad_of_inter;
 
