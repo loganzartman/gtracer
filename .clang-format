@@ -1,0 +1,14 @@
+---
+# Based on Google's C++ Style guide
+BasedOnStyle: Google
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 80
+SpacesInContainerLiterals: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeAssignmentOperators: true
+ReflowComments: true
+AllowShortBlocksOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+---
