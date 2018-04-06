@@ -15,14 +15,25 @@
 
 using namespace std;
 
+void sdl_check() {
+    const char *err = SDL_GetError();
+    if (err[0] != 0) {
+        cout << "SDL Error:" << endl;
+        cout << err << endl;
+        SDL_ClearError();
+    }
+}
+
 int main() {
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window =
         SDL_CreateWindow("SDL2/OpenGL Demo", 0, 0, 640, 480,
                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    sdl_check();
 
     // Create an OpenGL context associated with the window.
     SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+    sdl_check();
 
     bool running = true;
     SDL_Event event;
@@ -58,6 +69,7 @@ int main() {
 
     // Once finished with OpenGL functions, the SDL_GLContext can be deleted.
     SDL_GL_DeleteContext(glcontext);
+    sdl_check();
 
     return 0;
 }
