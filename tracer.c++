@@ -1,9 +1,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
+
+#include "Sphere.h"
+#include "Vec3.h"
+
 #define TARGET_FPS 60
 
 using namespace std;

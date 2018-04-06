@@ -1,4 +1,9 @@
-template <typename t> struct Vec3 {
+#ifndef VEC_3
+#define VEC_3
+
+#include <sstream>
+
+template <typename T> struct Vec3 {
   T x, y, z;
 
   Vec3() : x(), y(), z() {}
@@ -35,11 +40,20 @@ template <typename t> struct Vec3 {
   }
   Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
 
-  friend bool operator==(const Vec3<T> &o) const {
-    return x == o.x && y == o.y && z == o.z;
+  friend bool operator==(const Vec3<T> &l, const Vec3<T> &r) {
+    return l.x == r.x && l.y == r.y && l.z == r.z;
   }
 
   T length2() const { return x * x + y * y + z * z; }
 
   T length() const { return sqrt(length2()); }
-}
+
+  std::string print() const {
+    std::ostringstream o;
+    o << "(" << x << ", " << y << ", " << z << ")";
+    return o.str();
+  }
+};
+
+typedef Vec3<float> float3;
+#endif
