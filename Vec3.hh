@@ -7,7 +7,7 @@ template <typename T>
 struct Vec3 {
     T x, y, z;
 
-    Vec3() : x(), y(), z() {}
+    Vec3() : x(0), y(0), z(0) {}
     Vec3(T v) : x(v), y(v), z(v) {}
     Vec3(T vx, T vy, T vz) : x(vx), y(vy), z(vz) {}
 
@@ -25,20 +25,36 @@ struct Vec3 {
 
     T dot(const Vec3<T> &o) const { return x * o.x + y * o.y + z * o.z; }
 
-    Vec3<T> operator-(const Vec3<T> &o) const {
-        return Vec3<T>(x - o.x, y - o.y, z - o.z);
-    }
     Vec3<T> operator+(const Vec3<T> &o) const {
-        return Vec3<T>(x + o.x, y + o.y, z + o.z);
+        Vec3<T> result(*this);
+        return result += o;
     }
+
+    Vec3<T> operator-(const Vec3<T> &o) const {
+        Vec3<T> result(*this);
+        return result -= o;
+    }
+
+    Vec3<T> operator*(const T& o) const {
+        Vec3<T> result(*this);
+        return result *= o;
+    }
+    
     Vec3<T> &operator+=(const Vec3<T> &o) {
         x += o.x, y += o.y, z += o.z;
         return *this;
     }
-    Vec3<T> &operator*=(const Vec3<T> &o) {
-        x *= o.x, y *= o.y, z *= o.z;
+
+    Vec3<T> &operator-=(const Vec3<T> &o) {
+        x -= o.x, y -= o.y, z -= o.z;
         return *this;
     }
+
+    Vec3<T> &operator*=(const T& f) {
+        x *= f, y *= f, z *= f;
+        return *this;
+    }
+    
     Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
 
     friend bool operator==(const Vec3<T> &l, const Vec3<T> &r) {
