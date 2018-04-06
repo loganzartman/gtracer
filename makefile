@@ -16,10 +16,10 @@ clean:
 	-rm -f *.o
 
 format:
-	clang-format -i *.c++ *.h
+	clang-format -i *.c++ *.hh
 
 tracer: $(TRACER_OBJ) 
 	$(CXX) $(LDFLAGS) tracer.o -o tracer $(LDLIBS)
 
-%.o: %.c++ $(wildcard %.h)
+%.o: %.c++ $(wildcard %.hh)
 	$(CXX) $(CXXFLAGS) $^ -c

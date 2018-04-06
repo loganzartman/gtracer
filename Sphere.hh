@@ -1,7 +1,7 @@
-#ifndef SPHERE
-#define SPHERE
+#ifndef SPHERE_HH
+#define SPHERE_HH
 
-#include "Vec3.h"
+#include "Vec3.hh"
 
 struct Sphere {
   float3 center;

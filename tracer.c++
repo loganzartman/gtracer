@@ -6,8 +6,8 @@
 #include <cstdint>
 #include <iostream>
 
-#include "Sphere.h"
-#include "Vec3.h"
+#include "Sphere.hh"
+#include "Vec3.hh"
 
 #define TARGET_FPS 60
 
