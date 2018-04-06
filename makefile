@@ -2,7 +2,7 @@ SDL_CFLAGS := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 
 CXX = g++
-CXXFLAGS = -Wall $(SDL_CFLAGS)
+CXXFLAGS = -Wall -std=c++11 $(SDL_CFLAGS)
 LDFLAGS = $(SDL_LDFLAGS)
 LDLIBS = -lGL
 
@@ -19,7 +19,7 @@ format:
 	clang-format -i *.c++ *.hh
 
 tracer: $(TRACER_OBJ) 
-	$(CXX) $(LDFLAGS) tracer.o -o tracer $(LDLIBS)
+	$(CXX) tracer.o -o tracer $(LDFLAGS) $(LDLIBS)
 
 %.o: %.c++ $(wildcard %.hh)
 	$(CXX) $(CXXFLAGS) $^ -c
