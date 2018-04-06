@@ -2,6 +2,7 @@
 #define SPHERE_HH
 
 #include "Vec3.hh"
+#include <cmath>
 
 struct Sphere {
     float3 center;

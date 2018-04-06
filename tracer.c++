@@ -1,15 +1,17 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
+#include "SDL.h"
+#include "SDL_opengl.h"
 
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
 
+#include "render.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
 
 #define TARGET_FPS 60
+#define SPHERES 5
 
 using namespace std;
 
@@ -25,12 +27,22 @@ int main() {
     bool running = true;
     SDL_Event event;
 
+    Sphere s0(float3(1,1,3),    2, float3(1,0,0));
+    Sphere s1(float3(10,0,2),   1.5, float3(1,0,0));
+    Sphere s2(float3(0,-1,5),   1, float3(1,0,0));
+    Sphere s3(float3(5,1,5),    1, float3(1,0,0));
+    Sphere s4(float3(-10,2,10), 5, float3(1,0,0));
+
+    Sphere spheres[SPHERES] = { s0, s1, s2, s3, s4 };
+
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 running = false;
         }
+
+        cpu_render(spheres, SPHERES);
 
 #define randf() (rand() % 10000 / 10000.)
         glClearColor(randf(), randf(), randf(), 1);  // set clear color
