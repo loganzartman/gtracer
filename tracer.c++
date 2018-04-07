@@ -48,6 +48,8 @@ int main() {
 
     Sphere spheres[SPHERES] = { s0, s1, s2, s3, l0 };
 
+    float3 *image;
+
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
         while (SDL_PollEvent(&event)) {
@@ -55,7 +57,7 @@ int main() {
                 running = false;
         }
 
-        cpu_render(spheres, SPHERES);
+        image = cpu_render(spheres, SPHERES);
 
 #define randf() (rand() % 10000 / 10000.)
         glClearColor(randf(), randf(), randf(), 1);  // set clear color

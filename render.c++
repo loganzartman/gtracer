@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void cpu_render (Sphere *spheres, size_t num_spheres) {
+float3 *cpu_render (Sphere *spheres, size_t num_spheres) {
   if (spheres == nullptr)
     throw invalid_argument("Spheres is null");
   if (num_spheres <= 0)
@@ -36,11 +36,34 @@ void cpu_render (Sphere *spheres, size_t num_spheres) {
       ++pixel;
     }
   }
+
+  return image;
 }
 
-float3 trace (const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres, int num_spheres, int depth) {
+float3 trace (const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres, size_t num_spheres, int depth) {
   // for every sphere, detect collision. if there is one,
   // see if it is the closest. Once we get the closest
   // collision, determine the color we should show
+  float near = INFINITY;
+  Sphere *near_sphere = nullptr;
+
+  for (size_t i = 0; i < num_spheres; ++i) {
+    float t0 = INFINITY;
+    float t1 = INFINITY;
+    
+    if (spheres[i].intersect(ray_orig, ray_dir, t0, t1)) {
+      if (t0 < 0) //if t0 is negative, that's on the other side of the camera
+        t0 = t1;
+
+      if (t0 < near) {
+        near = t0;
+        near_sphere = &spheres[i];
+      }
+    }
+  }
+
+  if (!near_sphere)
+    return float3(2); //return background color
+
   return float3(0);
 }
