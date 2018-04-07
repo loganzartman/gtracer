@@ -3,17 +3,17 @@
 #include "render.hh"
 
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 
 using namespace std;
 
-float3 *cpu_render (Sphere *spheres, size_t num_spheres) {
+float3 *cpu_render (Sphere *spheres, size_t num_spheres, size_t w = 640, size_t h = 480) {
   if (spheres == nullptr)
     throw invalid_argument("Spheres is null");
   if (num_spheres <= 0)
     throw invalid_argument("There needs to be at least one sphere");
 
-  size_t w = 640, h = 480;
   float3 *image = new float3[w*h];
   float3 *pixel = image;
 
@@ -25,10 +25,9 @@ float3 *cpu_render (Sphere *spheres, size_t num_spheres) {
 
   for (size_t y = 0; y < h; ++y) {
     for (size_t x = 0; x < w; ++x) {
-      // compute the x and y magnitude of each vector
-      // TODO: do the math, replace placeholder
-      float v_x = 1;
-      float v_y = 1;
+      //  compute the x and y magnitude of each vector
+      float v_x = (2 * ((x + 0.5) * inv_w) - 1) * angle * aspect_ratio;
+      float v_y = (1 - 2 * ((y + 0.5) * inv_h))  * angle;
       float3 ray(v_x, v_y, 1);
       ray.normalize();
 
@@ -40,12 +39,17 @@ float3 *cpu_render (Sphere *spheres, size_t num_spheres) {
   return image;
 }
 
+
+/*
+*  for every sphere, detect collision. if there is one,
+*  see if it is the closest. Once we get the closest
+*  collision, determine the color we should show
+*/
 float3 trace (const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres, size_t num_spheres, int depth) {
-  // for every sphere, detect collision. if there is one,
-  // see if it is the closest. Once we get the closest
-  // collision, determine the color we should show
   float near = INFINITY;
   Sphere *near_sphere = nullptr;
+
+  size_t index = -1;
 
   for (size_t i = 0; i < num_spheres; ++i) {
     float t0 = INFINITY;
@@ -58,12 +62,14 @@ float3 trace (const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres, si
       if (t0 < near) {
         near = t0;
         near_sphere = &spheres[i];
+        index = i;
       }
     }
   }
 
   if (!near_sphere)
-    return float3(2); //return background color
+    return float3(0); //return background color
 
-  return float3(0);
+  std::cout << "collision between ray with origin=" << ray_orig.print() << "and dir=" << ray_dir.print() << " and sphere=" << index << endl;
+  return float3(1);
 }

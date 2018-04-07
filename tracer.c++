@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <iostream>
+#include <fstream>
 
 #include "render.hh"
 #include "Sphere.hh"
@@ -12,22 +13,19 @@
 
 #define TARGET_FPS 60
 #define SPHERES 5
+#define WIDTH 640
+#define HEIGHT 480 
 
 using namespace std;
 
-void sdl_check() {
-    const char *err = SDL_GetError();
-    if (err[0] != 0) {
-        cout << "SDL Error:" << endl;
-        cout << err << endl;
-        SDL_ClearError();
-    }
-}
+void output_to_ppm (float3 *image, size_t w, size_t h);
+void sdl_check();
+
 
 int main() {
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window =
-        SDL_CreateWindow("SDL2/OpenGL Demo", 0, 0, 640, 480,
+        SDL_CreateWindow("SDL2/OpenGL Demo", 0, 0, WIDTH, HEIGHT,
                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     sdl_check();
 
@@ -38,10 +36,10 @@ int main() {
     bool running = true;
     SDL_Event event;
 
-    Sphere s0(float3(1,1,3),    2,   float3(1,0,0));
-    Sphere s1(float3(10,0,2),   1.5, float3(1,0,0));
-    Sphere s2(float3(0,-1,5),   1,   float3(1,0,0));
-    Sphere s3(float3(5,1,5),    1,   float3(1,0,0));
+    Sphere s0(float3(5,5,10),      2,   float3(1,0,0));
+    Sphere s1(float3(WIDTH/2,HEIGHT/2,20),   1.5, float3(1,0,0));
+    Sphere s2(float3(-5,-1,15),   1,   float3(1,0,0));
+    Sphere s3(float3(5,1,30),     1,   float3(1,0,0));
 
     // light source
     Sphere l0(float3(-10,2,10), 5,   float3(1,0,0), 0, 0, float3(3));
@@ -57,7 +55,9 @@ int main() {
                 running = false;
         }
 
-        image = cpu_render(spheres, SPHERES);
+        image = cpu_render(spheres, SPHERES, WIDTH, HEIGHT);
+        output_to_ppm(image, WIDTH, HEIGHT);
+        running = false;
 
 #define randf() (rand() % 10000 / 10000.)
         glClearColor(randf(), randf(), randf(), 1);  // set clear color
@@ -75,5 +75,29 @@ int main() {
     SDL_GL_DeleteContext(glcontext);
     sdl_check();
 
+    delete [] image; 
+
     return 0;
+}
+
+// Util
+
+void output_to_ppm (float3 *image, size_t w, size_t h) {
+  std::ofstream ofs("./output.ppm", std::ios::out | std::ios::binary); 
+  ofs << "P6\n" << w << " " << h << "\n255\n"; 
+  for (unsigned i = 0; i < w * h; ++i) { 
+      ofs << (unsigned char)(std::min(float(1), image[i].x) * 255) << 
+             (unsigned char)(std::min(float(1), image[i].y) * 255) << 
+             (unsigned char)(std::min(float(1), image[i].z) * 255); 
+  } 
+  ofs.close(); 
+}
+
+void sdl_check() {
+    const char *err = SDL_GetError();
+    if (err[0] != 0) {
+        cout << "SDL Error:" << endl;
+        cout << err << endl;
+        SDL_ClearError();
+    }
 }
