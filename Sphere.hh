@@ -1,21 +1,21 @@
 #ifndef SPHERE_HH
 #define SPHERE_HH
 
-#include "Vec3.hh"
 #include <cmath>
+#include "Vec3.hh"
 
 struct Sphere {
     float3 center;
     float radius, radius2;
 
     // color of the surface itself
-    float3 surface_color; 
+    float3 surface_color;
     float transparency, reflection;
 
     // the light it emits
     float3 emission_color;
 
-    Sphere(const float3 &c, const float &r, const float3 &sc, 
+    Sphere(const float3 &c, const float &r, const float3 &sc,
            const float &trans = 0, const float &refl = 0, const float3 &ec = 0)
         : center(c),
           radius(r),

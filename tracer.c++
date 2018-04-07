@@ -4,23 +4,22 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "render.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
+#include "render.hh"
 
 #define TARGET_FPS 60
 #define SPHERES 5
 #define WIDTH 640
-#define HEIGHT 480 
+#define HEIGHT 480
 
 using namespace std;
 
-void output_to_ppm (float3 *image, size_t w, size_t h);
+void output_to_ppm(float3 *image, size_t w, size_t h);
 void sdl_check();
-
 
 int main() {
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
@@ -36,15 +35,15 @@ int main() {
     bool running = true;
     SDL_Event event;
 
-    Sphere s0(float3(5,5,10),      2,   float3(1,0,0));
-    Sphere s1(float3(WIDTH/2,HEIGHT/2,20),   1.5, float3(1,0,0));
-    Sphere s2(float3(-5,-1,15),   1,   float3(1,0,0));
-    Sphere s3(float3(5,1,30),     1,   float3(1,0,0));
+    Sphere s0(float3(5, 5, 10), 2, float3(1, 0, 0));
+    Sphere s1(float3(WIDTH / 2, HEIGHT / 2, 20), 1.5, float3(1, 0, 0));
+    Sphere s2(float3(-5, -1, 15), 1, float3(1, 0, 0));
+    Sphere s3(float3(5, 1, 30), 1, float3(1, 0, 0));
 
     // light source
-    Sphere l0(float3(-10,2,10), 5,   float3(1,0,0), 0, 0, float3(3));
+    Sphere l0(float3(-10, 2, 10), 5, float3(1, 0, 0), 0, 0, float3(3));
 
-    Sphere spheres[SPHERES] = { s0, s1, s2, s3, l0 };
+    Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
 
     float3 *image;
 
@@ -75,22 +74,22 @@ int main() {
     SDL_GL_DeleteContext(glcontext);
     sdl_check();
 
-    delete [] image; 
+    delete[] image;
 
     return 0;
 }
 
 // Util
 
-void output_to_ppm (float3 *image, size_t w, size_t h) {
-  std::ofstream ofs("./output.ppm", std::ios::out | std::ios::binary); 
-  ofs << "P6\n" << w << " " << h << "\n255\n"; 
-  for (unsigned i = 0; i < w * h; ++i) { 
-      ofs << (unsigned char)(std::min(float(1), image[i].x) * 255) << 
-             (unsigned char)(std::min(float(1), image[i].y) * 255) << 
-             (unsigned char)(std::min(float(1), image[i].z) * 255); 
-  } 
-  ofs.close(); 
+void output_to_ppm(float3 *image, size_t w, size_t h) {
+    std::ofstream ofs("./output.ppm", std::ios::out | std::ios::binary);
+    ofs << "P6\n" << w << " " << h << "\n255\n";
+    for (unsigned i = 0; i < w * h; ++i) {
+        ofs << (unsigned char)(std::min(float(1), image[i].x) * 255)
+            << (unsigned char)(std::min(float(1), image[i].y) * 255)
+            << (unsigned char)(std::min(float(1), image[i].z) * 255);
+    }
+    ofs.close();
 }
 
 void sdl_check() {

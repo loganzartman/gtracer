@@ -1,8 +1,8 @@
 #ifndef VEC3_HH
 #define VEC3_HH
 
-#include <sstream>
 #include <cmath>
+#include <sstream>
 
 template <typename T>
 struct Vec3 {
@@ -36,11 +36,11 @@ struct Vec3 {
         return result -= o;
     }
 
-    Vec3<T> operator*(const T& o) const {
+    Vec3<T> operator*(const T &o) const {
         Vec3<T> result(*this);
         return result *= o;
     }
-    
+
     Vec3<T> &operator+=(const Vec3<T> &o) {
         x += o.x, y += o.y, z += o.z;
         return *this;
@@ -51,11 +51,11 @@ struct Vec3 {
         return *this;
     }
 
-    Vec3<T> &operator*=(const T& f) {
+    Vec3<T> &operator*=(const T &f) {
         x *= f, y *= f, z *= f;
         return *this;
     }
-    
+
     Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
 
     friend bool operator==(const Vec3<T> &l, const Vec3<T> &r) {
