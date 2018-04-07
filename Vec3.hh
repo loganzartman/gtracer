@@ -2,6 +2,7 @@
 #define VEC3_HH
 
 #include <sstream>
+#include <cmath>
 
 template <typename T>
 struct Vec3 {
