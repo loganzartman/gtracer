@@ -3,6 +3,7 @@ Austin Atchley, Logan Zartman
 
 ## Dependencies
 * SDL2
+* GLEW
 
 ## Building
 * `make`
