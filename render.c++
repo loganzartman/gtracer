@@ -8,7 +8,7 @@
 
 using namespace std;
 
-float3 *cpu_render (Sphere *spheres, size_t num_spheres, size_t w = 640, size_t h = 480) {
+float3 *cpu_render (Sphere *spheres, size_t num_spheres, size_t w, size_t h) {
   if (spheres == nullptr)
     throw invalid_argument("Spheres is null");
   if (num_spheres <= 0)
