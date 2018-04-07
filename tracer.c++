@@ -30,7 +30,7 @@ int main() {
     SDL_GetWindowSize(window, &w, &h);
     glewInit();
     gl_init_viewport(w, h);
-    GLuint buffer_id = gl_init_buffer(w, h);
+    GLuint buffer_id = gl_create_buffer(w, h);  // for gpu
     GLuint texture_id = gl_create_texture(w, h);
 
     bool running = true;
@@ -44,23 +44,16 @@ int main() {
     Sphere l0(float3(-10, 2, 10), 5, float3(1, 0, 0), 0, 0, float3(3));
     Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
 
-    // copy texture to CPU (not strictly necessary)
+    // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
     float *pixels = new float[n_pixels];  // obv only do this once
-    glGetTextureImage(texture_id, 0, GL_RGBA, GL_FLOAT,
-                      n_pixels * sizeof(float), pixels);
-    gl_check();
+    fill_n(pixels, n_pixels, 0);
 
-    for (int i = 0; i < n_pixels; ++i)
-        pixels[i] = (rand() % 1000) / 1000.;
+    // do raytracing
     // cpu_render(spheres, SPHERES, WIDTH, HEIGHT, pixels);
 
     // copy texture to GPU
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    gl_check();
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0); //unbind pixel unpack. IMPORTANT.
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_FLOAT, pixels);
-    gl_check();
+    gl_data2tex(w, h, pixels, texture_id);
 
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
@@ -70,14 +63,11 @@ int main() {
         }
 
         // render buffer
-        // gl_buf2tex(w, h, buffer_id, texture_id);
+        // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
         glBindTexture(GL_TEXTURE_2D, texture_id);
-        gl_check();
         gl_draw_fullscreen();
+        gl_check();
 
-        // glClearColor(0, 0, 0, 1);                            // set clear
-        // color glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // clear
-        // context
         SDL_GL_SwapWindow(window);  // update window
 
         // limit framerate
@@ -115,19 +105,17 @@ void gl_init_viewport(int w, int h) {
 }
 
 /**
- * @brief Initalizes the GL buffer.
+ * @brief Creates a pixel unpack buffer.
  * @param[in] w desired width
  * @param[in] h desired height
  * @return the new buffer ID
  */
-GLuint gl_init_buffer(int w, int h) {
+GLuint gl_create_buffer(int w, int h) {
     GLuint buffer_id;
     // get a buffer ID
     glGenBuffers(1, &buffer_id);
-    gl_check();
     // set it as the current unpack buffer (a PBO)
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer_id);
-    gl_check();
     // allocate data for the buffer
     glBufferData(GL_PIXEL_UNPACK_BUFFER, w * h * 4 * sizeof(float), nullptr,
                  GL_DYNAMIC_COPY);
@@ -145,10 +133,8 @@ GLuint gl_create_texture(int w, int h) {
     GLuint texture_id;
     // get a texture ID
     glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
-    gl_check();
     // allocate texture memory
     glTextureStorage2D(texture_id, 1, GL_RGBA32F, w, h);
-    gl_check();
     // set interpolation (must be nearest for RECTANGLE_ARB)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -157,21 +143,37 @@ GLuint gl_create_texture(int w, int h) {
 }
 
 /**
- * @brief Make an existing texture from an existing buffer
+ * @brief Copy an existing buffer to an existing texture
  * @details Used to display data rendered into a buffer
- * @param[in] w width of the texture/buffer
- * @param[in] h height of the texture/buffer
  * @param[in] buffer_id the buffer ID
  * @param[in] texture_id the texture ID
+ * @param[in] w width of the texture/buffer
+ * @param[in] h height of the texture/buffer
  */
-void gl_buf2tex(int w, int h, GLuint buffer_id, GLuint texture_id) {
+void gl_buf2tex(GLuint buffer_id, GLuint texture_id, int w, int h) {
     // select buffer and texture
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer_id);
-    gl_check();
     glBindTexture(GL_TEXTURE_2D, texture_id);
-    gl_check();
-    // make a texture from the buffer
+    // copy buffer to texture
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_FLOAT, nullptr);
+    gl_check();
+}
+
+/**
+ * @brief Copy pixel data on the CPU to an existing texture
+ * @details Used to display data rendered into a buffer.
+ * The pixel data must be in RGBA float32 format.
+ * @param[in] buffer_id the buffer ID
+ * @param[in] texture_id the texture ID
+ * @param[in] w width of the texture/buffer
+ * @param[in] h height of the texture/buffer
+ */
+void gl_data2tex(int w, int h, float *pixels, GLuint texture_id) {
+    // bind texture, unbind pixel unpack buffer
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);  // muy importante!
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    // copy pixels to texture
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_FLOAT, pixels);
     gl_check();
 }
 

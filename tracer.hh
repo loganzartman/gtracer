@@ -22,9 +22,10 @@
 #define ERRINFO __FILE__ << ":" << __func__ << ":" << __LINE__
 
 void gl_init_viewport(int w, int h);
-GLuint gl_init_buffer(int w, int h);
+GLuint gl_create_buffer(int w, int h);
 GLuint gl_create_texture(int w, int h);
 void gl_buf2tex(int w, int h, GLuint buffer_id, GLuint texture_id);
+void gl_data2tex(int w, int h, float *pixels, GLuint texture_id);
 void gl_draw_fullscreen();
 #define gl_check()                                                  \
     ({                                                              \
