@@ -8,14 +8,12 @@
 
 using namespace std;
 
-float3 *cpu_render(Sphere *spheres, size_t num_spheres, size_t w, size_t h) {
+void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
+                size_t num_spheres) {
     if (spheres == nullptr)
         throw invalid_argument("Spheres is null");
     if (num_spheres <= 0)
         throw invalid_argument("There needs to be at least one sphere");
-
-    float3 *image = new float3[w * h];
-    float3 *pixel = image;
 
     float inv_w = 1 / float(w);
     float inv_h = 1 / float(h);
@@ -31,12 +29,14 @@ float3 *cpu_render(Sphere *spheres, size_t num_spheres, size_t w, size_t h) {
             float3 ray(v_x, v_y, 1);
             ray.normalize();
 
-            *pixel = trace(float3(0), ray, spheres, num_spheres, 0);
-            ++pixel;
+            float3 color = trace(float3(0), ray, spheres, num_spheres, 0);
+            const size_t idx = (y * w + x) * 4;
+            pixels[idx] = color.x;
+            pixels[idx+1] = color.y;
+            pixels[idx+2] = color.z;
+            pixels[idx+3] = 1; //alpha
         }
     }
-
-    return image;
 }
 
 /*

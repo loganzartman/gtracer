@@ -50,7 +50,7 @@ int main() {
     fill_n(pixels, n_pixels, 0);
 
     // do raytracing
-    // cpu_render(spheres, SPHERES, WIDTH, HEIGHT, pixels);
+    cpu_render(pixels, w, h, spheres, SPHERES);
 
     // copy texture to GPU
     gl_data2tex(w, h, pixels, texture_id);

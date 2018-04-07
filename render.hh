@@ -5,7 +5,7 @@
 
 float3 trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
              size_t num_spheres, int depth);
-float3 *cpu_render(Sphere *spheres, size_t num_spheres, size_t w = 640,
-                   size_t h = 480);
+void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
+                size_t num_spheres);
 
 #endif
