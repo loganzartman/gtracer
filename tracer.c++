@@ -44,7 +44,7 @@ int main() {
     // light source
     Sphere l0(float3(-10, 2, 10), 5, float3(1, 0, 0), 0, 0, float3(3));
     // Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
-    
+
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
     float *pixels = new float[n_pixels];  // obv only do this once
@@ -65,10 +65,10 @@ int main() {
         cpu_render(pixels, w, h, spheres, 1);
 
         // copy texture to GPU
+        // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
         gl_data2tex(w, h, pixels, texture_id);
 
         // render buffer
-        // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
         gl_draw_tex(texture_id);
 
         SDL_GL_SwapWindow(window);  // update window
@@ -76,7 +76,7 @@ int main() {
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
-        // cout << dt << endl;
+        cout << "\e[1G\e[0K" << dt << "ms" << flush;
         SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
     }
 
@@ -187,10 +187,10 @@ void gl_data2tex(int w, int h, float *pixels, GLuint texture_id) {
 }
 
 void gl_draw_tex(GLuint texture_id) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear screen
-    glBindTexture(GL_TEXTURE_2D, texture_id); // bind texture
-    glEnable(GL_TEXTURE_2D);  // enable texturing
-    gl_draw_fullscreen(); // draw fullscreen quad
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // clear screen
+    glBindTexture(GL_TEXTURE_2D, texture_id);            // bind texture
+    glEnable(GL_TEXTURE_2D);                             // enable texturing
+    gl_draw_fullscreen();                                // draw fullscreen quad
     glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
     gl_check();

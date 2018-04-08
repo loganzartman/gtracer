@@ -29,7 +29,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
             float3 ray(v_x, v_y, 1);
             ray.normalize();
 
-            float3 color = trace(float3(0), ray, spheres, num_spheres, 0);
+            float3 color = cpu_trace(float3(0), ray, spheres, num_spheres, 0);
             const size_t idx = (y * w + x) * 4;
             pixels[idx] = color.x;
             pixels[idx + 1] = color.y;
@@ -44,8 +44,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
  *  see if it is the closest. Once we get the closest
  *  collision, determine the color we should show
  */
-float3 trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
-             size_t num_spheres, int depth) {
+float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
+                 size_t num_spheres, int depth) {
     float near = INFINITY;
     Sphere *near_sphere = nullptr;
 
