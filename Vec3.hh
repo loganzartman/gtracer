@@ -59,7 +59,9 @@ struct Vec3 {
     Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
 
     friend bool operator==(const Vec3<T> &l, const Vec3<T> &r) {
-        return l.x == r.x && l.y == r.y && l.z == r.z;
+        const float tol = 1e-6f;
+        return fabs(l.x - r.x) < tol && fabs(l.y - r.y) < tol &&
+               fabs(l.z - r.z) < tol;
     }
 
     T length2() const { return x * x + y * y + z * z; }
