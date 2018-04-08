@@ -32,9 +32,9 @@ void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
             float3 color = trace(float3(0), ray, spheres, num_spheres, 0);
             const size_t idx = (y * w + x) * 4;
             pixels[idx] = color.x;
-            pixels[idx+1] = color.y;
-            pixels[idx+2] = color.z;
-            pixels[idx+3] = 1; //alpha
+            pixels[idx + 1] = color.y;
+            pixels[idx + 2] = color.z;
+            pixels[idx + 3] = 1;  // alpha
         }
     }
 }
@@ -56,8 +56,8 @@ float3 trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
         float t1 = INFINITY;
 
         if (spheres[i].intersect(ray_orig, ray_dir, t0, t1)) {
-            if (t0 <
-                0)  // if t0 is negative, that's on the other side of the camera
+            // if t0 is negative, that's on the other side of the camera
+            if (t0 < 0)
                 t0 = t1;
 
             if (t0 < near) {

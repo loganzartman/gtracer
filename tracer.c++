@@ -24,6 +24,7 @@ int main() {
     // Create an OpenGL context associated with the window.
     SDL_GLContext glcontext = SDL_GL_CreateContext(window);
     sdl_check();
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Initalize OpenGL
     int w, h;
@@ -42,18 +43,12 @@ int main() {
     Sphere s3(float3(5, 1, 30), 1, float3(1, 0, 0));
     // light source
     Sphere l0(float3(-10, 2, 10), 5, float3(1, 0, 0), 0, 0, float3(3));
-    Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
-
+    // Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
+    
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
     float *pixels = new float[n_pixels];  // obv only do this once
     fill_n(pixels, n_pixels, 0);
-
-    // do raytracing
-    cpu_render(pixels, w, h, spheres, SPHERES);
-
-    // copy texture to GPU
-    gl_data2tex(w, h, pixels, texture_id);
 
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
@@ -62,11 +57,19 @@ int main() {
                 running = false;
         }
 
+        float3 pos(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        Sphere sx(pos, 2, float3(1, 0, 0));
+        Sphere spheres[1] = {sx};
+
+        // do raytracing
+        cpu_render(pixels, w, h, spheres, 1);
+
+        // copy texture to GPU
+        gl_data2tex(w, h, pixels, texture_id);
+
         // render buffer
         // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
-        glBindTexture(GL_TEXTURE_2D, texture_id);
-        gl_draw_fullscreen();
-        gl_check();
+        gl_draw_tex(texture_id);
 
         SDL_GL_SwapWindow(window);  // update window
 
@@ -100,7 +103,6 @@ void gl_init_viewport(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glEnable(GL_DEPTH_TEST);  // do we really need depth sorting?
-    glEnable(GL_TEXTURE_2D);  // enable texturing
     gl_check();
 }
 
@@ -119,6 +121,8 @@ GLuint gl_create_buffer(int w, int h) {
     // allocate data for the buffer
     glBufferData(GL_PIXEL_UNPACK_BUFFER, w * h * 4 * sizeof(float), nullptr,
                  GL_DYNAMIC_COPY);
+    // unbind
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     gl_check();
     return buffer_id;
 }
@@ -156,6 +160,9 @@ void gl_buf2tex(GLuint buffer_id, GLuint texture_id, int w, int h) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     // copy buffer to texture
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_FLOAT, nullptr);
+    // unbind
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     gl_check();
 }
 
@@ -174,6 +181,18 @@ void gl_data2tex(int w, int h, float *pixels, GLuint texture_id) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     // copy pixels to texture
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_FLOAT, pixels);
+    // unbind
+    glBindTexture(GL_TEXTURE_2D, 0);
+    gl_check();
+}
+
+void gl_draw_tex(GLuint texture_id) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear screen
+    glBindTexture(GL_TEXTURE_2D, texture_id); // bind texture
+    glEnable(GL_TEXTURE_2D);  // enable texturing
+    gl_draw_fullscreen(); // draw fullscreen quad
+    glDisable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
     gl_check();
 }
 

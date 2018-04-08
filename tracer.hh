@@ -15,6 +15,8 @@
 #include "Vec3.hh"
 #include "render.hh"
 
+#define randf(a, b) ((float)rand() / RAND_MAX * (b - a) + a)
+
 #define TARGET_FPS 60
 #define SPHERES 5
 #define WIDTH 640
@@ -26,6 +28,7 @@ GLuint gl_create_buffer(int w, int h);
 GLuint gl_create_texture(int w, int h);
 void gl_buf2tex(int w, int h, GLuint buffer_id, GLuint texture_id);
 void gl_data2tex(int w, int h, float *pixels, GLuint texture_id);
+void gl_draw_tex(GLuint texture_id);
 void gl_draw_fullscreen();
 #define gl_check()                                                  \
     ({                                                              \
