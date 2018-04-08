@@ -26,7 +26,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
             //  compute the x and y magnitude of each vector
             float v_x = (2 * ((x + 0.5) * inv_w) - 1) * angle * aspect_ratio;
             float v_y = (1 - 2 * ((y + 0.5) * inv_h)) * angle;
-            float3 ray(v_x, v_y, 1);
+            float3 ray(v_x, v_y, -1);
             ray.normalize();
 
             float3 color = cpu_trace(float3(0), ray, spheres, num_spheres, 0);

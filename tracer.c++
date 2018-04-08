@@ -37,13 +37,13 @@ int main() {
     bool running = true;
     SDL_Event event;
 
-    Sphere s0(float3(5, 5, 10), 2, float3(1, 0, 0));
-    Sphere s1(float3(WIDTH / 2, HEIGHT / 2, 20), 1.5, float3(1, 0, 0));
-    Sphere s2(float3(-5, -1, 15), 1, float3(1, 0, 0));
-    Sphere s3(float3(5, 1, 30), 1, float3(1, 0, 0));
+    Sphere s0(float3(0.0, -10004, -20), 10000, float3(0.2, 0.2, 0.2));
+    Sphere s1(float3(0.0, 0, -20), 4, float3(1.0, 0.32, 0.36));
+    Sphere s2(float3(5.0, -1, -15), 2, float3(0.9, 0.76, 0.46));
+    Sphere s3(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97));
     // light source
-    Sphere l0(float3(-10, 2, 10), 5, float3(1, 0, 0), 0, 0, float3(3));
-    // Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
+    Sphere l0(float3(0.0, 20, -30), 3, float3(0, 0, 0), 0, 0, float3(3));
+    Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -57,9 +57,9 @@ int main() {
                 running = false;
         }
 
-        float3 pos(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        Sphere sx(pos, 2, float3(1, 0, 0));
-        Sphere spheres[1] = {sx};
+        //float3 pos(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        //Sphere sx(pos, 2, float3(1, 0, 0));
+        //Sphere spheres[1] = {sx};
 
         // do raytracing
         cpu_render(pixels, w, h, spheres, 1);
