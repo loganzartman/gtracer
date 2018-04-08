@@ -3,3 +3,4 @@
 # binaries
 *.o
 tracer
+test_tracer
