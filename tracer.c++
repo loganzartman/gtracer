@@ -57,12 +57,8 @@ int main() {
                 running = false;
         }
 
-        //float3 pos(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        //Sphere sx(pos, 2, float3(1, 0, 0));
-        //Sphere spheres[1] = {sx};
-
         // do raytracing
-        cpu_render(pixels, w, h, spheres, 1);
+        cpu_render(pixels, w, h, spheres, SPHERES);
 
         // copy texture to GPU
         // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
