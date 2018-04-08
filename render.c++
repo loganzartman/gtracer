@@ -71,8 +71,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
     if (!near_sphere)
         return float3(0);  // return background color
 
-    std::cout << "collision between ray with origin=" << ray_orig.print()
-              << "and dir=" << ray_dir.print() << " and sphere=" << index
-              << endl;
+    // std::cout << "collision between ray with origin=" << ray_orig.print()
+              // << "and dir=" << ray_dir.print() << " and sphere=" << index
+              // << endl;
     return float3(1);
 }

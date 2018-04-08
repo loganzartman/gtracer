@@ -36,7 +36,7 @@ struct Sphere {
             return false;
 
         float dist2 = line.dot(line) - tca * tca;
-        if (dist2 < radius2)  // dist is too short to reach the sphere
+        if (dist2 > radius2)  // dist is too short to reach the sphere
             return false;
 
         // to get the radius of intersection, compute how much
