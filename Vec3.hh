@@ -41,6 +41,14 @@ struct Vec3 {
         return result *= o;
     }
 
+    Vec3<T> operator*(const Vec3<T> &o) const {
+        Vec3<T> result(*this);
+        result.x *= o.x;
+        result.y *= o.y;
+        result.z *= o.z;
+        return result;
+    }
+
     Vec3<T> &operator+=(const Vec3<T> &o) {
         x += o.x, y += o.y, z += o.z;
         return *this;
