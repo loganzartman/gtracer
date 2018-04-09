@@ -51,11 +51,13 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
     Sphere *hit_sphere;
     float3 color = 0;
     if (!cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
-                          hit_sphere)) {
+                           hit_sphere)) {
         return color;  // return background color
     }
+    if (!(hit_sphere->emission_color == float3(0)))
+        return hit_sphere->emission_color;
     float3 normal = intersection - hit_sphere->center;
-    
+
     for (size_t i = 0; i < spheres.size(); ++i) {
         if (spheres[i].emission_color.x <= 0 || &spheres[i] == hit_sphere)
             continue;
@@ -65,15 +67,17 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
 
         float3 light_intersection;
         Sphere *light;
-        cpu_ray_intersect(intersection, light_dir, spheres, light_intersection, light);
+        cpu_ray_intersect(intersection, light_dir, spheres, light_intersection,
+                          light);
         if (light != &spheres[i])
             continue;
 
-        color += hit_sphere->surface_color * light->emission_color * light_dir.dot(normal);
+        color += hit_sphere->surface_color * light->emission_color *
+                 light_dir.dot(normal);
     }
 
     return color;
-    //return hit_sphere->surface_color;
+    // return hit_sphere->surface_color;
 }
 
 /**
