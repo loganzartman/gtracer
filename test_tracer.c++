@@ -35,6 +35,15 @@ TEST(Vec3Test, dot) {
     ASSERT_FLOAT_EQ(result, -26.5);
 }
 
+TEST(Vec3Test, reflect) {
+    float3 v(1, 1, 0);
+    float3 n(0, -1, 0);
+    float3 result = v.reflect(n);
+    ASSERT_FLOAT_EQ(result.x, 1);
+    ASSERT_FLOAT_EQ(result.y, -1);
+    ASSERT_FLOAT_EQ(result.z, 0);
+}
+
 TEST(Vec3Test, normalize) {
     float3 v(2, 4, -8);
     v.normalize();
