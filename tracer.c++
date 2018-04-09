@@ -37,13 +37,7 @@ int main() {
     bool running = true;
     SDL_Event event;
 
-    Sphere s0(float3(0.0, -10004, -20), 10000, float3(0.2, 0.2, 0.2));
-    Sphere s1(float3(0.0, 0, -20), 4, float3(1.0, 0.32, 0.36));
-    Sphere s2(float3(5.0, -1, -15), 2, float3(0.9, 0.76, 0.46));
-    Sphere s3(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97));
-    // light source
-    Sphere l0(float3(0.0, 20, -30), 3, float3(0, 0, 0), 0, 0, float3(3));
-    Sphere spheres[SPHERES] = {s0, s1, s2, s3, l0};
+    Sphere *spheres = construct_spheres(SPHERES);
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -210,6 +204,25 @@ void gl_draw_fullscreen() {
     glVertex3f(1, 0, 0);
     glEnd();
     gl_check();
+}
+
+// 3D Object Creation
+
+/**
+ * @brief Construct an array of spheres to render
+ * @param[in] num_spheres used to specify the amount 
+ * of spheres in the constructed array
+ * @return A pointer to the constructed array
+ */
+Sphere *construct_spheres(size_t num_spheres) {
+  Sphere s0(float3(0.0, -10004, -20), 10000, float3(0.2, 0.2, 0.2));
+  Sphere s1(float3(0.0, 0, -20), 4, float3(1.0, 0.32, 0.36));
+  Sphere s2(float3(5.0, -1, -15), 2, float3(0.9, 0.76, 0.46));
+  Sphere s3(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97));
+  // light source
+  Sphere l0(float3(0.0, 20, -30), 3, float3(0, 0, 0), 0, 0, float3(3));
+  Sphere spheres[num_spheres] = {s0, s1, s2, s3, l0};
+  return spheres;
 }
 
 // Util
