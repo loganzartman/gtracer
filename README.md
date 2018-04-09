@@ -8,5 +8,5 @@ Austin Atchley, Logan Zartman
 
 ## Building
 * `make`
-* `make tracer` to avoid running unit tests
+* `make unit-tests`
 * `./tracer`

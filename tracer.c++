@@ -67,7 +67,7 @@ int main() {
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
-        cout << "\e[1G\e[0K" << dt << "ms" << flush;
+        cout << "\e[1G\e[0K" << (1000 / dt) << "fps" << flush;
         SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
     }
 

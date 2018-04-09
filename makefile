@@ -9,7 +9,7 @@ LDLIBS = -lGL -lGLEW
 TRACER_SRC = tracer.c++ render.c++ Vec3.hh Sphere.hh
 TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
-all: tracer unit-tests
+all: tracer
 
 clean:
 	-rm -f tracer
