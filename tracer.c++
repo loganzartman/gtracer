@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include "Sphere.hh"
 #include "Vec3.hh"
@@ -53,6 +54,9 @@ int main() {
         }
 
         // do raytracing
+        double time = (double) clock() / CLOCKS_PER_SEC;
+        // spheres.back().center.y = sin(time) * 3;
+        // spheres.back().center.y = cos(time) * 3;
         cpu_render(pixels, w, h, spheres);
 
         // copy texture to GPU
@@ -216,16 +220,15 @@ void gl_draw_fullscreen() {
  * @return A pointer to the constructed array
  */
 vector<Sphere> construct_spheres(size_t num_spheres) {
-    Sphere s0(float3(0.0, -10004, -20), 10000, float3(0.2, 0.2, 0.2));
-    Sphere s1(float3(0.0, 0, -20), 4, float3(1.0, 0.32, 0.36));
-    Sphere s2(float3(5.0, -1, -15), 2, float3(0.9, 0.76, 0.46));
-    Sphere s3(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97));
-    // light source
-    Sphere l0(float3(0.0, 20, 10), 3, float3(0, 0, 0), 0, 0, float3(0.2));
-    Sphere l1(float3(0.0, 20, -10), 2, float3(0, 0, 0), 0, 0, float3(0.2));
-    Sphere l2(float3(-10.0, 10, 0), 2, float3(0, 0, 0), 0, 0, float3(0.2));
-    Sphere l3(float3(10.0, 10, 0), 2, float3(0, 0, 0), 0, 0, float3(0.2));
-    vector<Sphere> spheres{s0, s1, s2, s3, l0, l1, l2, l3};
+    vector<Sphere> spheres;
+    // position, radius, surface color, reflectivity, transparency, emission color
+    spheres.push_back(Sphere(float3( 0.0, -10004, -20), 10000, float3(0.20, 0.20, 0.20), 0, 0.0));
+    spheres.push_back(Sphere(float3( 0.0, 0, -20), 4, float3(1.00, 0.32, 0.36), 1, 0.5));
+    spheres.push_back(Sphere(float3( 5.0, -1, -15), 2, float3(0.90, 0.76, 0.46), 1, 0.0));
+    spheres.push_back(Sphere(float3( 5.0, 0, -25), 3, float3(0.65, 0.77, 0.97), 1, 0.0));
+    spheres.push_back(Sphere(float3(-5.5, 0, -15), 3, float3(0.90, 0.90, 0.90), 1, 0.0));
+    // light
+    spheres.push_back(Sphere(float3( 0.0, 20, -15), 3, float3(0.00, 0.00, 0.00), 0, 0.0, float3(1))); 
     return spheres;
 }
 

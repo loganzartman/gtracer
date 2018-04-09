@@ -1,6 +1,8 @@
 #include <cmath>
+#include <vector>
 #include "Sphere.hh"
 #include "Vec3.hh"
+#include "render.hh"
 #include "gtest/gtest.h"
 
 TEST(Vec3Test, ctor) {
@@ -117,4 +119,98 @@ TEST(RaySphereTest, no_intersection) {
     Sphere s(sphere_pos, sphere_radius);
     float t0, t1;
     ASSERT_FALSE(s.intersect(ray_origin, ray_direction, t0, t1));
+}
+
+TEST(CPURayIntersect, simple) {
+    float3 ray_orig(0, 0, 0);
+    float3 ray_dir(1, 0, 0);
+    Sphere sphere(float3(2, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(1, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[0]);
+}
+
+TEST(CPURayIntersect, negative) {
+    float3 ray_orig(0, 0, 0);
+    float3 ray_dir(-1, 0, 0);
+    Sphere sphere(float3(-2, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(-1, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[0]);
+}
+
+TEST(CPURayIntersect, negative_2) {
+    float3 ray_orig(-2, 0, 0);
+    float3 ray_dir(1, 0, 0);
+    Sphere sphere(float3(0, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(-1, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[0]);
+}
+
+TEST(CPURayIntersect, negative_3) {
+    float3 ray_orig(1, 0, 0);
+    float3 ray_dir(-1, 0, 0);
+    Sphere sphere(float3(-3, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(-2, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[0]);
+}
+
+TEST(CPURayIntersect, two_negative) {
+    float3 ray_orig(0, 0, 0);
+    float3 ray_dir(-1, 0, 0);
+    Sphere sphere1(float3(-2, 0, 0), 1, float3());
+    Sphere sphere2(float3(-4, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere1, sphere2};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(-1, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[0]);
+}
+
+TEST(CPURayIntersect, two_negative_2) {
+    float3 ray_orig(4, 0, 0);
+    float3 ray_dir(-1, 0, 0);
+    Sphere sphere1(float3(-2, 1.1, 0), 1, float3());
+    Sphere sphere2(float3(-4, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere1, sphere2};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(-3, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[1]);
+}
+
+TEST(CPURayIntersect, two_negative_inside) {
+    float3 ray_orig(-1.5, 0, 0);
+    float3 ray_dir(-1, 0, 0);
+    Sphere sphere1(float3(-2, 0, 0), 1, float3());
+    Sphere sphere2(float3(-4, 0, 0), 1, float3());
+    std::vector<Sphere> spheres{sphere1, sphere2};
+
+    float3 intersection;
+    Sphere *hit_sphere;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_EQ(intersection, float3(-3, 0, 0));
+    ASSERT_EQ(hit_sphere, &spheres[0]);
 }

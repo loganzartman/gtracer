@@ -22,7 +22,7 @@ tracer: $(TRACER_OBJ)
 	$(CXX) $^ -o tracer $(LDFLAGS) $(LDLIBS)
 
 test_tracer: tracer test_tracer.c++
-	$(CXX) test_tracer.c++ -o test_tracer $(LDFLAGS) $(LDLIBS) -lgtest -lgtest_main -pthread
+	$(CXX) render.o test_tracer.c++ -o test_tracer $(LDFLAGS) $(LDLIBS) -lgtest -lgtest_main -pthread
 
 %.o: %.c++ $(wildcard %.hh)
 	$(CXX) $(CXXFLAGS) $^ -c
