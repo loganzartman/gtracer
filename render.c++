@@ -49,12 +49,31 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                  vector<Sphere> spheres, int depth) {
     float3 intersection;
     Sphere *hit_sphere;
-    if (cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+    float3 color = 0;
+    if (!cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
                           hit_sphere)) {
-        return hit_sphere->surface_color;
+        return color;  // return background color
+    }
+    float3 normal = intersection - hit_sphere->center;
+    
+    for (size_t i = 0; i < spheres.size(); ++i) {
+        if (spheres[i].emission_color.x <= 0 || &spheres[i] == hit_sphere)
+            continue;
+
+        float3 light_dir = spheres[i].center - intersection;
+        light_dir.normalize();
+
+        float3 light_intersection;
+        Sphere *light;
+        cpu_ray_intersect(intersection, light_dir, spheres, light_intersection, light);
+        if (light != &spheres[i])
+            continue;
+
+        color += hit_sphere->surface_color * light_dir.dot(normal);
     }
 
-    return float3(0);  // return background color
+    return color;
+    //return hit_sphere->surface_color;
 }
 
 /**
