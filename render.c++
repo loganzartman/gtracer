@@ -47,25 +47,35 @@ void cpu_render(float *pixels, size_t w, size_t h, vector<Sphere> spheres) {
  */
 float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                  vector<Sphere> spheres, int depth) {
+    float3 color = 0;
+
+    // cast primary ray
     float3 intersection;
     Sphere *hit_sphere;
-    float3 color = 0;
     if (!cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
                            hit_sphere)) {
         return color;  // return background color
     }
+
+    // emissive objects are just rendered with their emission color for now
     if (!(hit_sphere->emission_color == float3(0)))
         return hit_sphere->emission_color;
+
+    // compute surface normal
     float3 normal = intersection - hit_sphere->center;
     normal.normalize();
 
+    // compute illumination
     for (size_t i = 0; i < spheres.size(); ++i) {
-        if (spheres[i].emission_color.x <= 0 || &spheres[i] == hit_sphere)
+        // skip non-emissive objects and the object hit by the primary ray
+        if (spheres[i].emission_color == 0 || &spheres[i] == hit_sphere)
             continue;
 
+        // compute shadow ray
         float3 light_dir = spheres[i].center - intersection;
         light_dir.normalize();
 
+        // see if shadow ray hits anything before reaching the light source 
         float3 light_intersection;
         Sphere *light;
         cpu_ray_intersect(intersection, light_dir, spheres, light_intersection,
@@ -73,6 +83,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         if (light != &spheres[i])
             continue;
 
+        // if there is a clear path to light source, add diffuse lighting
         color += hit_sphere->surface_color * light->emission_color *
                  light_dir.dot(normal);
     }
