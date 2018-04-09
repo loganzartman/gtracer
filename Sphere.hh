@@ -36,14 +36,14 @@ struct Sphere {
             return false;
 
         float dist2 = line.dot(line) - tca * tca;
-        if (dist2 > radius2)  // dist is too short to reach the sphere
+        if (dist2 > radius2)  // the radius is too short to span dist
             return false;
 
         // to get the radius of intersection, compute how much
         // of r_dir is in the sphere
         float rad_of_inter = sqrt(radius2 - dist2);
 
-        // t0 and t1 are parametrics of the original ray
+        // t0 and t1 are parametric coefficients of the original ray
         // AKA how far down the ray the collision occurs
         t0 = tca - rad_of_inter;
         t1 = tca + rad_of_inter;
