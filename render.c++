@@ -69,7 +69,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         if (light != &spheres[i])
             continue;
 
-        color += hit_sphere->surface_color * light_dir.dot(normal);
+        color += hit_sphere->surface_color * light->emission_color * light_dir.dot(normal);
     }
 
     return color;

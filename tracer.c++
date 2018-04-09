@@ -221,8 +221,11 @@ vector<Sphere> construct_spheres(size_t num_spheres) {
     Sphere s2(float3(5.0, -1, -15), 2, float3(0.9, 0.76, 0.46));
     Sphere s3(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97));
     // light source
-    Sphere l0(float3(0.0, 20, -30), 3, float3(0, 0, 0), 0, 0, float3(3));
-    vector<Sphere> spheres{s0, s1, s2, s3, l0};
+    Sphere l0(float3(0.0, 20, 10), 3, float3(0, 0, 0), 0, 0, float3(0.2));
+    Sphere l1(float3(0.0, 20, -10), 2, float3(0, 0, 0), 0, 0, float3(0.2));
+    Sphere l2(float3(-10.0, 10, 0), 2, float3(0, 0, 0), 0, 0, float3(0.2));
+    Sphere l3(float3(10.0, 10, 0), 2, float3(0, 0, 0), 0, 0, float3(0.2));
+    vector<Sphere> spheres{s0, s1, s2, s3, l0, l1, l2, l3};
     return spheres;
 }
 
