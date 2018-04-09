@@ -57,6 +57,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
     if (!(hit_sphere->emission_color == float3(0)))
         return hit_sphere->emission_color;
     float3 normal = intersection - hit_sphere->center;
+    normal.normalize();
 
     for (size_t i = 0; i < spheres.size(); ++i) {
         if (spheres[i].emission_color.x <= 0 || &spheres[i] == hit_sphere)
