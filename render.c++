@@ -75,7 +75,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         float3 light_dir = spheres[i].center - intersection;
         light_dir.normalize();
 
-        // see if shadow ray hits anything before reaching the light source 
+        // see if shadow ray hits anything before reaching the light source
         float3 light_intersection;
         Sphere *light;
         cpu_ray_intersect(intersection, light_dir, spheres, light_intersection,

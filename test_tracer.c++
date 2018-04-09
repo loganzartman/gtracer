@@ -2,8 +2,8 @@
 #include <vector>
 #include "Sphere.hh"
 #include "Vec3.hh"
-#include "render.hh"
 #include "gtest/gtest.h"
+#include "render.hh"
 
 TEST(Vec3Test, ctor) {
     float3 v(1, 2, 3);
@@ -129,7 +129,8 @@ TEST(CPURayIntersect, simple) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -142,7 +143,8 @@ TEST(CPURayIntersect, negative) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -155,7 +157,8 @@ TEST(CPURayIntersect, negative_2) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -168,7 +171,8 @@ TEST(CPURayIntersect, negative_3) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-2, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -182,7 +186,8 @@ TEST(CPURayIntersect, two_negative) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -196,7 +201,8 @@ TEST(CPURayIntersect, two_negative_2) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-3, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[1]);
 }
@@ -210,7 +216,8 @@ TEST(CPURayIntersect, two_negative_inside) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-3, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
