@@ -44,7 +44,7 @@ TEST(Vec3Test, normalize) {
 }
 
 TEST(Vec3Test, eq) {
-	// test for good floating point equality check
+    // test for good floating point equality check
     float3 v(0);
     for (int i = 0; i < 10; ++i)
         v += float3(0.1);
@@ -53,7 +53,7 @@ TEST(Vec3Test, eq) {
 }
 
 TEST(Vec3Test, eq_2) {
-	// test for good floating point equality check
+    // test for good floating point equality check
     float3 v(0);
     for (int i = 0; i < 10; ++i)
         v += float3(0.09999);

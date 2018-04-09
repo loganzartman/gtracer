@@ -8,12 +8,9 @@
 
 using namespace std;
 
-void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
-                size_t num_spheres) {
-    if (spheres == nullptr)
-        throw invalid_argument("Spheres is null");
-    if (num_spheres <= 0)
-        throw invalid_argument("There needs to be at least one sphere");
+void cpu_render(float *pixels, size_t w, size_t h, vector<Sphere> spheres) {
+    if (spheres.size() <= 0)
+        cerr << "\e[33mWarning: no spheres in call to cpu_render!" << endl;
 
     float inv_w = 1 / float(w);
     float inv_h = 1 / float(h);
@@ -29,7 +26,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
             float3 ray(v_x, v_y, -1);
             ray.normalize();
 
-            float3 color = cpu_trace(float3(0), ray, spheres, num_spheres, 0);
+            float3 color = cpu_trace(float3(0), ray, spheres, 0);
             const size_t idx = (y * w + x) * 4;
             pixels[idx] = color.x;
             pixels[idx + 1] = color.y;
@@ -44,14 +41,14 @@ void cpu_render(float *pixels, size_t w, size_t h, Sphere *spheres,
  *  see if it is the closest. Once we get the closest
  *  collision, determine the color we should show
  */
-float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
-                 size_t num_spheres, int depth) {
+float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
+                 vector<Sphere> spheres, int depth) {
     float near = INFINITY;
     Sphere *near_sphere = nullptr;
 
     size_t index = -1;
 
-    for (size_t i = 0; i < num_spheres; ++i) {
+    for (size_t i = 0; i < spheres.size(); ++i) {
         float t0 = INFINITY;
         float t1 = INFINITY;
 
@@ -72,7 +69,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir, Sphere *spheres,
         return float3(0);  // return background color
 
     // std::cout << "collision between ray with origin=" << ray_orig.print()
-              // << "and dir=" << ray_dir.print() << " and sphere=" << index
-              // << endl;
+    // << "and dir=" << ray_dir.print() << " and sphere=" << index
+    // << endl;
     return near_sphere->surface_color;
 }

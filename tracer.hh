@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 #include "Sphere.hh"
 #include "Vec3.hh"
@@ -37,6 +38,7 @@ void gl_draw_fullscreen();
             cout << ERRINFO << ": gl err 0x" << hex << err << endl; \
     })
 
+std::vector<Sphere> construct_spheres(size_t num_spheres);
 void output_to_ppm(float3 *image, size_t w, size_t h);
 #define sdl_check()                       \
     ({                                    \
