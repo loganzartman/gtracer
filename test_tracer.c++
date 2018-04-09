@@ -1,10 +1,10 @@
 #include <cmath>
 #include <vector>
+#include "Mat.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
-#include "Mat.hh"
-#include "render.hh"
 #include "gtest/gtest.h"
+#include "render.hh"
 
 TEST(Vec3Test, ctor) {
     float3 v(1, 2, 3);
@@ -130,7 +130,8 @@ TEST(CPURayIntersect, simple) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -143,7 +144,8 @@ TEST(CPURayIntersect, negative) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -156,7 +158,8 @@ TEST(CPURayIntersect, negative_2) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -169,7 +172,8 @@ TEST(CPURayIntersect, negative_3) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-2, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -183,7 +187,8 @@ TEST(CPURayIntersect, two_negative) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -197,7 +202,8 @@ TEST(CPURayIntersect, two_negative_2) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-3, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[1]);
 }
@@ -211,7 +217,8 @@ TEST(CPURayIntersect, two_negative_inside) {
 
     float3 intersection;
     Sphere *hit_sphere;
-    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection, hit_sphere));
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                                  hit_sphere));
     ASSERT_EQ(intersection, float3(-3, 0, 0));
     ASSERT_EQ(hit_sphere, &spheres[0]);
 }
@@ -223,23 +230,23 @@ TEST(MatTest, ctor) {
 
 TEST(MatTest, ctor_index) {
     Mat<float, 4, 4> m;
-    ASSERT_FLOAT_EQ(m(0,0), 0);
+    ASSERT_FLOAT_EQ(m(0, 0), 0);
 }
 
 TEST(MatTest, ctor_index_2) {
     Mat<float, 2, 2> m{1.f, 2.f, 3.f, 4.f};
-    ASSERT_FLOAT_EQ(m(0,0), 1);
-    ASSERT_FLOAT_EQ(m(0,1), 2);
-    ASSERT_FLOAT_EQ(m(1,0), 3);
-    ASSERT_FLOAT_EQ(m(1,1), 4);
+    ASSERT_FLOAT_EQ(m(0, 0), 1);
+    ASSERT_FLOAT_EQ(m(0, 1), 2);
+    ASSERT_FLOAT_EQ(m(1, 0), 3);
+    ASSERT_FLOAT_EQ(m(1, 1), 4);
 }
 
 TEST(MatTest, add) {
     Mat<float, 2, 2> a;
     Mat<float, 2, 2> b{1.f, 2.f, 3.f, 4.f};
     Mat<float, 2, 2> c = a + b;
-    ASSERT_FLOAT_EQ(c(0,0), 1);
-    ASSERT_FLOAT_EQ(c(0,1), 2);
-    ASSERT_FLOAT_EQ(c(1,0), 3);
-    ASSERT_FLOAT_EQ(c(1,1), 4);
+    ASSERT_FLOAT_EQ(c(0, 0), 1);
+    ASSERT_FLOAT_EQ(c(0, 1), 2);
+    ASSERT_FLOAT_EQ(c(1, 0), 3);
+    ASSERT_FLOAT_EQ(c(1, 1), 4);
 }

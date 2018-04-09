@@ -4,11 +4,11 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <cmath>
 
 #include "Sphere.hh"
 #include "Vec3.hh"
@@ -54,7 +54,7 @@ int main() {
         }
 
         // do raytracing
-        double time = (double) clock() / CLOCKS_PER_SEC;
+        double time = (double)clock() / CLOCKS_PER_SEC;
         // spheres.back().center.y = sin(time) * 3;
         // spheres.back().center.y = cos(time) * 3;
         cpu_render(pixels, w, h, spheres);
@@ -221,14 +221,21 @@ void gl_draw_fullscreen() {
  */
 vector<Sphere> construct_spheres(size_t num_spheres) {
     vector<Sphere> spheres;
-    // position, radius, surface color, reflectivity, transparency, emission color
-    spheres.push_back(Sphere(float3( 0.0, -10004, -20), 10000, float3(0.20, 0.20, 0.20), 0, 0.0));
-    spheres.push_back(Sphere(float3( 0.0, 0, -20), 4, float3(1.00, 0.32, 0.36), 1, 0.5));
-    spheres.push_back(Sphere(float3( 5.0, -1, -15), 2, float3(0.90, 0.76, 0.46), 1, 0.0));
-    spheres.push_back(Sphere(float3( 5.0, 0, -25), 3, float3(0.65, 0.77, 0.97), 1, 0.0));
-    spheres.push_back(Sphere(float3(-5.5, 0, -15), 3, float3(0.90, 0.90, 0.90), 1, 0.0));
+    // position, radius, surface color, reflectivity, transparency, emission
+    // color
+    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000,
+                             float3(0.20, 0.20, 0.20), 0, 0.0));
+    spheres.push_back(
+        Sphere(float3(0.0, 0, -20), 4, float3(1.00, 0.32, 0.36), 1, 0.5));
+    spheres.push_back(
+        Sphere(float3(5.0, -1, -15), 2, float3(0.90, 0.76, 0.46), 1, 0.0));
+    spheres.push_back(
+        Sphere(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97), 1, 0.0));
+    spheres.push_back(
+        Sphere(float3(-5.5, 0, -15), 3, float3(0.90, 0.90, 0.90), 1, 0.0));
     // light
-    spheres.push_back(Sphere(float3( 0.0, 20, -15), 3, float3(0.00, 0.00, 0.00), 0, 0.0, float3(1))); 
+    spheres.push_back(Sphere(float3(0.0, 20, -15), 3, float3(0.00, 0.00, 0.00),
+                             0, 0.0, float3(1)));
     return spheres;
 }
 
