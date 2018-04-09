@@ -23,10 +23,10 @@ void cpu_render(float *pixels, size_t w, size_t h, vector<Sphere> spheres) {
             //  compute the x and y magnitude of each vector
             float v_x = (2 * ((x + 0.5) * inv_w) - 1) * angle * aspect_ratio;
             float v_y = (1 - 2 * ((y + 0.5) * inv_h)) * angle;
-            float3 ray(v_x, v_y, -1);
-            ray.normalize();
+            float3 ray_dir(v_x, v_y, -1);
+            ray_dir.normalize();
 
-            float3 color = cpu_trace(float3(0), ray, spheres, 0);
+            float3 color = cpu_trace(float3(0), ray_dir, spheres, 0);
             const size_t idx = (y * w + x) * 4;
             pixels[idx] = color.x;
             pixels[idx + 1] = color.y;
@@ -36,17 +36,42 @@ void cpu_render(float *pixels, size_t w, size_t h, vector<Sphere> spheres) {
     }
 }
 
-/*
- *  for every sphere, detect collision. if there is one,
- *  see if it is the closest. Once we get the closest
- *  collision, determine the color we should show
+/**
+ * @brief Traces a primary ray and produces a color
+ *
+ * @param ray_orig Ray origin point
+ * @param ray_dir Ray direction as a unit vector
+ * @param spheres Scene geometry
+ * @param depth Maximum trace depth
+ * @return Color computed for this primary ray
  */
 float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                  vector<Sphere> spheres, int depth) {
-    float near = INFINITY;
-    Sphere *near_sphere = nullptr;
+    float3 intersection;
+    Sphere *hit_sphere;
+    if (cpu_ray_intersect(ray_orig, ray_dir, spheres, intersection,
+                          hit_sphere)) {
+        return hit_sphere->surface_color;
+    }
 
-    size_t index = -1;
+    return float3(0);  // return background color
+}
+
+/**
+ * @brief Finds the nearest intersection between a ray and scene geometry.
+ *
+ * @param[in] ray_orig Ray origin point
+ * @param[in] ray_dir Ray direction as unit vector
+ * @param[in] spheres Scene geometry
+ * @param[out] intersection The point of intersection
+ * @param[out] hit_sphere The sphere that was intersected
+ * @return Whether there was an intersection
+ */
+bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
+                       vector<Sphere> &spheres, float3 &intersection,
+                       Sphere *&hit_sphere) {
+    float near_t = INFINITY;
+    Sphere *near_sphere = nullptr;
 
     for (size_t i = 0; i < spheres.size(); ++i) {
         float t0 = INFINITY;
@@ -57,19 +82,17 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
             if (t0 < 0)
                 t0 = t1;
 
-            if (t0 < near) {
-                near = t0;
+            if (t0 < near_t) {
+                near_t = t0;
                 near_sphere = &spheres[i];
-                index = i;
             }
         }
     }
 
-    if (!near_sphere)
-        return float3(0);  // return background color
-
-    // std::cout << "collision between ray with origin=" << ray_orig.print()
-    // << "and dir=" << ray_dir.print() << " and sphere=" << index
-    // << endl;
-    return near_sphere->surface_color;
+    if (near_sphere) {
+        intersection = ray_orig + ray_dir * near_t;
+        hit_sphere = near_sphere;
+        return true;
+    }
+    return false;
 }
