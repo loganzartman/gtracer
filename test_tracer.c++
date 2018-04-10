@@ -260,3 +260,12 @@ TEST(MatTest, multiply) {
     ASSERT_FLOAT_EQ(c(1, 0), 139);
     ASSERT_FLOAT_EQ(c(1, 1), 154);
 }
+
+TEST(MatTest, multiply_vec3) {
+    Mat<float, 4, 4> a = Mat<float, 4, 4>::identity();
+    Vec3<float> b(1, 2, 3);
+    Vec3<float> result = a * b;
+    ASSERT_FLOAT_EQ(result.x, 1);
+    ASSERT_FLOAT_EQ(result.y, 2);
+    ASSERT_FLOAT_EQ(result.z, 3);
+}
