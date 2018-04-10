@@ -57,7 +57,8 @@ int main() {
         double time = (double)clock() / CLOCKS_PER_SEC;
         // spheres.back().center.y = sin(time) * 3;
         // spheres.back().center.y = cos(time) * 3;
-        cpu_render(pixels, w, h, spheres);
+        Mat4f camera = Mat4f::identity();
+        cpu_render(pixels, w, h, camera, spheres);
 
         // copy texture to GPU
         // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu

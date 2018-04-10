@@ -1,4 +1,5 @@
 #include "render.hh"
+#include "Mat.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
 
@@ -8,7 +9,8 @@
 
 using namespace std;
 
-void cpu_render(float *pixels, size_t w, size_t h, vector<Sphere> spheres) {
+void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
+                vector<Sphere> spheres) {
     if (spheres.size() <= 0)
         cerr << "\e[33mWarning: no spheres in call to cpu_render!" << endl;
 
@@ -23,7 +25,7 @@ void cpu_render(float *pixels, size_t w, size_t h, vector<Sphere> spheres) {
             //  compute the x and y magnitude of each vector
             float v_x = (2 * ((x + 0.5) * inv_w) - 1) * angle * aspect_ratio;
             float v_y = (1 - 2 * ((y + 0.5) * inv_h)) * angle;
-            float3 ray_dir(v_x, v_y, -1);
+            float3 ray_dir = camera * float3(v_x, v_y, -1);
             ray_dir.normalize();
 
             float3 color = cpu_trace(float3(0), ray_dir, spheres, 0);
