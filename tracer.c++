@@ -40,10 +40,14 @@ int main() {
 
     bool running = true;
     SDL_Event event;
-    float mouse_x = 0, mouse_y = 0;
-    float3 orbit_pos(-0.3, 0, 0);
-    float3 orbit_vel;
 
+    // state for orbit controls
+    float mouse_x = 0, mouse_y = 0;
+    float3 orbit_pos(0.3, 0, 0);
+    float3 orbit_vel;
+    float orbit_zoom = 30;
+
+    // scene geometry
     vector<Sphere> spheres = construct_spheres(SPHERES);
 
     // prepare CPU pixel buffer
@@ -53,6 +57,8 @@ int main() {
 
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
+
+        // poll SDL events
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 running = false;
@@ -64,18 +70,23 @@ int main() {
                 mouse_x = x;
                 mouse_y = y;
             }
+            else if (event.type == SDL_MOUSEWHEEL) {
+                orbit_zoom -= event.wheel.y * 2;
+            }
         }
 
+        // integrate orbit controls velocity
         orbit_pos += orbit_vel;
         orbit_pos.x = max(-(float)M_PI/2, min((float)M_PI/2, orbit_pos.x));
         orbit_vel *= 0.5;
 
-        // do raytracing
-        float time = (float)clock() / CLOCKS_PER_SEC;
+        // compute orbit camera transform
         Mat4f camera = Mat4f::identity();
         camera = camera * transform_rotateY(orbit_pos.y);
         camera = camera * transform_rotateX(-orbit_pos.x);
-        camera = camera * transform_translate(float3(0, 0, 30));
+        camera = camera * transform_translate(float3(0, 0, orbit_zoom));
+        
+        // do raytracing
         cpu_render(pixels, w, h, camera, spheres);
 
         // copy texture to GPU
