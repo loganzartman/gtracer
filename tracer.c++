@@ -10,10 +10,12 @@
 #include <iostream>
 #include <vector>
 
+#include "Mat.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
 #include "render.hh"
 #include "tracer.hh"
+#include "transform.hh"
 
 using namespace std;
 
@@ -54,10 +56,11 @@ int main() {
         }
 
         // do raytracing
-        double time = (double)clock() / CLOCKS_PER_SEC;
-        // spheres.back().center.y = sin(time) * 3;
-        // spheres.back().center.y = cos(time) * 3;
+        float time = (float)clock() / CLOCKS_PER_SEC;
         Mat4f camera = Mat4f::identity();
+        camera = camera * transform_rotateY(time * 3);
+        camera = camera * transform_translate(float3(0, 10, 30));
+        camera = camera * transform_rotateX(-0.25f);
         cpu_render(pixels, w, h, camera, spheres);
 
         // copy texture to GPU
@@ -227,16 +230,16 @@ vector<Sphere> construct_spheres(size_t num_spheres) {
     spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000,
                              float3(0.20, 0.20, 0.20), 0, 0.0));
     spheres.push_back(
-        Sphere(float3(0.0, 0, -20), 4, float3(1.00, 0.32, 0.36), 1, 0.5));
+        Sphere(float3(0.0, 0, 0), 4, float3(1.00, 0.32, 0.36), 1, 0.5));
     spheres.push_back(
-        Sphere(float3(5.0, -1, -15), 2, float3(0.90, 0.76, 0.46), 1, 0.0));
+        Sphere(float3(5.0, -1, 5), 2, float3(0.90, 0.76, 0.46), 1, 0.0));
     spheres.push_back(
-        Sphere(float3(5.0, 0, -25), 3, float3(0.65, 0.77, 0.97), 1, 0.0));
+        Sphere(float3(5.0, 0, -5), 3, float3(0.65, 0.77, 0.97), 1, 0.0));
     spheres.push_back(
-        Sphere(float3(-5.5, 0, -15), 3, float3(0.90, 0.90, 0.90), 1, 0.0));
+        Sphere(float3(-5.5, 0, 5), 3, float3(0.90, 0.90, 0.90), 1, 0.0));
     // light
-    spheres.push_back(Sphere(float3(0.0, 20, -15), 3, float3(0.00, 0.00, 0.00),
-                             0, 0.0, float3(1)));
+    spheres.push_back(Sphere(float3(0.0, 20, 5), 3, float3(0.00, 0.00, 0.00), 0,
+                             0.0, float3(1)));
     return spheres;
 }
 

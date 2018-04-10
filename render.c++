@@ -2,6 +2,7 @@
 #include "Mat.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
+#include "transform.hh"
 
 #include <cmath>
 #include <iostream>
@@ -20,15 +21,17 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     float aspect_ratio = float(w) / float(h);
     float angle = tan(0.5 * M_PI * fov / 180.0);
 
+    Mat4f dir_camera = transform_clear_translate(camera);
+    float3 origin = camera * float3();
     for (size_t y = 0; y < h; ++y) {
         for (size_t x = 0; x < w; ++x) {
             //  compute the x and y magnitude of each vector
             float v_x = (2 * ((x + 0.5) * inv_w) - 1) * angle * aspect_ratio;
             float v_y = (1 - 2 * ((y + 0.5) * inv_h)) * angle;
-            float3 ray_dir = camera * float3(v_x, v_y, -1);
+            float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            float3 color = cpu_trace(float3(0), ray_dir, spheres, 0);
+            float3 color = cpu_trace(origin, ray_dir, spheres, 0);
             const size_t idx = (y * w + x) * 4;
             pixels[idx] = color.x;
             pixels[idx + 1] = color.y;

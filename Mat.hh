@@ -26,14 +26,9 @@ class Mat {
      *
      * @param elems Array of row-vectors
      */
-    Mat(std::array<T, N> elems) { std::copy(elems.begin(), elems.end(), el); }
-
-    /**
-     * @brief Construct a matrix from several elements
-     * @param elems Array of row-vectors
-     */
-    template <typename... E>
-    Mat(E... elems) : el(elems...){};
+    Mat(std::array<T, N * M> elems) {
+        std::copy(elems.begin(), elems.end(), el);
+    }
 
     /**
      * @brief Add two matrices
@@ -42,7 +37,7 @@ class Mat {
      * @return A new matrix representing the sum
      */
     Mat<T, N, M> operator+(const Mat<T, N, M>& a) {
-        Mat<T, N, M> out = this->clone();
+        Mat<T, N, M> out = *this;
         for (size_t i = 0; i < N; ++i) {
             for (size_t j = 0; j < M; ++j) {
                 out(i, j) = (*this)(i, j) + a(i, j);
@@ -81,19 +76,14 @@ class Mat {
     Vec3<T> operator*(const Vec3<T>& b) {
         Mat<T, 4, 1> b_vec{{b.x, b.y, b.z, 1}};
         Mat<T, 4, 1> result = (*this) * b_vec;
-        return Vec3<T>(result(0, 0), result(1, 0), result(2, 0));
+        const T iw = 1 / result(3, 0);
+        return Vec3<T>(result(0, 0), result(1, 0), result(2, 0)) * iw;
     }
 
     T& operator()(size_t row, size_t col) { return el[row * M + col]; }
     const T& operator()(size_t row, size_t col) const {
         return el[row * M + col];
     }
-
-    /**
-     * @brief Produce a copy of this matrix
-     * @return The copy
-     */
-    Mat<T, N, M> clone() { return Mat<T, N, M>(el); }
 
     /**
      * @brief Produce an identity matrix. Dimensions must be equal.

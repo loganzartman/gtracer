@@ -234,7 +234,7 @@ TEST(MatTest, ctor_index) {
 }
 
 TEST(MatTest, ctor_index_2) {
-    Mat<float, 2, 2> m{1.f, 2.f, 3.f, 4.f};
+    Mat<float, 2, 2> m({1.f, 2.f, 3.f, 4.f});
     ASSERT_FLOAT_EQ(m(0, 0), 1);
     ASSERT_FLOAT_EQ(m(0, 1), 2);
     ASSERT_FLOAT_EQ(m(1, 0), 3);
@@ -243,7 +243,7 @@ TEST(MatTest, ctor_index_2) {
 
 TEST(MatTest, add) {
     Mat<float, 2, 2> a;
-    Mat<float, 2, 2> b{1.f, 2.f, 3.f, 4.f};
+    Mat<float, 2, 2> b({1.f, 2.f, 3.f, 4.f});
     Mat<float, 2, 2> c = a + b;
     ASSERT_FLOAT_EQ(c(0, 0), 1);
     ASSERT_FLOAT_EQ(c(0, 1), 2);
@@ -252,8 +252,8 @@ TEST(MatTest, add) {
 }
 
 TEST(MatTest, multiply) {
-    Mat<float, 2, 3> a{1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
-    Mat<float, 3, 2> b{7.f, 8.f, 9.f, 10.f, 11.f, 12.f};
+    Mat<float, 2, 3> a({1.f, 2.f, 3.f, 4.f, 5.f, 6.f});
+    Mat<float, 3, 2> b({7.f, 8.f, 9.f, 10.f, 11.f, 12.f});
     Mat<float, 2, 2> c = a * b;
     ASSERT_FLOAT_EQ(c(0, 0), 58);
     ASSERT_FLOAT_EQ(c(0, 1), 64);
