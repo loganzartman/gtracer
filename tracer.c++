@@ -40,6 +40,9 @@ int main() {
 
     bool running = true;
     SDL_Event event;
+    float mouse_x = 0, mouse_y = 0;
+    float3 orbit_pos(-0.3, 0, 0);
+    float3 orbit_vel;
 
     vector<Sphere> spheres = construct_spheres(SPHERES);
 
@@ -53,14 +56,26 @@ int main() {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 running = false;
+            else if (event.type == SDL_MOUSEMOTION) {
+                float x = event.motion.x;
+                float y = event.motion.y;
+                if (event.motion.state & SDL_BUTTON_LMASK)
+                    orbit_vel += (float3(y, x, 0) - float3(mouse_y, mouse_x, 0)) * 0.005;
+                mouse_x = x;
+                mouse_y = y;
+            }
         }
+
+        orbit_pos += orbit_vel;
+        orbit_pos.x = max(-(float)M_PI/2, min((float)M_PI/2, orbit_pos.x));
+        orbit_vel *= 0.5;
 
         // do raytracing
         float time = (float)clock() / CLOCKS_PER_SEC;
         Mat4f camera = Mat4f::identity();
-        camera = camera * transform_rotateY(time * 3);
-        camera = camera * transform_translate(float3(0, 10, 30));
-        camera = camera * transform_rotateX(-0.25f);
+        camera = camera * transform_rotateY(orbit_pos.y);
+        camera = camera * transform_rotateX(-orbit_pos.x);
+        camera = camera * transform_translate(float3(0, 0, 30));
         cpu_render(pixels, w, h, camera, spheres);
 
         // copy texture to GPU

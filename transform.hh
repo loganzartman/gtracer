@@ -54,6 +54,23 @@ Mat<T, 4, 4> transform_rotateZ(const T &t) {
 }
 
 template <typename T>
+Mat<T, 4, 4> transform_rotate(const Vec3<T> &v) {
+    Mat<T, 4, 4> result = Mat<T, 4, 4>::identity();
+    result(0, 0) = cos(v.y) * cos(v.z);
+    result(0, 1) = cos(v.y) * sin(v.z);
+    result(0, 2) = -sin(v.y);
+
+    result(1, 0) = sin(v.x) * sin(v.y) * cos(v.z) - cos(v.x) * sin(v.z);
+    result(1, 1) = sin(v.x) * sin(v.y) * sin(v.z) + cos(v.x) * cos(v.z);
+    result(1, 2) = sin(v.x) * cos(v.y);
+
+    result(2, 0) = cos(v.x) * sin(v.y) * cos(v.z) + sin(v.x) * sin(v.z);
+    result(2, 1) = cos(v.x) * sin(v.y) * sin(v.z) - sin(v.x) * cos(v.z);
+    result(2, 2) = cos(v.x) * cos(v.y);
+    return result;
+}
+
+template <typename T>
 Mat<T, 4, 4> transform_clear_translate(const Mat<T, 4, 4> &a) {
     Mat<T, 4, 4> result = a;
     result(0, 3) = 0;
