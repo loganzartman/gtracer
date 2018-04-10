@@ -66,9 +66,15 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
     if (!(hit_sphere->emission_color == float3(0)))
         return hit_sphere->emission_color;
 
+    // TODO: proper ambient color
+    color += hit_sphere->surface_color * 0.1;
+
     // compute surface normal
     float3 normal = intersection - hit_sphere->center;
     normal.normalize();
+
+    // compute direction to camera (for Phong specular lighting)
+    float3 camera_dir = (ray_orig - intersection).normalize();
 
     // compute illumination
     for (size_t i = 0; i < spheres.size(); ++i) {
@@ -88,13 +94,21 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         if (light != &spheres[i])
             continue;
 
-        // if there is a clear path to light source, add diffuse lighting
+        // add diffuse lighting
         color += hit_sphere->surface_color * light->emission_color *
                  light_dir.dot(normal);
+
+        // add Phong specular lighting
+        if (hit_sphere->reflection > 0) {
+            float3 reflect_dir = light_dir.reflect(normal);
+            float rv = reflect_dir.dot(camera_dir);
+            float specularity = 16 * hit_sphere->reflection;
+            color += hit_sphere->surface_color * light->emission_color *
+                     pow(rv, specularity) * hit_sphere->reflection;
+        }
     }
 
     return color;
-    // return hit_sphere->surface_color;
 }
 
 /**

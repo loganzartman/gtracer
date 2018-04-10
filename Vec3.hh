@@ -26,7 +26,7 @@ struct Vec3 {
 
     T dot(const Vec3<T> &o) const { return x * o.x + y * o.y + z * o.z; }
 
-    Vec3<T> reflect(const Vec3<T> &normal) {
+    Vec3<T> reflect(const Vec3<T> &normal) const {
         return *this - normal * (2 * (this->dot(normal)));
     }
 

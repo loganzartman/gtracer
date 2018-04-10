@@ -6,7 +6,7 @@
 
 /**
  * @brief Produce a transformation matrix for a given translation.
- * 
+ *
  * @param v The translation vector
  * @return The resulting transformation matrix
  */
@@ -21,7 +21,7 @@ Mat<T, 4, 4> transform_translate(const Vec3<T> &v) {
 
 /**
  * @brief Produce a transformation matrix for a given scale.
- * 
+ *
  * @param v The scale vector, where components represent the scale on each axis
  * @return The resulting transformation matrix.
  */
@@ -39,7 +39,7 @@ Mat<T, 4, 4> transform_scale(const Vec3<T> &v) {
  * @brief Produce a transformation matrix for a given X rotation.
  * @details Rotating individual components is helpful when you want to control
  * the order of rotations, which is necessary in some cases.
- * 
+ *
  * @param t the rotation amount in radians
  * @return The resulting transformation matrix.
  */
@@ -57,7 +57,7 @@ Mat<T, 4, 4> transform_rotateX(const T &t) {
  * @brief Produce a transformation matrix for a given Y rotation.
  * @details Rotating individual components is helpful when you want to control
  * the order of rotations, which is necessary in some cases.
- * 
+ *
  * @param t the rotation amount in radians
  * @return The resulting transformation matrix.
  */
@@ -75,7 +75,7 @@ Mat<T, 4, 4> transform_rotateY(const T &t) {
  * @brief Produce a transformation matrix for a given Z rotation.
  * @details Rotating individual components is helpful when you want to control
  * the order of rotations, which is necessary in some cases.
- * 
+ *
  * @param t the rotation amount in radians
  * @return The resulting transformation matrix.
  */
@@ -93,7 +93,7 @@ Mat<T, 4, 4> transform_rotateZ(const T &t) {
  * @brief Produce a transformation matrix for a given rotation.
  * @details The rotation is performed in the order X, Y, Z. If you need a
  * particular order other than this, use the other rotation functions.
- * 
+ *
  * @param v The rotation vector, where each component is radians on that axis
  * @return The resulting transformation matrix
  */
@@ -116,9 +116,9 @@ Mat<T, 4, 4> transform_rotate(const Vec3<T> &v) {
 
 /**
  * @brief Produce a copy of this transformation matrix without translation.
- * @details This is used to apply the camera transform to ray directions, 
+ * @details This is used to apply the camera transform to ray directions,
  * which should be rotated but not translated.
- * 
+ *
  * @param a An existing transformation matrix
  * @return A copy of the transformation matrix with no translation
  */
