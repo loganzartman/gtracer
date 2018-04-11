@@ -1,5 +1,6 @@
 #include "render.hh"
 #include "Mat.hh"
+#include "Material.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
 #include "transform.hh"
@@ -63,11 +64,11 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
     }
 
     // emissive objects are just rendered with their emission color for now
-    if (!(hit_sphere->emission_color == float3(0)))
-        return hit_sphere->emission_color;
+    if (!(hit_sphere->material->emission_color == float3(0)))
+        return hit_sphere->material->emission_color;
 
     // TODO: proper ambient color
-    color += hit_sphere->surface_color * 0.1;
+    color += hit_sphere->material->surface_color * 0.1;
 
     // compute surface normal
     float3 normal = intersection - hit_sphere->center;
@@ -79,7 +80,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
     // compute illumination
     for (size_t i = 0; i < spheres.size(); ++i) {
         // skip non-emissive objects and the object hit by the primary ray
-        if (spheres[i].emission_color == 0 || &spheres[i] == hit_sphere)
+        if (spheres[i].material->emission_color == 0 || &spheres[i] == hit_sphere)
             continue;
 
         // compute shadow ray
@@ -95,16 +96,16 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
             continue;
 
         // add diffuse lighting
-        color += hit_sphere->surface_color * light->emission_color *
+        color += hit_sphere->material->surface_color * light->material->emission_color *
                  light_dir.dot(normal);
 
         // add Phong specular lighting
-        if (hit_sphere->reflection > 0) {
+        if (hit_sphere->material->reflection > 0) {
             float3 reflect_dir = light_dir.reflect(normal);
             float rv = reflect_dir.dot(camera_dir);
-            float specularity = 16 * hit_sphere->reflection;
-            color += hit_sphere->surface_color * light->emission_color *
-                     pow(rv, specularity) * hit_sphere->reflection;
+            float specularity = 16 * hit_sphere->material->reflection;
+            color += hit_sphere->material->surface_color * light->material->emission_color *
+                     pow(rv, specularity) * hit_sphere->material->reflection;
         }
     }
 

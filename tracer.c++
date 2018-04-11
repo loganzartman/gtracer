@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Mat.hh"
+#include "Material.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
 #include "render.hh"
@@ -250,22 +251,26 @@ void gl_draw_fullscreen() {
  * @return A pointer to the constructed array
  */
 vector<Sphere> construct_spheres(size_t num_spheres) {
+    //surface color, transparency, reflectivity, emission color
+    Material wood(float3(0.545, 0.271, 0.075), 0, 0.2, float3(0));
+    Material metal(float3(0.377, 0.377, 0.377), 0, 0.8, float3(0));
+    Material mirror(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0));
+
     vector<Sphere> spheres;
-    // position, radius, surface color, reflectivity, transparency, emission
-    // color
-    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000,
-                             float3(0.20, 0.20, 0.20), 0, 0.0));
+    // position, radius, material    
+    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, &metal));
+                             
     spheres.push_back(
-        Sphere(float3(0.0, 0, 0), 4, float3(1.00, 0.32, 0.36), 1, 0.5));
+        Sphere(float3(0.0, 0, 0), 4, &wood));
     spheres.push_back(
-        Sphere(float3(5.0, -1, 5), 2, float3(0.90, 0.76, 0.46), 1, 1.0));
+        Sphere(float3(5.0, -1, 5), 2, &mirror));
     spheres.push_back(
-        Sphere(float3(5.0, 0, -5), 3, float3(0.65, 0.77, 0.97), 1, 0.0));
+        Sphere(float3(5.0, 0, -5), 3, &metal));
     spheres.push_back(
-        Sphere(float3(-5.5, 0, 5), 3, float3(0.90, 0.90, 0.90), 1, 0.0));
+        Sphere(float3(-5.5, 0, 5), 3, &wood));
     // light
-    spheres.push_back(Sphere(float3(0.0, 20, 5), 3, float3(0.00, 0.00, 0.00), 0,
-                             0.0, float3(1)));
+    spheres.push_back(Sphere(float3(0.0, 20, 5), 3, &mirror));
+
     return spheres;
 }
 
