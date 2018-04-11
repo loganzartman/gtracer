@@ -8,9 +8,11 @@ struct Material {
     float transparency, reflection;
 
     Material(const float3 &sc = float3(0), const float &trans = 0,
-            const float &refl = 0, const float3 &ec = float3(0)) 
-        : surface_color(sc), emission_color(ec),
-          transparency(trans), reflection(refl) {}
+             const float &refl = 0, const float3 &ec = float3(0))
+        : surface_color(sc),
+          emission_color(ec),
+          transparency(trans),
+          reflection(refl) {}
 };
 
 #endif

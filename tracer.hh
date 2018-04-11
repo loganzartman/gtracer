@@ -10,8 +10,11 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
+#include "Material.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
 #include "render.hh"
@@ -19,7 +22,6 @@
 #define randf(a, b) ((float)rand() / RAND_MAX * (b - a) + a)
 
 #define TARGET_FPS 60
-#define SPHERES 5
 #define WIDTH 640
 #define HEIGHT 480
 #define ERRINFO __FILE__ << ":" << __func__ << ":" << __LINE__
@@ -38,7 +40,8 @@ void gl_draw_fullscreen();
             cout << ERRINFO << ": gl err 0x" << hex << err << endl; \
     })
 
-std::vector<Sphere> construct_spheres(size_t num_spheres);
+std::vector<Sphere> construct_spheres(
+    std::unordered_map<std::string, Material *> mats);
 void output_to_ppm(float3 *image, size_t w, size_t h);
 #define sdl_check()                       \
     ({                                    \

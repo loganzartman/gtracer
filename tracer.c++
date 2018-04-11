@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "Mat.hh"
@@ -49,7 +50,13 @@ int main() {
     float orbit_zoom = 30;
 
     // scene geometry
-    vector<Sphere> spheres = construct_spheres(SPHERES);
+    // surface color, transparency, reflectivity, emission color
+    unordered_map<string, Material *> mats = {
+        {"wood", new Material(float3(0.545, 0.271, 0.075), 0, 0.2, float3(0))},
+        {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.8, float3(0))},
+        {"mirror", new Material(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0))},
+        {"light", new Material(float3(1), 0, 0, float3(1))}};
+    vector<Sphere> spheres = construct_spheres(mats);
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -109,6 +116,10 @@ int main() {
     // Once finished with OpenGL functions, the SDL_GLContext can be deleted.
     SDL_GL_DeleteContext(glcontext);
     sdl_check();
+
+    // deallocate materials
+    for (auto it = mats.begin(); it != mats.end(); ++it)
+        delete it->second;
 
     delete[] pixels;
 
@@ -250,26 +261,17 @@ void gl_draw_fullscreen() {
  * of spheres in the constructed array
  * @return A pointer to the constructed array
  */
-vector<Sphere> construct_spheres(size_t num_spheres) {
-    //surface color, transparency, reflectivity, emission color
-    Material wood(float3(0.545, 0.271, 0.075), 0, 0.2, float3(0));
-    Material metal(float3(0.377, 0.377, 0.377), 0, 0.8, float3(0));
-    Material mirror(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0));
-
+vector<Sphere> construct_spheres(unordered_map<string, Material *> mats) {
     vector<Sphere> spheres;
-    // position, radius, material    
-    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, &metal));
-                             
-    spheres.push_back(
-        Sphere(float3(0.0, 0, 0), 4, &wood));
-    spheres.push_back(
-        Sphere(float3(5.0, -1, 5), 2, &mirror));
-    spheres.push_back(
-        Sphere(float3(5.0, 0, -5), 3, &metal));
-    spheres.push_back(
-        Sphere(float3(-5.5, 0, 5), 3, &wood));
+    // position, radius, material
+    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, mats["metal"]));
+
+    spheres.push_back(Sphere(float3(0.0, 0, 0), 4, mats["wood"]));
+    spheres.push_back(Sphere(float3(5.0, -1, 5), 2, mats["mirror"]));
+    spheres.push_back(Sphere(float3(5.0, 0, -5), 3, mats["metal"]));
+    spheres.push_back(Sphere(float3(-5.5, 0, 5), 3, mats["wood"]));
     // light
-    spheres.push_back(Sphere(float3(0.0, 20, 5), 3, &mirror));
+    spheres.push_back(Sphere(float3(0.0, 20, 5), 3, mats["light"]));
 
     return spheres;
 }

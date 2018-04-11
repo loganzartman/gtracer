@@ -2,18 +2,16 @@
 #define SPHERE_HH
 
 #include <cmath>
-#include "Vec3.hh"
 #include "Material.hh"
+#include "Vec3.hh"
 
 struct Sphere {
     float3 center;
     float radius;
-    Material *material;
+    const Material *material;
 
-    Sphere(const float3 &c, const float &r, Material *m)
-        : center(c),
-          radius(r),
-          material(m) {}
+    Sphere(const float3 &c, const float &r, const Material *m)
+        : center(c), radius(r), material(m) {}
 
     bool intersect(const float3 &r_orig, const float3 &r_dir, float &t0,
                    float &t1) const {
@@ -26,12 +24,12 @@ struct Sphere {
             return false;
 
         float dist2 = line.dot(line) - tca * tca;
-        if (dist2 > radius*radius)  // the radius is too short to span dist
+        if (dist2 > radius * radius)  // the radius is too short to span dist
             return false;
 
         // to get the radius of intersection, compute how much
         // of r_dir is in the sphere
-        float rad_of_inter = sqrt(radius*radius - dist2);
+        float rad_of_inter = sqrt(radius * radius - dist2);
 
         // t0 and t1 are parametric coefficients of the original ray
         // AKA how far down the ray the collision occurs
