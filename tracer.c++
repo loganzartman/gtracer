@@ -173,9 +173,10 @@ GLuint gl_create_buffer(int w, int h) {
 GLuint gl_create_texture(int w, int h) {
     GLuint texture_id;
     // get a texture ID
-    glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
     // allocate texture memory
-    glTextureStorage2D(texture_id, 1, GL_RGBA32F, w, h);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, w, h);
     // set interpolation (must be nearest for RECTANGLE_ARB)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
