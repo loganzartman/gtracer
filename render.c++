@@ -4,6 +4,7 @@
 #include "Sphere.hh"
 #include "Vec3.hh"
 #include "transform.hh"
+#include "util.hh"
 
 #include <cmath>
 #include <iostream>

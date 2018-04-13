@@ -19,6 +19,7 @@
 #include "render.hh"
 #include "tracer.hh"
 #include "transform.hh"
+#include "util.hh"
 
 using namespace std;
 

@@ -6,8 +6,8 @@ CXXFLAGS = -Wall -std=c++11 $(SDL_CFLAGS) -pthread -Ofast
 LDFLAGS = $(SDL_LDFLAGS)
 LDLIBS = -lGL -lGLEW
 
-TRACER_SRC = tracer.c++ render.c++
-TRACER_HH  = Vec3.hh Mat.hh transform.hh Sphere.hh transform.hh
+TRACER_SRC = tracer.c++ render.c++ util.c++
+TRACER_HH  = Vec3.hh Mat.hh transform.hh Sphere.hh transform.hh util.hh
 TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
 all: tracer

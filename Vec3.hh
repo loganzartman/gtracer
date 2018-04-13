@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <sstream>
-#define randf(a, b) ((float)rand() / RAND_MAX * (b - a) + a)
+#include "util.hh"
 
 template <typename T>
 struct Vec3 {
