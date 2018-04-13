@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window =
-        SDL_CreateWindow("raytracer", 0, 0, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+        SDL_CreateWindow("raytracer", 0, 0, args.width, args.height, SDL_WINDOW_OPENGL);
     sdl_check();
 
     // Create an OpenGL context associated with the window.
