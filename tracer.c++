@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     float mouse_x = 0, mouse_y = 0;
     float3 orbit_pos(0.3, 0, 0);
     float orbit_zoom = 30;
+    float3 trans(0);
 
     // scene geometry
     // surface color, transparency, reflectivity, emission color
@@ -88,6 +89,24 @@ int main(int argc, char *argv[]) {
             } else if (event.type == SDL_MOUSEWHEEL) {
                 iteration = 0;  // reset progress
                 orbit_zoom -= event.wheel.y * 2;
+            } else if (event.type == SDL_KEYDOWN) {
+                iteration = 0;  // reset progress
+                switch (event.key.keysym.sym) {
+                    case SDLK_LEFT:
+                        trans.x = 1;
+                        break;
+                    case SDLK_RIGHT:
+                        trans.x = -1;
+                        break;
+                    case SDLK_UP:
+                        trans.z = 1;
+                        break;
+                    case SDLK_DOWN:
+                        trans.z = -1;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -96,6 +115,7 @@ int main(int argc, char *argv[]) {
 
         // compute orbit camera transform
         Mat4f camera = Mat4f::identity();
+        camera = camera * transform_translate(float3(trans.x, 0, trans.z));
         camera = camera * transform_rotateY(orbit_pos.y);
         camera = camera * transform_rotateX(-orbit_pos.x);
         camera = camera * transform_translate(float3(0, 0, orbit_zoom));
