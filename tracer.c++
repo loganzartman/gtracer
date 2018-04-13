@@ -15,13 +15,16 @@
 #include "Material.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
+#include "options.hh"
 #include "render.hh"
 #include "tracer.hh"
 #include "transform.hh"
 
 using namespace std;
 
-int main() {
+int main(int argc, char *argv[]) {
+    TracerArgs args = parse_args(argc, argv);
+
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window = SDL_CreateWindow("SDL2/OpenGL Demo", 0, 0, WIDTH,
                                           HEIGHT, SDL_WINDOW_OPENGL);
@@ -111,6 +114,12 @@ int main() {
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
         cout << "\e[1G\e[0K" << (1000 / dt) << "fps" << flush;
         SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
+    }
+
+    // output rendered image
+    if (args.output) {
+        // TODO: copy data back from GPU when in GPU mode
+        output_bmp(pixels, w, h, args.outfile);
     }
 
     // Once finished with OpenGL functions, the SDL_GLContext can be deleted.
@@ -277,15 +286,31 @@ vector<Sphere> construct_spheres(unordered_map<string, Material *> mats) {
     return spheres;
 }
 
-// Util
+/**
+ * @brief Output a pixel array to a bitmap
+ *
+ * @param[in] pixels an RGBA float32 array
+ * @param[in] w width of the input array in pixels
+ * @param[in] h height of the input array in pixels
+ * @param[in] outfile path to output to
+ */
+void output_bmp(float *pixels, int w, int h, string outfile) {
+    SDL_Surface *surf =
+        SDL_CreateRGBSurfaceWithFormat(0, w, h, 24, SDL_PIXELFORMAT_RGB24);
+    sdl_check();
 
-void output_to_ppm(float3 *image, size_t w, size_t h) {
-    std::ofstream ofs("./output.ppm", std::ios::out | std::ios::binary);
-    ofs << "P6\n" << w << " " << h << "\n255\n";
-    for (unsigned i = 0; i < w * h; ++i) {
-        ofs << (unsigned char)(std::min(float(1), image[i].x) * 255)
-            << (unsigned char)(std::min(float(1), image[i].y) * 255)
-            << (unsigned char)(std::min(float(1), image[i].z) * 255);
+    // copy pixels to surface
+    uint8_t *spixels = static_cast<uint8_t *>(surf->pixels);
+    for (int i = 0; i < w * h; ++i) {
+        spixels[i * 3 + 0] = color_float_to_byte(pixels[i * 4 + 0]);
+        spixels[i * 3 + 1] = color_float_to_byte(pixels[i * 4 + 1]);
+        spixels[i * 3 + 2] = color_float_to_byte(pixels[i * 4 + 2]);
     }
-    ofs.close();
+
+    // write bitmap
+    SDL_SaveBMP(surf, outfile.c_str());
+    sdl_check();
+
+    SDL_FreeSurface(surf);
+    sdl_check();
 }

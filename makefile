@@ -7,7 +7,7 @@ LDFLAGS = $(SDL_LDFLAGS)
 LDLIBS = -lGL -lGLEW
 
 TRACER_SRC = tracer.c++ render.c++
-TRACER_HH  = Vec3.hh Mat.hh transform.hh Sphere.hh
+TRACER_HH  = Vec3.hh Mat.hh transform.hh Sphere.hh transform.hh
 TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
 all: tracer
