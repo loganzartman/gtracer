@@ -19,7 +19,6 @@
 #include "Vec3.hh"
 #include "render.hh"
 
-#define randf(a, b) ((float)rand() / RAND_MAX * (b - a) + a)
 #define color_float_to_byte(f) \
     (static_cast<uint8_t>(std::min(255.f, std::max(0.f, f * 255))))
 

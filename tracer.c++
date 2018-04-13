@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
-    SDL_Window *window = SDL_CreateWindow("SDL2/OpenGL Demo", 0, 0, WIDTH,
+    SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, WIDTH,
                                           HEIGHT, SDL_WINDOW_OPENGL);
     sdl_check();
 
@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
     // state for orbit controls
     float mouse_x = 0, mouse_y = 0;
     float3 orbit_pos(0.3, 0, 0);
-    float3 orbit_vel;
     float orbit_zoom = 30;
 
     // scene geometry
@@ -66,6 +65,7 @@ int main(int argc, char *argv[]) {
     float *pixels = new float[n_pixels];  // obv only do this once
     fill_n(pixels, n_pixels, 0);
 
+    unsigned iteration = 0;
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
 
@@ -76,20 +76,21 @@ int main(int argc, char *argv[]) {
             else if (event.type == SDL_MOUSEMOTION) {
                 float x = event.motion.x;
                 float y = event.motion.y;
-                if (event.motion.state & SDL_BUTTON_LMASK)
-                    orbit_vel +=
+                if (event.motion.state & SDL_BUTTON_LMASK) {
+                    iteration = 0; // reset progress
+                    orbit_pos +=
                         (float3(y, x, 0) - float3(mouse_y, mouse_x, 0)) * 0.005;
+                }
                 mouse_x = x;
                 mouse_y = y;
             } else if (event.type == SDL_MOUSEWHEEL) {
+                iteration = 0; // reset progress
                 orbit_zoom -= event.wheel.y * 2;
             }
         }
 
-        // integrate orbit controls velocity
-        orbit_pos += orbit_vel;
+        // limit orbit controls
         orbit_pos.x = max(-(float)M_PI / 2, min((float)M_PI / 2, orbit_pos.x));
-        orbit_vel *= 0.5;
 
         // compute orbit camera transform
         Mat4f camera = Mat4f::identity();
@@ -98,7 +99,7 @@ int main(int argc, char *argv[]) {
         camera = camera * transform_translate(float3(0, 0, orbit_zoom));
 
         // do raytracing
-        cpu_render(pixels, w, h, camera, spheres);
+        cpu_render(pixels, w, h, camera, spheres, iteration);
 
         // copy texture to GPU
         // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
@@ -109,10 +110,15 @@ int main(int argc, char *argv[]) {
 
         SDL_GL_SwapWindow(window);  // update window
 
+        // check for completion
+        ++iteration;
+        if (args.iterations > 0 && iteration >= args.iterations)
+            break;
+
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
-        cout << "\e[1G\e[0K" << (1000 / dt) << "fps" << flush;
+        cout << "\e[1G\e[0K" << "iteration " << iteration << ". " << (1000 / dt) << "fps" << flush;
         SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
     }
 

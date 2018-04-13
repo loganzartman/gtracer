@@ -8,11 +8,12 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#define PRIMARY_RAYS 1
 
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                vector<Sphere> spheres) {
+                vector<Sphere> spheres, unsigned iteration) {
     if (spheres.size() <= 0)
         cerr << "\e[33mWarning: no spheres in call to cpu_render!" << endl;
 
@@ -26,17 +27,31 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     float3 origin = camera * float3();
     for (size_t y = 0; y < h; ++y) {
         for (size_t x = 0; x < w; ++x) {
-            //  compute the x and y magnitude of each vector
-            float v_x = (2 * ((x + 0.5) * inv_w) - 1) * angle * aspect_ratio;
-            float v_y = (1 - 2 * ((y + 0.5) * inv_h)) * angle;
-            float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
-            ray_dir.normalize();
+            // do raytracing
+            float3 color;
+            for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
+                //  compute the x and y magnitude of each vector
+                float v_x = (2 * ((x + randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
+                float v_y = (1 - 2 * ((y + randf(0, 1)) * inv_h)) * angle;
+                float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
+                ray_dir.normalize();
 
-            float3 color = cpu_trace(origin, ray_dir, spheres, 0);
+                color += cpu_trace(origin, ray_dir, spheres, 0);
+            }
+            color *= 1.f / PRIMARY_RAYS;
+
+            // compute all-time average color
             const size_t idx = (y * w + x) * 4;
-            pixels[idx] = color.x;
-            pixels[idx + 1] = color.y;
-            pixels[idx + 2] = color.z;
+            float3 dst = float3(pixels[idx], pixels[idx+1], pixels[idx+2]);
+            float f = 1;
+            if (iteration > 0)
+                f = 1.f / iteration;
+            float3 blended = color * f + dst * (1-f);
+            
+            // write color
+            pixels[idx] = blended.x;
+            pixels[idx + 1] = blended.y;
+            pixels[idx + 2] = blended.z;
             pixels[idx + 3] = 1;  // alpha
         }
     }
