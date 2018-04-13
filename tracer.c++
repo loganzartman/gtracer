@@ -348,7 +348,7 @@ vector<Sphere> construct_spheres_random(
  */
 void output_bmp(float *pixels, int w, int h, string outfile) {
     SDL_Surface *surf =
-        SDL_CreateRGBSurfaceWithFormat(0, w, h, 24, SDL_PIXELFORMAT_RGB24);
+        SDL_CreateRGBSurface(0, w, h, 24, 0, 0, 0, 0);
     sdl_check();
 
     // copy pixels to surface
