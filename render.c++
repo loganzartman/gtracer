@@ -98,13 +98,15 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         if (randf(0, 1) < hit_sphere->material->reflection) {
             // reflective material
             direction = direction.reflect(normal);
+        } else if (randf(0, 1) < hit_sphere->material->transparency) {
+
         } else {
             // diffuse material
-            do {//TODO: this is bad, fix it
-                //we are trying to choose a direction in the hemisphere not
-                //intersecting the sphere we just hit. 
-                direction = float3::random_spherical();
-            } while (direction.dot(normal) <= 0);
+            // generate random number on a sphere, but we want only
+            // vectors pointing in the same hemisphere as the normal
+            direction = float3::random_spherical();
+            if (direction.dot(normal) < 0)
+                direction *= -1;
         }
     }
 
