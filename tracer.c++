@@ -53,7 +53,6 @@ int main(int argc, char *argv[]) {
     float orbit_zoom = 30;
     float3 trans(0);
     
-    Mat4f camera = Mat4f::identity();
 
     // scene geometry
     // surface color, transparency, reflectivity, emission color
@@ -73,6 +72,7 @@ int main(int argc, char *argv[]) {
     unsigned iteration = 0;
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
+    Mat4f camera = Mat4f::identity();
 
         // poll SDL events
         while (SDL_PollEvent(&event)) {
@@ -95,31 +95,30 @@ int main(int argc, char *argv[]) {
                 iteration = 0;  // reset progress
                 switch (event.key.keysym.sym) {
                     case SDLK_LEFT:
-                        trans.x = 1;
+                        trans.x += 1;
                         break;
                     case SDLK_RIGHT:
-                        trans.x = -1;
+                        trans.x -= 1;
                         break;
                     case SDLK_UP:
-                        trans.z = 1;
+                        trans.z += 1;
                         break;
                     case SDLK_DOWN:
-                        trans.z = -1;
+                        trans.z -= 1;
                         break;
                     default:
                         break;
                 }
             } else if (event.type == SDL_KEYUP) {
                 iteration = 0;
-                trans = float3(0);
             }
-            camera = camera * transform_translate(float3(trans.x, 0, trans.z));
         }
 
         // limit orbit controls
         orbit_pos.x = max(-(float)M_PI / 2, min((float)M_PI / 2, orbit_pos.x));
 
         // compute orbit camera transform
+        camera = camera * transform_translate(float3(trans.x, 0, trans.z));
         camera = camera * transform_rotateY(orbit_pos.y);
         camera = camera * transform_rotateX(-orbit_pos.x);
         camera = camera * transform_translate(float3(0, 0, orbit_zoom));
