@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
-    SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, WIDTH,
-                                          HEIGHT, SDL_WINDOW_OPENGL);
+    SDL_Window *window =
+        SDL_CreateWindow("raytracer", 0, 0, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
     sdl_check();
 
     // Create an OpenGL context associated with the window.
@@ -54,11 +54,12 @@ int main(int argc, char *argv[]) {
     // scene geometry
     // surface color, transparency, reflectivity, emission color
     unordered_map<string, Material *> mats = {
-        {"wood", new Material(float3(0.545, 0.271, 0.075), 0, 0.2, float3(0))},
-        {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.8, float3(0))},
+        {"ground", new Material(float3(0.8, 0.8, 0.9), 0, 0.0, float3(0))},
+        {"wood", new Material(float3(0.545, 0.271, 0.075), 0, 0.0, float3(0))},
+        {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.0, float3(0))},
         {"mirror", new Material(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0))},
         {"light", new Material(float3(1), 0, 0, float3(1))}};
-    vector<Sphere> spheres = construct_spheres(mats);
+    vector<Sphere> spheres = construct_spheres_random(mats);
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -77,14 +78,14 @@ int main(int argc, char *argv[]) {
                 float x = event.motion.x;
                 float y = event.motion.y;
                 if (event.motion.state & SDL_BUTTON_LMASK) {
-                    iteration = 0; // reset progress
+                    iteration = 0;  // reset progress
                     orbit_pos +=
                         (float3(y, x, 0) - float3(mouse_y, mouse_x, 0)) * 0.005;
                 }
                 mouse_x = x;
                 mouse_y = y;
             } else if (event.type == SDL_MOUSEWHEEL) {
-                iteration = 0; // reset progress
+                iteration = 0;  // reset progress
                 orbit_zoom -= event.wheel.y * 2;
             }
         }
@@ -118,7 +119,9 @@ int main(int argc, char *argv[]) {
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
-        cout << "\e[1G\e[0K" << "iteration " << iteration << ". " << (1000 / dt) << "fps" << flush;
+        cout << "\e[1G\e[0K"
+             << "iteration " << iteration << ". " << (1000 / dt) << "fps"
+             << flush;
         SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
     }
 
@@ -282,12 +285,31 @@ vector<Sphere> construct_spheres(unordered_map<string, Material *> mats) {
     // position, radius, material
     spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, mats["metal"]));
 
-    spheres.push_back(Sphere(float3(0.0, 0, 0), 4, mats["wood"]));
+    spheres.push_back(Sphere(float3(0.0, 0, 0), 4, mats["mirror"]));
     spheres.push_back(Sphere(float3(5.0, -1, 5), 2, mats["mirror"]));
     spheres.push_back(Sphere(float3(5.0, 0, -5), 3, mats["metal"]));
     spheres.push_back(Sphere(float3(-5.5, 0, 5), 3, mats["wood"]));
     // light
     spheres.push_back(Sphere(float3(0.0, 20, 5), 3, mats["light"]));
+
+    return spheres;
+}
+
+vector<Sphere> construct_spheres_random(
+    unordered_map<string, Material *> mats) {
+    vector<Sphere> spheres;
+
+    // position, radius, material
+    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, mats["ground"]));
+
+    for (int i = 0; i < 20; ++i) {
+        float3 pos(randf(-20, 20), randf(0, 10), randf(-20, 20));
+        float radius = randf(2, 5);
+        float3 col(randf(0, 1), randf(0, 1), randf(0, 1));
+        Material *mat = new Material(col, 0.f, randf(0, 1), float3(0));
+        mats[to_string(i)] = mat;
+        spheres.push_back(Sphere(pos, radius, mat));
+    }
 
     return spheres;
 }

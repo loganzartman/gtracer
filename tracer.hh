@@ -19,6 +19,7 @@
 #include "Vec3.hh"
 #include "render.hh"
 
+#define randf(a, b) ((float)rand() / RAND_MAX * (b - a) + a)
 #define color_float_to_byte(f) \
     (static_cast<uint8_t>(std::min(255.f, std::max(0.f, f * 255))))
 
@@ -42,6 +43,8 @@ void gl_draw_fullscreen();
     })
 
 std::vector<Sphere> construct_spheres(
+    std::unordered_map<std::string, Material *> mats);
+std::vector<Sphere> construct_spheres_random(
     std::unordered_map<std::string, Material *> mats);
 void output_bmp(float *pixels, int w, int h, std::string outfile);
 #define sdl_check()                       \

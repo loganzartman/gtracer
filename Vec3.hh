@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <sstream>
+#define randf(a, b) ((float)rand() / RAND_MAX * (b - a) + a)
 
 template <typename T>
 struct Vec3 {
@@ -47,10 +48,7 @@ struct Vec3 {
 
     Vec3<T> operator*(const Vec3<T> &o) const {
         Vec3<T> result(*this);
-        result.x *= o.x;
-        result.y *= o.y;
-        result.z *= o.z;
-        return result;
+        return result *= o;
     }
 
     Vec3<T> &operator+=(const Vec3<T> &o) {
@@ -68,6 +66,13 @@ struct Vec3 {
         return *this;
     }
 
+    Vec3<T> &operator*=(const Vec3<T> &o) {
+        this->x *= o.x;
+        this->y *= o.y;
+        this->z *= o.z;
+        return *this;
+    }
+
     Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
 
     friend bool operator==(const Vec3<T> &l, const Vec3<T> &r) {
@@ -79,6 +84,18 @@ struct Vec3 {
     T length2() const { return x * x + y * y + z * z; }
 
     T length() const { return sqrt(length2()); }
+
+    static Vec3<T> random_spherical() {
+        Vec3<T> result;
+        T phi = randf(0, M_PI * 2);
+        T costheta = randf(-1, 1);
+
+        T theta = acos(costheta);
+        result.x = sin(theta) * cos(phi);
+        result.y = sin(theta) * sin(phi);
+        result.z = cos(theta);
+        return result;
+    }
 
     std::string print() const {
         std::ostringstream o;
