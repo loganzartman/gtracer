@@ -7,3 +7,7 @@ float randf(float lo, float hi) {
     static mt19937 mt(rd());
     return (float) mt() / mt.max() * (hi - lo) + lo;
 }
+
+float mix(float a, float b, float ratio) {
+    return a * ratio + b * (1 - ratio);
+}

@@ -25,5 +25,6 @@ void* cpu_render_thread(void *thread_arg);
 bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
                        std::vector<Sphere> &spheres, float3 &intersection,
                        Sphere *&hit_sphere);
+float fresnel(float3 dir, float3 normal);
 
 #endif
