@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
                 iteration = 0;  // reset progress
                 orbit_zoom -= event.wheel.y * 2;
             } else if (event.type == SDL_KEYDOWN) {
-                iteration = 0;  // reset progress
+                bool reset = true;
                 switch (event.key.keysym.sym) {
                     case SDLK_LEFT:
                         trans.x += 1;
@@ -107,10 +107,11 @@ int main(int argc, char *argv[]) {
                         trans.z -= 1;
                         break;
                     default:
+                        reset = false;
                         break;
                 }
-            } else if (event.type == SDL_KEYUP) {
-                iteration = 0;
+                if (reset)
+                    iteration = 0;  // reset progress
             }
         }
 
@@ -324,7 +325,7 @@ vector<Sphere> construct_spheres_random(
     vector<Sphere> spheres;
 
     // position, radius, material
-    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, mats["ground"]));
+    spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000, mats["ground"]));
 
     for (int i = 0; i < 20; ++i) {
         float3 pos(randf(-20, 20), randf(0, 10), randf(-20, 20));
