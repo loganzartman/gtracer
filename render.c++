@@ -143,14 +143,14 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
           if (hit_sphere->material->reflection > 0) {
               // reflective material
               direction = direction.reflect(normal);
-          } 
+          }
           if (hit_sphere->material->transparency > 0) {
               float refr_i;
               if (direction.dot(normal) > 0)
                 refr_i = 1.1;
               else
                 refr_i = 0.91;
-              float angle = -normal.dot(direction);
+              float angle = normal.dot(direction);
               float k = 1 - refr_i * refr_i * (1 - angle * angle);
               float3 refraction_dir = direction * refr_i + normal * (refr_i * angle - sqrt(k));
               refraction_dir.normalize();
