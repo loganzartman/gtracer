@@ -136,7 +136,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         origin = intersection;
         float3 normal = (intersection - hit_sphere->center).normalize();
 
-        if (hit_sphere->material->transparency + hit_sphere->material->reflection > randf(0,2)) {
+        if (max(hit_sphere->material->transparency, hit_sphere->material->reflection) > randf(0,1)) {
             float fresneleffect = fresnel(direction, normal, 1.1f);
             if (randf(0,1) < fresneleffect) {
                 // reflective material
