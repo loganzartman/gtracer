@@ -331,7 +331,7 @@ vector<Sphere> construct_spheres_random(
         float3 pos(randf(-20, 20), randf(0, 10), randf(-20, 20));
         float radius = randf(2, 5);
         float3 col(randf(0, 1), randf(0, 1), randf(0, 1));
-        Material *mat = new Material(col, 0.f, randf(0, 1), float3(0));
+        Material *mat = new Material(col, randf(0,1), randf(0, 0.5), float3(0));
         mats[to_string(i)] = mat;
         spheres.push_back(Sphere(pos, radius, mat));
     }
