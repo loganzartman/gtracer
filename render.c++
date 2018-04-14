@@ -9,7 +9,10 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#include <memory>
+#include <pthread.h>
 #define PRIMARY_RAYS 1
+#define N_THREADS    4
 
 using namespace std;
 
@@ -18,15 +21,36 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     if (spheres.size() <= 0)
         cerr << "\e[33mWarning: no spheres in call to cpu_render!" << endl;
 
-    const size_t pitch = 4;
-    CPUThreadArgs args = {
-        w, h, pitch,
-        camera,
-        spheres,
-        iteration,
-        pixels
-    };
-    cpu_render_thread(static_cast<void*>(&args));
+    CPUThreadArgs **args = new CPUThreadArgs*[N_THREADS];
+    pthread_t *threads = new pthread_t[N_THREADS];
+
+    for (int i = 0; i < N_THREADS; ++i) {
+        const unsigned pitch = N_THREADS;
+        const unsigned offset = i;
+        args[i] = new CPUThreadArgs{
+            w, h, pitch, offset,
+            camera,
+            spheres,
+            iteration,
+            pixels
+        };
+
+        if (N_THREADS > 1) {
+            pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
+        } else {
+            cpu_render_thread(static_cast<void*>(args[i]));
+        }
+    }
+
+    if (N_THREADS > 1) {
+        for (int i = 0; i < N_THREADS; ++i) {
+            pthread_join(threads[i], NULL);
+            delete args[i];
+        }
+    }
+
+    delete[] args;
+    delete[] threads;
 }
 
 void* cpu_render_thread(void *thread_arg) {
@@ -42,7 +66,7 @@ void* cpu_render_thread(void *thread_arg) {
     float3 origin = args.camera * float3();
     
     const size_t len = args.w * args.h;
-    for (size_t p = 0; p < len; p += args.pitch) {
+    for (size_t p = args.offset; p < len; p += args.pitch) {
         // compute position
         const size_t x = p % args.w;
         const size_t y = p / args.w;

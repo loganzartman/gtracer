@@ -10,6 +10,7 @@ struct CPUThreadArgs {
     size_t w;
     size_t h;
     size_t pitch;
+    size_t offset;
     Mat4f &camera;
     std::vector<Sphere> &spheres;
     unsigned iteration;
