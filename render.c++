@@ -12,7 +12,7 @@
 #include <memory>
 #include <pthread.h>
 #define PRIMARY_RAYS 1
-#define N_THREADS    4
+#define N_THREADS    8
 
 using namespace std;
 
