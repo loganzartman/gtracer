@@ -331,7 +331,7 @@ vector<Sphere> construct_spheres_random(
         float3 pos(randf(-20, 20), randf(0, 10), randf(-20, 20));
         float radius = randf(2, 5);
         float3 col(randf(0, 1), randf(0, 1), randf(0, 1));
-        Material *mat = new Material(col, randf(0, 1), randf(0, 1), float3(0));
+        Material *mat = new Material(col, 0.f, randf(0, 1), float3(0));
         mats[to_string(i)] = mat;
         spheres.push_back(Sphere(pos, radius, mat));
     }
@@ -354,9 +354,9 @@ void output_bmp(float *pixels, int w, int h, string outfile) {
     // copy pixels to surface
     uint8_t *spixels = static_cast<uint8_t *>(surf->pixels);
     for (int i = 0; i < w * h; ++i) {
-        spixels[i * 3 + 0] = color_float_to_byte(pixels[i * 4 + 0]);
+        spixels[i * 3 + 2] = color_float_to_byte(pixels[i * 4 + 0]);
         spixels[i * 3 + 1] = color_float_to_byte(pixels[i * 4 + 1]);
-        spixels[i * 3 + 2] = color_float_to_byte(pixels[i * 4 + 2]);
+        spixels[i * 3 + 0] = color_float_to_byte(pixels[i * 4 + 2]);
     }
 
     // write bitmap
