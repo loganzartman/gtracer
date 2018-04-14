@@ -6,44 +6,40 @@
 #include "transform.hh"
 #include "util.hh"
 
-#include <cmath>
-#include <iostream>
-#include <stdexcept>
-#include <memory>
 #include <pthread.h>
+#include <cmath>
+#include <algorithm>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 #define PRIMARY_RAYS 1
-#define N_THREADS    8
 
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                vector<Sphere> spheres, unsigned iteration) {
+                vector<Sphere> spheres, unsigned iteration,
+                unsigned n_threads) {
     if (spheres.size() <= 0)
         cerr << "\e[33mWarning: no spheres in call to cpu_render!" << endl;
 
-    CPUThreadArgs **args = new CPUThreadArgs*[N_THREADS];
-    pthread_t *threads = new pthread_t[N_THREADS];
+    CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
+    pthread_t *threads = new pthread_t[n_threads];
 
-    for (int i = 0; i < N_THREADS; ++i) {
-        const unsigned pitch = N_THREADS;
+    for (unsigned i = 0; i < n_threads; ++i) {
+        const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{
-            w, h, pitch, offset,
-            camera,
-            spheres,
-            iteration,
-            pixels
-        };
+        args[i] = new CPUThreadArgs{w,      h,       pitch,     offset,
+                                    camera, spheres, iteration, pixels};
 
-        if (N_THREADS > 1) {
+        if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
         } else {
-            cpu_render_thread(static_cast<void*>(args[i]));
+            cpu_render_thread(static_cast<void *>(args[i]));
         }
     }
 
-    if (N_THREADS > 1) {
-        for (int i = 0; i < N_THREADS; ++i) {
+    if (n_threads > 1) {
+        for (unsigned i = 0; i < n_threads; ++i) {
             pthread_join(threads[i], NULL);
             delete args[i];
         }
@@ -53,8 +49,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     delete[] threads;
 }
 
-void* cpu_render_thread(void *thread_arg) {
-    CPUThreadArgs& args = *static_cast<CPUThreadArgs*>(thread_arg);
+void *cpu_render_thread(void *thread_arg) {
+    CPUThreadArgs &args = *static_cast<CPUThreadArgs *>(thread_arg);
 
     float inv_w = 1 / float(args.w);
     float inv_h = 1 / float(args.h);
@@ -64,7 +60,7 @@ void* cpu_render_thread(void *thread_arg) {
 
     Mat4f dir_camera = transform_clear_translate(args.camera);
     float3 origin = args.camera * float3();
-    
+
     const size_t len = args.w * args.h;
     for (size_t p = args.offset; p < len; p += args.pitch) {
         // compute position
@@ -75,8 +71,8 @@ void* cpu_render_thread(void *thread_arg) {
         float3 color;
         for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
             //  compute the x and y magnitude of each vector
-            float v_x = (2 * ((x + randf(0, 1)) * inv_w) - 1) * angle *
-                        aspect_ratio;
+            float v_x =
+                (2 * ((x + randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
             float v_y = (1 - 2 * ((y + randf(0, 1)) * inv_h)) * angle;
             float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
             ray_dir.normalize();
@@ -87,7 +83,8 @@ void* cpu_render_thread(void *thread_arg) {
 
         // compute all-time average color
         const size_t idx = p * 4;
-        float3 dst = float3(args.pixels[idx], args.pixels[idx + 1], args.pixels[idx + 2]);
+        float3 dst = float3(args.pixels[idx], args.pixels[idx + 1],
+                            args.pixels[idx + 2]);
         float f = 1;
         if (args.iteration > 0)
             f = 1.f / args.iteration;
@@ -139,8 +136,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         origin = intersection;
         float3 normal = (intersection - hit_sphere->center).normalize();
 
-        if (hit_sphere->material->transparency + hit_sphere->material->reflection < randf(0,2)) {
-            float fresneleffect = fresnel(direction, normal);
+        if (hit_sphere->material->transparency + hit_sphere->material->reflection > randf(0,2)) {
+            float fresneleffect = fresnel(direction, normal, 1.1f);
             if (randf(0,1) < fresneleffect) {
                 // reflective material
                 direction = direction.reflect(normal);
@@ -155,8 +152,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                 float3 refraction_dir = direction * refr_i + normal * (refr_i * angle - sqrt(k));
                 refraction_dir.normalize();
                 direction = refraction_dir;
-                origin += direction * 0.005;
             }
+            origin += direction * 0.005;
         } else {
             // diffuse material
             // generate random number on a sphere, but we want only
@@ -210,7 +207,21 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
     return false;
 }
 
-float fresnel(float3 dir, float3 normal) {
-    float ratio = -dir.dot(normal);
-    return mix(pow(1 - ratio, 3), 1, 0.1);
+float fresnel(float3 dir, float3 normal, float ior) {
+    float cosi = dir.dot(normal);
+    float n1 = 1;
+    float n2 = ior;
+    if (cosi > 0.f)
+        swap(n1, n2);
+
+    float sint = (n1 / n2) * sqrt(max(0.f, 1.f - cosi * cosi));
+    if (sint >= 1.f) // total internal relfection
+        return 1.f;
+
+    float cost = sqrt(max(0.f, 1.f - sint*sint));
+    cosi = abs(cosi);
+    
+    float Rs = ((n2 * cosi) - (n1 * cost)) / ((n2 * cosi) + (n1 * cost));
+    float Rp = ((n1 * cosi) - (n2 * cost)) / ((n1 * cosi) + (n2 * cost));
+    return (Rs*Rs + Rp*Rp) / 2;
 }

@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <thread>
 
 struct TracerArgs {
     std::string outfile;
@@ -10,6 +11,7 @@ struct TracerArgs {
     int width;
     int height;
     size_t iterations;
+    unsigned threads;
 };
 
 TracerArgs parse_args(int argc, char *argv[]) {
@@ -19,14 +21,16 @@ TracerArgs parse_args(int argc, char *argv[]) {
         {"iterations", optional_argument, NULL, 'n'},
         {"width", optional_argument, NULL, 'w'},
         {"height", optional_argument, NULL, 'h'},
+        {"threads", optional_argument, NULL, 't'},
         {"help", no_argument, NULL, '?'}};
 
-    TracerArgs opts = {"", false, 640, 480, 0};
+    const unsigned thread_count = thread::hardware_concurrency();
+    TracerArgs opts = {"", false, 640, 480, 0, thread_count};
 
     int longindex = 0;
     char flag = 0;
-    while ((flag = getopt_long(argc, argv, "o:n:h:w:", longopts, &longindex)) !=
-           -1) {
+    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:", longopts,
+                               &longindex)) != -1) {
         switch (flag) {
             case 'o':
                 opts.output = true;
@@ -41,6 +45,9 @@ TracerArgs parse_args(int argc, char *argv[]) {
             case 'h':
                 opts.height = stoi(optarg);
                 break;
+            case 't':
+                opts.threads = stoi(optarg);
+                break;
             case '?':
             default:
                 cout << "Usage: tracer [options...]" << endl;
@@ -48,10 +55,9 @@ TracerArgs parse_args(int argc, char *argv[]) {
                      << endl;
                 cout << " -n, --iterations run for a given number of iterations"
                      << endl;
-                cout << " -w, --width of screen"
-                     << endl;
-                cout << " -h, --height of screen"
-                     << endl;
+                cout << " -w, --width of screen" << endl;
+                cout << " -h, --height of screen" << endl;
+                cout << " -t, --threads number of CPU threads" << endl;
                 exit(-1);
         }
     }

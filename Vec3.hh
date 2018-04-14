@@ -87,8 +87,8 @@ struct Vec3 {
 
     static Vec3<T> random_spherical() {
         Vec3<T> result;
-        T phi = randf(0, M_PI * 2);
-        T costheta = randf(-1, 1);
+        T phi = randf(0., M_PI * 2);
+        T costheta = randf(-1., 1.);
 
         T theta = acos(costheta);
         result.x = sin(theta) * cos(phi);
