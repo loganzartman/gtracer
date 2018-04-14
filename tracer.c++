@@ -25,10 +25,11 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
+    cout << "Using " << args.threads << " CPU threads." << endl;
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
-    SDL_Window *window =
-        SDL_CreateWindow("raytracer", 0, 0, args.width, args.height, SDL_WINDOW_OPENGL);
+    SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, args.width,
+                                          args.height, SDL_WINDOW_OPENGL);
     sdl_check();
 
     // Create an OpenGL context associated with the window.
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
     SDL_GetWindowSize(window, &w, &h);
     glewInit();
     gl_init_viewport(w, h);
-    GLuint buffer_id = gl_create_buffer(w, h);  // for gpu
+    // GLuint buffer_id = gl_create_buffer(w, h);  // for gpu
     GLuint texture_id = gl_create_texture(w, h);
 
     bool running = true;
@@ -52,7 +53,6 @@ int main(int argc, char *argv[]) {
     float3 orbit_pos(0.3, 0, 0);
     float orbit_zoom = 30;
     float3 trans(0);
-    
 
     // scene geometry
     // surface color, transparency, reflectivity, emission color
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     unsigned iteration = 0;
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
-    Mat4f camera = Mat4f::identity();
+        Mat4f camera = Mat4f::identity();
 
         // poll SDL events
         while (SDL_PollEvent(&event)) {
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
         camera = camera * transform_translate(float3(0, 0, orbit_zoom));
 
         // do raytracing
-        cpu_render(pixels, w, h, camera, spheres, iteration);
+        cpu_render(pixels, w, h, camera, spheres, iteration, args.threads);
 
         // copy texture to GPU
         // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
@@ -331,7 +331,7 @@ vector<Sphere> construct_spheres_random(
         float3 pos(randf(-20, 20), randf(0, 10), randf(-20, 20));
         float radius = randf(2, 5);
         float3 col(randf(0, 1), randf(0, 1), randf(0, 1));
-        Material *mat = new Material(col, randf(0,1), randf(0, 1), float3(0));
+        Material *mat = new Material(col, randf(0, 1), randf(0, 1), float3(0));
         mats[to_string(i)] = mat;
         spheres.push_back(Sphere(pos, radius, mat));
     }
@@ -348,8 +348,7 @@ vector<Sphere> construct_spheres_random(
  * @param[in] outfile path to output to
  */
 void output_bmp(float *pixels, int w, int h, string outfile) {
-    SDL_Surface *surf =
-        SDL_CreateRGBSurface(0, w, h, 24, 0, 0, 0, 0);
+    SDL_Surface *surf = SDL_CreateRGBSurface(0, w, h, 24, 0, 0, 0, 0);
     sdl_check();
 
     // copy pixels to surface
