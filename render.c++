@@ -139,11 +139,23 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         origin = intersection;
         float3 normal = (intersection - hit_sphere->center).normalize();
 
-        if (randf(0, 1) < hit_sphere->material->reflection) {
-            // reflective material
-            direction = direction.reflect(normal);
-        } else if (randf(0, 1) < hit_sphere->material->transparency) {
-
+        if (hit_sphere->material->reflection > randf(0,1) || hit_sphere->material->transparency > randf(0,1)) {
+          if (hit_sphere->material->reflection > 0) {
+              // reflective material
+              direction = direction.reflect(normal);
+          } 
+          if (hit_sphere->material->transparency > 0) {
+              float refr_i;
+              if (direction.dot(normal) > 0)
+                refr_i = 1.1;
+              else
+                refr_i = 0.91;
+              float angle = -normal.dot(direction);
+              float k = 1 - refr_i * refr_i * (1 - angle * angle);
+              float3 refraction_dir = direction * refr_i + normal * (refr_i * angle - sqrt(k));
+              refraction_dir.normalize();
+              direction = refraction_dir;
+          }
         } else {
             // diffuse material
             // generate random number on a sphere, but we want only
