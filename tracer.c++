@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include "Box.hh"
+#include "Geometry.hh"
 #include "Mat.hh"
 #include "Material.hh"
 #include "Sphere.hh"
@@ -59,10 +61,21 @@ int main(int argc, char *argv[]) {
     unordered_map<string, Material *> mats = {
         {"ground", new Material(float3(0.8, 0.8, 0.9), 0, 0.0, float3(0))},
         {"wood", new Material(float3(0.545, 0.271, 0.075), 0, 0.0, float3(0))},
+        {"red", new Material(float3(0.618, 0.213, 0.175), 0, 0.0, float3(0))},
         {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.0, float3(0))},
         {"mirror", new Material(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0))},
-        {"light", new Material(float3(1), 0, 0, float3(1))}};
-    vector<Sphere> spheres = construct_spheres_random(mats);
+        {"lens", new Material(float3(0.8, 0.8, 1.0), 1.0, 1.0, float3(0))},
+        {"light", new Material(float3(1, 0, 0), 0, 0, float3(10))}};
+    vector<Geometry *> geom;
+    // vector<Sphere> spheres = construct_spheres_random(mats);
+    // for (size_t i = 0; i < spheres.size(); ++i)
+    // geom.push_back(&spheres[i]);
+    Sphere light(float3(0, 10, 0), 3, mats["light"]);
+    Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
+    Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
+    geom.push_back(&light);
+    geom.push_back(&ground);
+    geom.push_back(&b);
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -125,7 +138,7 @@ int main(int argc, char *argv[]) {
         camera = camera * transform_translate(float3(0, 0, orbit_zoom));
 
         // do raytracing
-        cpu_render(pixels, w, h, camera, spheres, iteration, args.threads);
+        cpu_render(pixels, w, h, camera, geom, iteration, args.threads);
 
         // copy texture to GPU
         // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu

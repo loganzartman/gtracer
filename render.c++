@@ -17,19 +17,16 @@
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                vector<Sphere> spheres, unsigned iteration,
+                vector<Geometry *> geom, unsigned iteration,
                 unsigned n_threads) {
-    if (spheres.size() <= 0)
-        cerr << "\e[33mWarning: no spheres in call to cpu_render!" << endl;
-
     CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
     pthread_t *threads = new pthread_t[n_threads];
 
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,      h,       pitch,     offset,
-                                    camera, spheres, iteration, pixels};
+        args[i] = new CPUThreadArgs{w,      h,    pitch,     offset,
+                                    camera, geom, iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -77,7 +74,7 @@ void *cpu_render_thread(void *thread_arg) {
             float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += cpu_trace(origin, ray_dir, args.spheres, 16);
+            color += cpu_trace(origin, ray_dir, args.geom, 16);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -110,7 +107,7 @@ void *cpu_render_thread(void *thread_arg) {
  * @return Color computed for this primary ray
  */
 float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
-                 vector<Sphere> spheres, int depth) {
+                 vector<Geometry *> geom, int depth) {
     float3 color = 1.0;
     float3 light = 0.0;
 
@@ -119,25 +116,25 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
     for (int i = 0; i < depth; ++i) {
         // cast ray
         float3 intersection;
-        Sphere *hit_sphere;
-        if (!cpu_ray_intersect(origin, direction, spheres, intersection,
-                               hit_sphere)) {
-            light += float3(1) * color;
+        Geometry *hit_geom;
+        if (!cpu_ray_intersect(origin, direction, geom, intersection,
+                               hit_geom)) {
+            light += float3(0) * color;
             break;
         }
 
         // emissive material
-        if (!(hit_sphere->material->emission_color == 0)) {
-            light += hit_sphere->material->emission_color * color;
+        if (!(hit_geom->material()->emission_color == 0)) {
+            light += hit_geom->material()->emission_color * color;
             break;
         }
 
-        color *= hit_sphere->material->surface_color;
+        color *= hit_geom->material()->surface_color;
         origin = intersection;
-        float3 normal = (intersection - hit_sphere->center).normalize();
+        float3 normal = hit_geom->normal(ray_dir, intersection);
 
-        if (max(hit_sphere->material->transparency,
-                hit_sphere->material->reflection) > randf(0, 1)) {
+        if (max(hit_geom->material()->transparency,
+                hit_geom->material()->reflection) > randf(0, 1)) {
             float fresneleffect = fresnel(direction, normal, 1.1f);
             if (randf(0, 1) < fresneleffect) {
                 // reflective material
@@ -174,36 +171,36 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
  *
  * @param[in] ray_orig Ray origin point
  * @param[in] ray_dir Ray direction as unit vector
- * @param[in] spheres Scene geometry
+ * @param[in] geom Scene geometry
  * @param[out] intersection The point of intersection
- * @param[out] hit_sphere The sphere that was intersected
+ * @param[out] hit_geom The sphere that was intersected
  * @return Whether there was an intersection
  */
 bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
-                       vector<Sphere> &spheres, float3 &intersection,
-                       Sphere *&hit_sphere) {
+                       vector<Geometry *> &geom, float3 &intersection,
+                       Geometry *&hit_geom) {
     float near_t = INFINITY;
-    Sphere *near_sphere = nullptr;
+    Geometry *near_geom = nullptr;
 
-    for (size_t i = 0; i < spheres.size(); ++i) {
+    for (size_t i = 0; i < geom.size(); ++i) {
         float t0 = INFINITY;
         float t1 = INFINITY;
 
-        if (spheres[i].intersect(ray_orig, ray_dir, t0, t1)) {
+        if (geom[i]->intersect(ray_orig, ray_dir, t0, t1)) {
             // if t0 is negative, that's on the other side of the camera
             if (t0 < 0)
                 t0 = t1;
 
             if (t0 < near_t) {
                 near_t = t0;
-                near_sphere = &spheres[i];
+                near_geom = geom[i];
             }
         }
     }
 
-    if (near_sphere) {
+    if (near_geom) {
         intersection = ray_orig + ray_dir * near_t;
-        hit_sphere = near_sphere;
+        hit_geom = near_geom;
         return true;
     }
     return false;

@@ -10,12 +10,14 @@
 struct Sphere : public Geometry {
     float3 center;
     float radius;
-    const Material *material;
+    const Material *mat;
 
     Sphere(const float3 &c, const float &r) : Sphere(c, r, nullptr) {}
 
     Sphere(const float3 &c, const float &r, const Material *m)
-        : center(c), radius(r), material(m) {}
+        : center(c), radius(r), mat(m) {}
+
+    const Material *material() const { return mat; }
 
     bool intersect(const float3 &r_orig, const float3 &r_dir, float &t0,
                    float &t1) const {
@@ -41,6 +43,10 @@ struct Sphere : public Geometry {
         t1 = tca + rad_of_inter;
 
         return true;
+    }
+
+    float3 normal(const float3 &r_dir, const float3 &intersection) const {
+        return (intersection - center).normalize();
     }
 
     AABB bounds() const {
