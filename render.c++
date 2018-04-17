@@ -7,8 +7,8 @@
 #include "util.hh"
 
 #include <pthread.h>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -136,20 +136,22 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         origin = intersection;
         float3 normal = (intersection - hit_sphere->center).normalize();
 
-        if (max(hit_sphere->material->transparency, hit_sphere->material->reflection) > randf(0,1)) {
+        if (max(hit_sphere->material->transparency,
+                hit_sphere->material->reflection) > randf(0, 1)) {
             float fresneleffect = fresnel(direction, normal, 1.1f);
-            if (randf(0,1) < fresneleffect) {
+            if (randf(0, 1) < fresneleffect) {
                 // reflective material
                 direction = direction.reflect(normal);
             } else {
                 float refr_i;
                 if (direction.dot(normal) > 0)
-                  refr_i = 1.1;
+                    refr_i = 1.1;
                 else
-                  refr_i = 0.91;
+                    refr_i = 0.91;
                 float angle = normal.dot(direction);
                 float k = 1 - refr_i * refr_i * (1 - angle * angle);
-                float3 refraction_dir = direction * refr_i + normal * (refr_i * angle - sqrt(k));
+                float3 refraction_dir =
+                    direction * refr_i + normal * (refr_i * angle - sqrt(k));
                 refraction_dir.normalize();
                 direction = refraction_dir;
             }
@@ -215,13 +217,13 @@ float fresnel(float3 dir, float3 normal, float ior) {
         swap(n1, n2);
 
     float sint = (n1 / n2) * sqrt(max(0.f, 1.f - cosi * cosi));
-    if (sint >= 1.f) // total internal relfection
+    if (sint >= 1.f)  // total internal relfection
         return 1.f;
 
-    float cost = sqrt(max(0.f, 1.f - sint*sint));
+    float cost = sqrt(max(0.f, 1.f - sint * sint));
     cosi = abs(cosi);
-    
+
     float Rs = ((n2 * cosi) - (n1 * cost)) / ((n2 * cosi) + (n1 * cost));
     float Rp = ((n1 * cosi) - (n2 * cost)) / ((n1 * cosi) + (n2 * cost));
-    return (Rs*Rs + Rp*Rp) / 2;
+    return (Rs * Rs + Rp * Rp) / 2;
 }

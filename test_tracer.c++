@@ -1,9 +1,9 @@
 #include <cmath>
 #include <vector>
+#include "Box.hh"
 #include "Mat.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
-#include "AABB.hh"
 #include "gtest/gtest.h"
 #include "render.hh"
 
@@ -271,40 +271,40 @@ TEST(MatTest, multiply_vec3) {
     ASSERT_FLOAT_EQ(result.z, 3);
 }
 
-TEST(AABBTest, intersect_aabb_1) {
-    AABB a(float3(0), float3(1));
-    AABB b(float3(2), float3(3));
+TEST(BoxTest, intersect_box_1) {
+    Box a(float3(0), float3(1));
+    Box b(float3(2), float3(3));
     ASSERT_FALSE(a.intersect(b));
 }
 
-TEST(AABBTest, intersect_aabb_2) {
-    AABB a(float3(0), float3(1));
-    AABB b(float3(0.5), float3(1));
+TEST(BoxTest, intersect_box_2) {
+    Box a(float3(0), float3(1));
+    Box b(float3(0.5), float3(1));
     ASSERT_TRUE(a.intersect(b));
 }
 
-TEST(AABBTest, intersect_aabb_3) {
-    AABB a(float3(0), float3(1));
-    AABB b(float3(0), float3(1));
+TEST(BoxTest, intersect_box_3) {
+    Box a(float3(0), float3(1));
+    Box b(float3(0), float3(1));
     ASSERT_TRUE(a.intersect(b));
 }
 
-TEST(AABBTest, intersect_aabb_4) {
-    AABB a(float3(0), float3(1));
-    AABB b(float3(0.1), float3(0.9));
+TEST(BoxTest, intersect_box_4) {
+    Box a(float3(0), float3(1));
+    Box b(float3(0.1), float3(0.9));
     ASSERT_TRUE(a.intersect(b));
 }
 
-TEST(AABBTest, intersect_ray_1) {
-    AABB a(float3(1), float3(2));
+TEST(BoxTest, intersect_ray_1) {
+    Box a(float3(1), float3(2));
     float3 r_orig(0);
     float3 r_dir(1);
     float t0, t1;
     ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
 }
 
-TEST(AABBTest, intersect_ray_2) {
-    AABB a(float3(1), float3(2));
+TEST(BoxTest, intersect_ray_2) {
+    Box a(float3(1), float3(2));
     float3 r_orig(0, 2, 0);
     float3 r_dir(1);
     float t0, t1;

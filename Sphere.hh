@@ -2,17 +2,17 @@
 #define SPHERE_HH
 
 #include <cmath>
+#include "AABB.hh"
+#include "Geometry.hh"
 #include "Material.hh"
 #include "Vec3.hh"
-#include "AABB.hh"
 
-struct Sphere {
+struct Sphere : public Geometry {
     float3 center;
     float radius;
     const Material *material;
 
-    Sphere(const float3 &c, const float &r)
-        : Sphere(c, r, nullptr) {}
+    Sphere(const float3 &c, const float &r) : Sphere(c, r, nullptr) {}
 
     Sphere(const float3 &c, const float &r, const Material *m)
         : center(c), radius(r), material(m) {}
