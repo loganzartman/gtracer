@@ -1,12 +1,23 @@
 #ifndef VEC3_HH
 #define VEC3_HH
 
+#include <algorithm>
 #include <cmath>
 #include <sstream>
 #include "util.hh"
 
 template <typename T>
 struct Vec3 {
+    friend Vec3<T> min(Vec3<T> a, Vec3<T> b) {
+        using namespace std;
+        return Vec3<T>(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
+    }
+
+    friend Vec3<T> max(Vec3<T> a, Vec3<T> b) {
+        using namespace std;
+        return Vec3<T>(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
+    }
+
     T x, y, z;
 
     Vec3() : x(0), y(0), z(0) {}
@@ -46,9 +57,19 @@ struct Vec3 {
         return result *= o;
     }
 
+    Vec3<T> operator/(const T &o) const {
+        Vec3<T> result(*this);
+        return result *= 1.f / o;
+    }
+
     Vec3<T> operator*(const Vec3<T> &o) const {
         Vec3<T> result(*this);
         return result *= o;
+    }
+
+    Vec3<T> operator/(const Vec3<T> &o) const {
+        Vec3<T> result(*this);
+        return result /= o;
     }
 
     Vec3<T> &operator+=(const Vec3<T> &o) {
@@ -73,12 +94,35 @@ struct Vec3 {
         return *this;
     }
 
+    Vec3<T> &operator/=(const Vec3<T> &o) {
+        this->x /= o.x;
+        this->y /= o.y;
+        this->z /= o.z;
+        return *this;
+    }
+
     Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
 
     friend bool operator==(const Vec3<T> &l, const Vec3<T> &r) {
         const float tol = 1e-6f;
         return fabs(l.x - r.x) < tol && fabs(l.y - r.y) < tol &&
                fabs(l.z - r.z) < tol;
+    }
+
+    friend bool operator<(const Vec3<T> &l, const Vec3<T> &r) {
+        return l.x < r.x && l.y < r.y && l.z < r.z;
+    }
+
+    friend bool operator>(const Vec3<T> &l, const Vec3<T> &r) {
+        return l.x > r.x && l.y > r.y && l.z > r.z;
+    }
+
+    friend bool operator<=(const Vec3<T> &l, const Vec3<T> &r) {
+        return l < r || l == r;
+    }
+
+    friend bool operator>=(const Vec3<T> &l, const Vec3<T> &r) {
+        return l > r || l == r;
     }
 
     T length2() const { return x * x + y * y + z * z; }

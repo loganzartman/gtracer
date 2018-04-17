@@ -55,9 +55,9 @@ TracerArgs parse_args(int argc, char *argv[]) {
                      << endl;
                 cout << " -n, --iterations run for a given number of iterations"
                      << endl;
-                cout << " -w, --width of screen" << endl;
-                cout << " -h, --height of screen" << endl;
-                cout << " -t, --threads number of CPU threads" << endl;
+                cout << " -w, --width      width of screen" << endl;
+                cout << " -h, --height     height of screen" << endl;
+                cout << " -t, --threads    number of CPU threads" << endl;
                 exit(-1);
         }
     }

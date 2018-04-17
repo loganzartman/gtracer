@@ -3,6 +3,7 @@
 #include "Mat.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
+#include "AABB.hh"
 #include "gtest/gtest.h"
 #include "render.hh"
 
@@ -125,7 +126,7 @@ TEST(RaySphereTest, no_intersection) {
 TEST(CPURayIntersect, simple) {
     float3 ray_orig(0, 0, 0);
     float3 ray_dir(1, 0, 0);
-    Sphere sphere(float3(2, 0, 0), 1, float3());
+    Sphere sphere(float3(2, 0, 0), 1);
     std::vector<Sphere> spheres{sphere};
 
     float3 intersection;
@@ -139,7 +140,7 @@ TEST(CPURayIntersect, simple) {
 TEST(CPURayIntersect, negative) {
     float3 ray_orig(0, 0, 0);
     float3 ray_dir(-1, 0, 0);
-    Sphere sphere(float3(-2, 0, 0), 1, float3());
+    Sphere sphere(float3(-2, 0, 0), 1);
     std::vector<Sphere> spheres{sphere};
 
     float3 intersection;
@@ -153,7 +154,7 @@ TEST(CPURayIntersect, negative) {
 TEST(CPURayIntersect, negative_2) {
     float3 ray_orig(-2, 0, 0);
     float3 ray_dir(1, 0, 0);
-    Sphere sphere(float3(0, 0, 0), 1, float3());
+    Sphere sphere(float3(0, 0, 0), 1);
     std::vector<Sphere> spheres{sphere};
 
     float3 intersection;
@@ -167,7 +168,7 @@ TEST(CPURayIntersect, negative_2) {
 TEST(CPURayIntersect, negative_3) {
     float3 ray_orig(1, 0, 0);
     float3 ray_dir(-1, 0, 0);
-    Sphere sphere(float3(-3, 0, 0), 1, float3());
+    Sphere sphere(float3(-3, 0, 0), 1);
     std::vector<Sphere> spheres{sphere};
 
     float3 intersection;
@@ -181,8 +182,8 @@ TEST(CPURayIntersect, negative_3) {
 TEST(CPURayIntersect, two_negative) {
     float3 ray_orig(0, 0, 0);
     float3 ray_dir(-1, 0, 0);
-    Sphere sphere1(float3(-2, 0, 0), 1, float3());
-    Sphere sphere2(float3(-4, 0, 0), 1, float3());
+    Sphere sphere1(float3(-2, 0, 0), 1);
+    Sphere sphere2(float3(-4, 0, 0), 1);
     std::vector<Sphere> spheres{sphere1, sphere2};
 
     float3 intersection;
@@ -196,8 +197,8 @@ TEST(CPURayIntersect, two_negative) {
 TEST(CPURayIntersect, two_negative_2) {
     float3 ray_orig(4, 0, 0);
     float3 ray_dir(-1, 0, 0);
-    Sphere sphere1(float3(-2, 1.1, 0), 1, float3());
-    Sphere sphere2(float3(-4, 0, 0), 1, float3());
+    Sphere sphere1(float3(-2, 1.1, 0), 1);
+    Sphere sphere2(float3(-4, 0, 0), 1);
     std::vector<Sphere> spheres{sphere1, sphere2};
 
     float3 intersection;
@@ -211,8 +212,8 @@ TEST(CPURayIntersect, two_negative_2) {
 TEST(CPURayIntersect, two_negative_inside) {
     float3 ray_orig(-1.5, 0, 0);
     float3 ray_dir(-1, 0, 0);
-    Sphere sphere1(float3(-2, 0, 0), 1, float3());
-    Sphere sphere2(float3(-4, 0, 0), 1, float3());
+    Sphere sphere1(float3(-2, 0, 0), 1);
+    Sphere sphere2(float3(-4, 0, 0), 1);
     std::vector<Sphere> spheres{sphere1, sphere2};
 
     float3 intersection;
@@ -268,4 +269,44 @@ TEST(MatTest, multiply_vec3) {
     ASSERT_FLOAT_EQ(result.x, 1);
     ASSERT_FLOAT_EQ(result.y, 2);
     ASSERT_FLOAT_EQ(result.z, 3);
+}
+
+TEST(AABBTest, intersect_aabb_1) {
+    AABB a(float3(0), float3(1));
+    AABB b(float3(2), float3(3));
+    ASSERT_FALSE(a.intersect(b));
+}
+
+TEST(AABBTest, intersect_aabb_2) {
+    AABB a(float3(0), float3(1));
+    AABB b(float3(0.5), float3(1));
+    ASSERT_TRUE(a.intersect(b));
+}
+
+TEST(AABBTest, intersect_aabb_3) {
+    AABB a(float3(0), float3(1));
+    AABB b(float3(0), float3(1));
+    ASSERT_TRUE(a.intersect(b));
+}
+
+TEST(AABBTest, intersect_aabb_4) {
+    AABB a(float3(0), float3(1));
+    AABB b(float3(0.1), float3(0.9));
+    ASSERT_TRUE(a.intersect(b));
+}
+
+TEST(AABBTest, intersect_ray_1) {
+    AABB a(float3(1), float3(2));
+    float3 r_orig(0);
+    float3 r_dir(1);
+    float t0, t1;
+    ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
+}
+
+TEST(AABBTest, intersect_ray_2) {
+    AABB a(float3(1), float3(2));
+    float3 r_orig(0, 2, 0);
+    float3 r_dir(1);
+    float t0, t1;
+    ASSERT_FALSE(a.intersect(r_orig, r_dir, t0, t1));
 }

@@ -4,11 +4,15 @@
 #include <cmath>
 #include "Material.hh"
 #include "Vec3.hh"
+#include "AABB.hh"
 
 struct Sphere {
     float3 center;
     float radius;
     const Material *material;
+
+    Sphere(const float3 &c, const float &r)
+        : Sphere(c, r, nullptr) {}
 
     Sphere(const float3 &c, const float &r, const Material *m)
         : center(c), radius(r), material(m) {}
@@ -37,6 +41,11 @@ struct Sphere {
         t1 = tca + rad_of_inter;
 
         return true;
+    }
+
+    AABB bounds() const {
+        const float3 offset(radius);
+        return AABB(center - offset, center + offset);
     }
 };
 
