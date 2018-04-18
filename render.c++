@@ -3,6 +3,7 @@
 #include "Material.hh"
 #include "Sphere.hh"
 #include "Vec3.hh"
+#include "UniformGrid.hh"
 #include "transform.hh"
 #include "util.hh"
 
@@ -19,14 +20,20 @@ using namespace std;
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
                 vector<Geometry *> geom, unsigned iteration,
                 unsigned n_threads) {
+
+    // construct uniform grid
+    AABB bounds = geometry_bounds(geom.begin(), geom.end());
+    float3 res = UniformGrid::resolution(bounds, geom.size());
+    UniformGrid grid(res); //3D vector of index pairs into geometry list
+
+    // spawn threads
     CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
     pthread_t *threads = new pthread_t[n_threads];
-
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,      h,    pitch,     offset,
-                                    camera, geom, iteration, pixels};
+        args[i] = new CPUThreadArgs{w,      h,    pitch,  offset,
+                                    camera, geom, bounds, iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -35,6 +42,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
         }
     }
 
+    // wait for threads
     if (n_threads > 1) {
         for (unsigned i = 0; i < n_threads; ++i) {
             pthread_join(threads[i], NULL);

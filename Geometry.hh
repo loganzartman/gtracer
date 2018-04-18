@@ -15,4 +15,29 @@ class Geometry {
     virtual AABB bounds() const = 0;
 };
 
+/**
+ * @brief Finds the AABB of a collection of geometry
+ * @details Each item in the collection must implement bounds()
+ * 
+ * @param b Beginning InputIterator
+ * @param e Ending InputIterator
+ * @return AABB of the collection
+ */
+template <typename II>
+AABB geometry_bounds(II b, II e) {
+	if (b == e)
+		return AABB(0, 0);
+
+	AABB bounds = (*b)->bounds();
+	++b;
+
+	while (b != e) {
+		AABB candidate = (*b)->bounds();
+		bounds = AABB(min(bounds.xmin, candidate.xmin),
+		              max(bounds.xmax, candidate.xmax));
+		++b;
+	}
+	return bounds;
+}
+
 #endif

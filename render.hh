@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <vector>
 #include "Geometry.hh"
+#include "AABB.hh"
 #include "Mat.hh"
 
 struct CPUThreadArgs {
@@ -13,6 +14,7 @@ struct CPUThreadArgs {
     size_t offset;
     Mat4f &camera;
     std::vector<Geometry *> &geom;
+    AABB bounds;
     unsigned iteration;
     float *pixels;
 };

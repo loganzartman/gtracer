@@ -7,7 +7,7 @@ LDFLAGS = $(SDL_LDFLAGS)
 LDLIBS = -lGL -lGLEW
 
 TRACER_SRC = tracer.c++ render.c++ util.c++
-TRACER_HH  = Vec3.hh Mat.hh transform.hh Box.hh Tri.hh Sphere.hh transform.hh util.hh
+TRACER_HH  = Vec3.hh Mat.hh transform.hh AABB.hh Tri.hh Geometry.hh Sphere.hh Box.hh UniformGrid.hh transform.hh util.hh
 TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
 all: tracer
@@ -21,10 +21,10 @@ format:
 	clang-format -i *.c++ *.hh
 
 tracer: $(TRACER_OBJ) $(TRACER_HH)
-	$(CXX) $(CXXFLAGS) $^ -o tracer $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(TRACER_OBJ) -o tracer $(LDFLAGS) $(LDLIBS)
 
-test_tracer: tracer test_tracer.c++
-	$(CXX) $(CXXFLAGS) $(TRACER_HH) $(filter-out tracer.c++,$(TRACER_SRC)) test_tracer.c++ -o test_tracer $(LDFLAGS) $(LDLIBS) -lgtest -lgtest_main -pthread
+test_tracer: tracer test_tracer.c++ $(TRACER_HH)
+	$(CXX) $(CXXFLAGS) $(filter-out tracer.c++,$(TRACER_SRC)) test_tracer.c++ -o test_tracer $(LDFLAGS) $(LDLIBS) -lgtest -lgtest_main -pthread
 
 %.o: %.c++ $(wildcard %.hh)
 	$(CXX) $(CXXFLAGS) $^ -c
