@@ -2,7 +2,7 @@ SDL_CFLAGS := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 
 CXX = g++
-CXXFLAGS = -Wall -std=c++11 $(SDL_CFLAGS) -pthread -Ofast
+override CXXFLAGS += -Wall -std=c++11 $(SDL_CFLAGS) -pthread -Ofast
 LDFLAGS = $(SDL_LDFLAGS)
 LDLIBS = -lGL -lGLEW
 

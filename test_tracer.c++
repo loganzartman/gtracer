@@ -320,6 +320,18 @@ TEST(TriTest, intersect_ray_1) {
     float3 r_dir(0,-1,0);
     float t0, t1;
     ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
+    ASSERT_EQ(t0, 1);
+    ASSERT_EQ(t0, t1);
+}
+
+TEST(TriTest, intersect_ray_2) {
+    Tri a(float3(0), float3(1,0,0), float3(1,0,2));
+    float3 r_orig(-1.5, 1, -1.5);
+    float3 r_dir(1,-0.5,1);
+    float t0, t1;
+    ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
+    ASSERT_EQ(t0, 2);
+    ASSERT_EQ(t0, t1);
 }
 
 TEST(UniformGridTest, grid_construct) {
