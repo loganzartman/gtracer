@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstddef>
 #include <vector>
 #include "Box.hh"
 #include "Mat.hh"
@@ -356,4 +357,23 @@ TEST(UniformGridTest, grid_resolution) {
     ASSERT_FLOAT_EQ(res.x, cbrt(2) * 1);
     ASSERT_FLOAT_EQ(res.y, cbrt(2) * 2);
     ASSERT_FLOAT_EQ(res.z, cbrt(2) * 3);
+}
+
+TEST(UniformGridTest, grid_count_pairs) {
+    AABB world_bounds(float3(0), float3(1));
+    Sphere s(float3(0.5), 0.2);
+    std::vector<Geometry*> geom{&s};
+
+    float3 res = UniformGrid::resolution(world_bounds, 1, 64);
+    ASSERT_EQ(res.x, 4);
+    ASSERT_EQ(res.y, 4);
+    ASSERT_EQ(res.z, 4);
+
+    UniformGrid g(res);
+    ASSERT_EQ(g.rx, 4);
+    ASSERT_EQ(g.ry, 4);
+    ASSERT_EQ(g.rz, 4);
+
+    size_t pairs = g.count_pairs(world_bounds, geom.begin(), geom.end());
+    ASSERT_EQ(pairs, 8);
 }
