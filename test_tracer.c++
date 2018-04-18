@@ -392,3 +392,9 @@ TEST(UniformGridTest, grid_count_pairs) {
     size_t pairs = g.count_pairs(world_bounds, geom.begin(), geom.end());
     ASSERT_EQ(pairs, 8);
 }
+
+TEST(CrossProductTest, cross_1) {
+    float3 a(0,1,1);
+    float3 b(1,-1,3);
+    ASSERT_EQ(a.cross(b), float3(4,1,-1));
+}
