@@ -24,7 +24,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     // construct uniform grid
     AABB bounds = geometry_bounds(geom.begin(), geom.end());
     float3 res = UniformGrid::resolution(bounds, geom.size());
-    UniformGrid grid(res); //3D vector of index pairs into geometry list
+    UniformGrid grid(res);
 
     // spawn threads
     CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
