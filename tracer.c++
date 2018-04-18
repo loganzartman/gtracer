@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     // vector<Sphere> spheres = construct_spheres_random(mats);
     // for (size_t i = 0; i < spheres.size(); ++i)
     // geom.push_back(&spheres[i]);
-    Sphere light(float3(0, 10, 0), 3, mats["light"]);
+    Sphere light(float3(10, 10, 0), 3, mats["light"]);
     Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
     Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
     geom.push_back(&light);

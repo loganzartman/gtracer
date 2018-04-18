@@ -38,6 +38,16 @@ struct Vec3 {
 
     T dot(const Vec3<T> &o) const { return x * o.x + y * o.y + z * o.z; }
 
+    // shouldn't use fabs because we want to keep this generic
+    friend void vabs(Vec3& v) { 
+        if (v.x < 0)
+            v.x = -v.x;
+        if (v.y < 0)
+            v.y = -v.y;
+        if (v.z < 0)
+            v.z = -v.z;
+    }
+
     Vec3<T> reflect(const Vec3<T> &normal) const {
         return *this - normal * (2 * (this->dot(normal)));
     }

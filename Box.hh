@@ -57,7 +57,14 @@ class Box : public Geometry {
     }
 
     float3 normal(const float3 &r_dir, const float3 &intersection) const {
-        return (intersection - (box.xmin * 0.5 + box.xmax * 0.5)).normalize();
+        float bias = 1.000001;
+        float3 p = intersection - (box.xmin * 0.5 + box.xmax * 0.5);
+
+        float3 d((box.xmin - box.xmax) * 0.5);
+        vabs(d);
+        float3 normal(p / d * bias);
+
+        return normal.normalize();
     }
 
     AABB bounds() const { return box; }
