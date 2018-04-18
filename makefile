@@ -14,6 +14,7 @@ all: tracer
 
 clean:
 	-rm -f tracer
+	-rm -f test_tracer
 	-rm -f *.o
 	-rm -f *.gcda
 
@@ -23,7 +24,7 @@ format:
 tracer: $(TRACER_OBJ) $(TRACER_HH)
 	$(CXX) $(CXXFLAGS) $(TRACER_OBJ) -o tracer $(LDFLAGS) $(LDLIBS)
 
-test_tracer: tracer test_tracer.c++ $(TRACER_HH)
+test_tracer: tracer test_tracer.c++ $(TRACER_SRC) $(TRACER_HH)
 	$(CXX) $(CXXFLAGS) $(filter-out tracer.c++,$(TRACER_SRC)) test_tracer.c++ -o test_tracer $(LDFLAGS) $(LDLIBS) -lgtest -lgtest_main -pthread
 
 %.o: %.c++ $(wildcard %.hh)
