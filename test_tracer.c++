@@ -335,6 +335,21 @@ TEST(TriTest, intersect_ray_2) {
     ASSERT_EQ(t0, t1);
 }
 
+TEST(TriTest, cpu_ray_intersect) {
+    float3 ray_orig(0,2,0);
+    float3 ray_dir(0,-1,0);
+    Tri tri1(float3(0), float3(1,0,0), float3(1,0,2));
+    Tri tri2(float3(0,1,0), float3(1,1,0), float3(1,1,2));
+    std::vector<Geometry*> geoms{&tri1, &tri2};
+
+    float3 intersection;
+    Geometry *hit_geom;
+    ASSERT_TRUE(cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection,
+                                  hit_geom));
+    ASSERT_EQ(intersection, float3(0,1,0));
+    ASSERT_EQ(hit_geom, geoms[1]);
+}
+
 TEST(UniformGridTest, grid_construct) {
     UniformGrid g(float3(10, 10, 10));
 }
