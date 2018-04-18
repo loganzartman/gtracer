@@ -4,6 +4,7 @@
 #include "Box.hh"
 #include "Mat.hh"
 #include "Sphere.hh"
+#include "Tri.hh"
 #include "Vec3.hh"
 #include "AABB.hh"
 #include "UniformGrid.hh"
@@ -312,6 +313,14 @@ TEST(BoxTest, intersect_ray_2) {
     float3 r_dir(1);
     float t0, t1;
     ASSERT_FALSE(a.intersect(r_orig, r_dir, t0, t1));
+}
+
+TEST(TriTest, intersect_ray_1) {
+    Tri a(float3(0), float3(1,0,0), float3(1,0,2));
+    float3 r_orig(0.5, 1, 0.5);
+    float3 r_dir(0,-1,0);
+    float t0, t1;
+    ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
 }
 
 TEST(UniformGridTest, grid_construct) {
