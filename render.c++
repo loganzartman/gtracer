@@ -22,11 +22,12 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
     pthread_t *threads = new pthread_t[n_threads];
 
+    AABB bounds = geometry_bounds(geom.begin(), geom.end());
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,      h,    pitch,     offset,
-                                    camera, geom, iteration, pixels};
+        args[i] = new CPUThreadArgs{w,      h,    pitch,  offset,
+                                    camera, geom, bounds, iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
