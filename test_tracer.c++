@@ -312,3 +312,27 @@ TEST(BoxTest, intersect_ray_2) {
     float t0, t1;
     ASSERT_FALSE(a.intersect(r_orig, r_dir, t0, t1));
 }
+
+TEST(UniformGridTest, grid_construct) {
+    UniformGrid g(float3(10, 10, 10));
+}
+
+TEST(UniformGridTest, grid_access) {
+    UniformGrid g(float3(10, 10, 10));
+    g.first(5, 5, 5) = 1;
+    g.first(4, 5, 4) = 2;
+    g.first(5, 6, 5) = 3;
+    g.last(5, 5, 5) = 4;
+    ASSERT_EQ(g.first(5, 5, 5), 1);
+    ASSERT_EQ(g.first(4, 5, 4), 2);
+    ASSERT_EQ(g.first(5, 6, 5), 3);
+    ASSERT_EQ(g.last(5, 5, 5),  4);
+}
+
+TEST(UniformGridTest, grid_resolution) {
+    AABB bounds(float3(0), float3(1, 2, 3));
+    float3 res = UniformGrid::resolution(bounds, 2, 6);
+    ASSERT_FLOAT_EQ(res.x, cbrt(2) * 1);
+    ASSERT_FLOAT_EQ(res.y, cbrt(2) * 2);
+    ASSERT_FLOAT_EQ(res.z, cbrt(2) * 3);
+}
