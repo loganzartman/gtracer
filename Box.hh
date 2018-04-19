@@ -45,9 +45,11 @@ class Box : public Geometry {
         if (tmax < 0)
             return false;
 
-        float t0 = fabs(tmin);  // not sure
-        float t1 = fabs(tmax);  // might be bad
-        t = t0;
+        t = std::min(tmin, tmax);
+        if (t < 0)
+            t = std::max(tmin, tmax);
+        if (t < 0)
+            return false;
 
         return true;
     }

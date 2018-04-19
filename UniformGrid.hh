@@ -136,11 +136,11 @@ class UniformGrid {
         Geometry* operator*() const { return gc[index].first; }
     };
 
-    iterator first(int3 coord) {
+    iterator first(int3 coord) const {
         return iterator(data[data_index(coord)].first, geom_cell);
     }
 
-    iterator last(int3 coord) {
+    iterator last(int3 coord) const {
         return iterator(data[data_index(coord)].second, geom_cell);
     }
 

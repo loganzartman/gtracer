@@ -92,7 +92,7 @@ void *cpu_render_thread(void *thread_arg) {
             ray_dir.normalize();
 
             color += cpu_trace(origin, ray_dir, args.geom, args.bounds,
-                               args.grid, 16);
+                               args.grid, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -138,7 +138,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         Geometry *hit_geom;
         if (!cpu_ray_intersect(origin, direction, geom, world_bounds, grid,
                                intersection, hit_geom)) {
-            light += float3(1) * color;
+            light += float3(0) * color;
             break;
         }
 
@@ -152,8 +152,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         origin = intersection;
         float3 normal = hit_geom->normal(ray_dir, intersection);
 
-        if (max(hit_geom->material()->transparency,
-                hit_geom->material()->reflection) > randf(0, 1)) {
+        if (hit_geom->material()->transparency > randf(0, 1)) {
             float fresneleffect = fresnel(direction, normal, 1.1f);
             if (randf(0, 1) < fresneleffect) {
                 // reflective material
@@ -171,6 +170,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                 refraction_dir.normalize();
                 direction = refraction_dir;
             }
+        } else if (hit_geom->material()->reflection) {
+            direction = direction.reflect(normal);
         } else {
             // diffuse material
             // generate random number on a sphere, but we want only
@@ -203,14 +204,14 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
     float near_t = INFINITY;
     Geometry *near_geom = nullptr;
 
-    for (size_t i = 0; i < geom.size(); ++i) {
-        float t = INFINITY;
-
-        if (geom[i]->intersect(ray_orig, ray_dir, t)) {
-            if (t < near_t) {
-                near_t = t;
-                near_geom = geom[i];
-            }
+    for (auto i = geom.begin(); i != geom.end(); ++i) {
+        Geometry *g = *i;
+        float t;
+        if (!g->intersect(ray_orig, ray_dir, t))
+            continue;
+        if (t < near_t) {
+            near_t = t;
+            near_geom = g;
         }
     }
 

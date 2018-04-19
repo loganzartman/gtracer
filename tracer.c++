@@ -68,9 +68,14 @@ int main(int argc, char *argv[]) {
         {"lens", new Material(float3(0.8, 0.8, 1.0), 1.0, 1.0, float3(0))},
         {"light", new Material(float3(1, 0, 0), 0, 0, float3(20))}};
     vector<Geometry *> geom;
+    // vector<Sphere> spheres = construct_spheres_random(mats);
+    // for (size_t i = 0; i < spheres.size(); ++i)
+    //     geom.push_back(&spheres[i]);
+
     vector<Tri> tris = construct_tris_random(mats);
     for (size_t i = 0; i < tris.size(); ++i)
         geom.push_back(&tris[i]);
+
     // Sphere light(float3(5, 15, 5), 3, mats["light"]);
     // Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
     // Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
@@ -344,9 +349,9 @@ vector<Sphere> construct_spheres_random(
     // spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000,
     // mats["ground"]));
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 500; ++i) {
         float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
-        float radius = randf(1, 2);
+        float radius = randf(0.5, 1.0);
         float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
         Material *mat =
             new Material(col, randf(0., 1.), randf(0., 0.5), float3(0));
@@ -357,16 +362,16 @@ vector<Sphere> construct_spheres_random(
     return spheres;
 }
 
-vector<Tri> construct_tris_random(
-    unordered_map<string, Material *> mats) {
+vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
     vector<Tri> tris;
 
-    // position, radius, material
-    // spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000,
-    // mats["ground"]));
+    float3 la(-5, 15, -5);
+    float3 lb( 5, 15, -5);
+    float3 lc( 0, 15,  5);
+    tris.push_back(Tri(la, lb, lc, mats["light"]));
 
-    for (int i = 0; i < 1000; ++i) {
-        float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
+    for (int i = 0; i < 100; ++i) {
+        float3 pos(randf(-10., 10.), randf(-5., 5.), randf(-10., 10.));
         float3 a = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
         float3 b = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
         float3 c = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));

@@ -45,7 +45,8 @@ struct Sphere : public Geometry {
         t = std::min(t0, t1);
         if (t < 0)
             t = std::max(t0, t1);
-        assert(t > 0);
+        if (t < 0)
+            return false;
 
         return true;
     }
