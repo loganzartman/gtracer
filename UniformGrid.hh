@@ -9,7 +9,7 @@
 #include "Geometry.hh"
 #include "Vec3.hh"
 
-typedef size_t difference_type; // yeah
+typedef size_t difference_type;  // yeah
 typedef std::pair<size_t, size_t> ugrid_data_t;
 typedef std::pair<Geometry*, size_t> ugrid_pair_t;
 
@@ -81,7 +81,7 @@ class UniformGrid {
         const ugrid_pair_t* gc;
 
        public:
-        iterator(size_t index, ugrid_pair_t *gc) : index(index), gc(gc) {}
+        iterator(size_t index, ugrid_pair_t* gc) : index(index), gc(gc) {}
         iterator(const iterator& it) = default;
 
         friend bool operator==(const iterator& lhs, const iterator& rhs) {
@@ -125,8 +125,14 @@ class UniformGrid {
             return lhs.index - rhs.index;
         }
 
-        iterator& operator++() { ++index; return *this; }
-        iterator& operator--() { --index; return *this; }
+        iterator& operator++() {
+            ++index;
+            return *this;
+        }
+        iterator& operator--() {
+            --index;
+            return *this;
+        }
         Geometry* operator*() const { return gc[index].first; }
     };
 
@@ -146,8 +152,7 @@ class UniformGrid {
      * @param density an arbitrary density factor
      * @return a grid resolution
      */
-    static int3
-    resolution(AABB bounds, int n, int density = 5) {
+    static int3 resolution(AABB bounds, int n, int density = 5) {
         float3 d = bounds.xmax - bounds.xmin;
         float vol = d.x * d.y * d.z;
         float factor = cbrt(density * n / vol);

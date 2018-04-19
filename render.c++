@@ -1,4 +1,5 @@
 #include "render.hh"
+#include "Box.hh"
 #include "Mat.hh"
 #include "Material.hh"
 #include "Sphere.hh"
@@ -9,8 +10,8 @@
 
 #include <pthread.h>
 #include <algorithm>
-#include <cmath>
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -38,8 +39,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,    h,      pitch,     offset, camera,
-                                    geom, bounds, iteration, pixels};
+        args[i] = new CPUThreadArgs{w,    h,      pitch, offset,    camera,
+                                    geom, bounds, grid,  iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -90,7 +91,8 @@ void *cpu_render_thread(void *thread_arg) {
             float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += cpu_trace(origin, ray_dir, args.geom, 16);
+            color += cpu_trace(origin, ray_dir, args.geom, args.bounds,
+                               args.grid, 16);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -123,7 +125,8 @@ void *cpu_render_thread(void *thread_arg) {
  * @return Color computed for this primary ray
  */
 float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
-                 vector<Geometry *> geom, int depth) {
+                 vector<Geometry *> geom, AABB world_bounds,
+                 const UniformGrid &grid, int depth) {
     float3 color = 1.0;
     float3 light = 0.0;
 
@@ -133,8 +136,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         // cast ray
         float3 intersection;
         Geometry *hit_geom;
-        if (!cpu_ray_intersect(origin, direction, geom, intersection,
-                               hit_geom)) {
+        if (!cpu_ray_intersect(origin, direction, geom, world_bounds, grid,
+                               intersection, hit_geom)) {
             light += float3(1) * color;
             break;
         }
@@ -194,26 +197,18 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
  * @return Whether there was an intersection
  */
 bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
-                       vector<Geometry *> &geom, float3 &intersection,
+                       vector<Geometry *> &geom, AABB world_bounds,
+                       const UniformGrid &grid, float3 &intersection,
                        Geometry *&hit_geom) {
     float near_t = INFINITY;
     Geometry *near_geom = nullptr;
 
     for (size_t i = 0; i < geom.size(); ++i) {
-        float t0 = INFINITY;
-        float t1 = INFINITY;
+        float t = INFINITY;
 
-        if (geom[i]->intersect(ray_orig, ray_dir, t0, t1)) {
-            // if t0 is negative, that's on the other side of the camera
-            if (t0 < 0 && t1 < 0)
-                continue;
-                //assert(0);
-
-            if (t0 < 0)
-                t0 = t1;
-
-            if (t0 < near_t) {
-                near_t = t0;
+        if (geom[i]->intersect(ray_orig, ray_dir, t)) {
+            if (t < near_t) {
+                near_t = t;
                 near_geom = geom[i];
             }
         }

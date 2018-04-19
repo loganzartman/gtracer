@@ -1,6 +1,8 @@
 #ifndef SPHERE_HH
 #define SPHERE_HH
 
+#include <algorithm>
+#include <cassert>
 #include <cmath>
 #include "AABB.hh"
 #include "Geometry.hh"
@@ -19,8 +21,7 @@ struct Sphere : public Geometry {
 
     const Material *material() const { return mat; }
 
-    bool intersect(const float3 &r_orig, const float3 &r_dir, float &t0,
-                   float &t1) const {
+    bool intersect(const float3 &r_orig, const float3 &r_dir, float &t) const {
         // draw a line between the center of the sphere and ray origin
         float3 line = center - r_orig;
 
@@ -39,8 +40,12 @@ struct Sphere : public Geometry {
 
         // t0 and t1 are parametric coefficients of the original ray
         // AKA how far down the ray the collision occurs
-        t0 = tca - rad_of_inter;
-        t1 = tca + rad_of_inter;
+        float t0 = tca - rad_of_inter;
+        float t1 = tca + rad_of_inter;
+        t = std::min(t0, t1);
+        if (t < 0)
+            t = std::max(t0, t1);
+        assert(t > 0);
 
         return true;
     }

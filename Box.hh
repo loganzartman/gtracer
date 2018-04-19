@@ -18,8 +18,7 @@ class Box : public Geometry {
 
     const Material *material() const { return mat; }
 
-    bool intersect(const float3 &r_orig, const float3 &r_dir, float &t0,
-                   float &t1) const {
+    bool intersect(const float3 &r_orig, const float3 &r_dir, float &t) const {
         using namespace std;
 
         float tx1 = (box.xmin.x - r_orig.x) / r_dir.x;
@@ -46,8 +45,9 @@ class Box : public Geometry {
         if (tmax < 0)
             return false;
 
-        t0 = fabs(tmin);  // not sure
-        t1 = fabs(tmax);  // might be bad
+        float t0 = fabs(tmin);  // not sure
+        float t1 = fabs(tmax);  // might be bad
+        t = t0;
 
         return true;
     }

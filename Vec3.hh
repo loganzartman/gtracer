@@ -8,12 +8,12 @@
 
 template <typename T>
 struct Vec3 {
-    friend Vec3<T> min(const Vec3<T>& a, const Vec3<T>& b) {
+    friend Vec3<T> min(const Vec3<T> &a, const Vec3<T> &b) {
         using namespace std;
         return Vec3<T>(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
     }
 
-    friend Vec3<T> max(const Vec3<T>& a, const Vec3<T>& b) {
+    friend Vec3<T> max(const Vec3<T> &a, const Vec3<T> &b) {
         using namespace std;
         return Vec3<T>(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
     }
@@ -38,7 +38,7 @@ struct Vec3 {
 
     T dot(const Vec3<T> &o) const { return x * o.x + y * o.y + z * o.z; }
 
-    Vec3<T> cross (const Vec3<T>& o) const {
+    Vec3<T> cross(const Vec3<T> &o) const {
         Vec3<T> result;
         result.x = y * o.z - z * o.y;
         result.y = z * o.x - x * o.z;
@@ -47,7 +47,7 @@ struct Vec3 {
     }
 
     // shouldn't use fabs because we want to keep this generic
-    friend void vabs(Vec3& v) { 
+    friend void vabs(Vec3 &v) {
         if (v.x < 0)
             v.x = -v.x;
         if (v.y < 0)

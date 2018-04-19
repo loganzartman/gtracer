@@ -16,6 +16,7 @@
 
 #include "Material.hh"
 #include "Sphere.hh"
+#include "Tri.hh"
 #include "Vec3.hh"
 #include "render.hh"
 
@@ -44,6 +45,8 @@ void gl_draw_fullscreen();
 std::vector<Sphere> construct_spheres(
     std::unordered_map<std::string, Material *> mats);
 std::vector<Sphere> construct_spheres_random(
+    std::unordered_map<std::string, Material *> mats);
+std::vector<Tri> construct_tris_random(
     std::unordered_map<std::string, Material *> mats);
 void output_bmp(float *pixels, int w, int h, std::string outfile);
 #define sdl_check()                       \

@@ -12,11 +12,11 @@
 #include <vector>
 
 #include "Box.hh"
-#include "Tri.hh"
 #include "Geometry.hh"
 #include "Mat.hh"
 #include "Material.hh"
 #include "Sphere.hh"
+#include "Tri.hh"
 #include "Vec3.hh"
 #include "options.hh"
 #include "render.hh"
@@ -68,17 +68,17 @@ int main(int argc, char *argv[]) {
         {"lens", new Material(float3(0.8, 0.8, 1.0), 1.0, 1.0, float3(0))},
         {"light", new Material(float3(1, 0, 0), 0, 0, float3(20))}};
     vector<Geometry *> geom;
-    // vector<Sphere> spheres = construct_spheres_random(mats);
-    // for (size_t i = 0; i < spheres.size(); ++i)
-    // geom.push_back(&spheres[i]);
-    Sphere light(float3(5, 15, 5), 3, mats["light"]);
-    Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
-    Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
-    Tri t(float3(0,10,0), float3(10,10,0), float3(5,10,10), mats["red"]);
-    geom.push_back(&light);
-    // geom.push_back(&ground);
-    geom.push_back(&b);
-    geom.push_back(&t);
+    vector<Tri> tris = construct_tris_random(mats);
+    for (size_t i = 0; i < tris.size(); ++i)
+        geom.push_back(&tris[i]);
+    // Sphere light(float3(5, 15, 5), 3, mats["light"]);
+    // Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
+    // Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
+    // Tri t(float3(0,10,0), float3(10,10,0), float3(5,10,10), mats["red"]);
+    // geom.push_back(&light);
+    // // geom.push_back(&ground);
+    // geom.push_back(&b);
+    // geom.push_back(&t);
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -341,11 +341,12 @@ vector<Sphere> construct_spheres_random(
     vector<Sphere> spheres;
 
     // position, radius, material
-    spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000, mats["ground"]));
+    // spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000,
+    // mats["ground"]));
 
-    for (int i = 0; i < 20; ++i) {
-        float3 pos(randf(-20., 20.), randf(0., 10.), randf(-20., 20.));
-        float radius = randf(2, 5);
+    for (int i = 0; i < 100; ++i) {
+        float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
+        float radius = randf(1, 2);
         float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
         Material *mat =
             new Material(col, randf(0., 1.), randf(0., 0.5), float3(0));
@@ -354,6 +355,29 @@ vector<Sphere> construct_spheres_random(
     }
 
     return spheres;
+}
+
+vector<Tri> construct_tris_random(
+    unordered_map<string, Material *> mats) {
+    vector<Tri> tris;
+
+    // position, radius, material
+    // spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000,
+    // mats["ground"]));
+
+    for (int i = 0; i < 1000; ++i) {
+        float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
+        float3 a = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        float3 b = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        float3 c = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Material *mat =
+            new Material(col, randf(0., 1.), randf(0., 0.5), float3(0));
+        mats[to_string(i)] = mat;
+        tris.push_back(Tri(a, b, c, mat));
+    }
+
+    return tris;
 }
 
 /**
