@@ -7,6 +7,7 @@
 #include "Tri.hh"
 #include "Vec3.hh"
 #include "AABB.hh"
+#include "Geometry.hh"
 #include "UniformGrid.hh"
 #include "gtest/gtest.h"
 #include "render.hh"
@@ -356,22 +357,6 @@ TEST(TriTest, cpu_ray_intersect) {
     ASSERT_EQ(hit_geom, geoms[1]);
 }
 
-TEST(UniformGridTest, grid_construct) {
-    UniformGrid g(float3(10, 10, 10));
-}
-
-TEST(UniformGridTest, grid_access) {
-    UniformGrid g(float3(10, 10, 10));
-    g.first(5, 5, 5) = 1;
-    g.first(4, 5, 4) = 2;
-    g.first(5, 6, 5) = 3;
-    g.last(5, 5, 5) = 4;
-    ASSERT_EQ(g.first(5, 5, 5), 1);
-    ASSERT_EQ(g.first(4, 5, 4), 2);
-    ASSERT_EQ(g.first(5, 6, 5), 3);
-    ASSERT_EQ(g.last(5, 5, 5),  4);
-}
-
 TEST(UniformGridTest, grid_resolution) {
     AABB bounds(float3(0), float3(1, 2, 3));
     int3 res = UniformGrid::resolution(bounds, 2, 6);
@@ -385,17 +370,77 @@ TEST(UniformGridTest, grid_count_pairs) {
     Sphere s(float3(0.5), 0.2);
     std::vector<Geometry*> geom{&s};
 
-    float3 res = UniformGrid::resolution(world_bounds, 1, 64);
+    int3 res = UniformGrid::resolution(world_bounds, 1, 64);
     ASSERT_EQ(res.x, 4);
     ASSERT_EQ(res.y, 4);
     ASSERT_EQ(res.z, 4);
 
-    UniformGrid g(res);
-    ASSERT_EQ(g.res.x, 4);
-    ASSERT_EQ(g.res.y, 4);
-    ASSERT_EQ(g.res.z, 4);
-
     size_t pairs = UniformGrid::count_pairs(res, world_bounds, geom.begin(),
                                             geom.end());
     ASSERT_EQ(pairs, 8);
+}
+
+TEST(UniformGridTest, acceptance) {
+    // build scene
+    Sphere sphere1(float3(-2, 0, 0), 0.5f);
+    Sphere sphere2(float3( 2, 0, 0), 0.5f);
+    std::vector<Geometry*> geom{&sphere1, &sphere2};
+
+    // compute resolution
+    AABB world_bounds = geometry_bounds(geom.begin(), geom.end());
+    int3 res = UniformGrid::resolution(world_bounds, geom.size());
+    ASSERT_EQ(res.x, 7);
+    ASSERT_EQ(res.y, 2);
+    ASSERT_EQ(res.z, 2);
+
+    // compute space requirements
+    size_t n_data = UniformGrid::data_size(res);
+    ASSERT_EQ(n_data, 72);
+    size_t n_pairs = UniformGrid::count_pairs(res, world_bounds, geom.begin(), geom.end());
+    ASSERT_EQ(n_pairs, 16);
+
+    // allocate memory
+    ugrid_data_t *grid_data = new ugrid_data_t[n_data];
+    ugrid_pair_t *grid_pairs = new ugrid_pair_t[n_pairs];
+
+    // build grid
+    UniformGrid grid(res, world_bounds, grid_data, grid_pairs, n_pairs, geom.begin(), geom.end());
+
+    // test lookup of sphere1
+    {
+        int3 cell = int3(0,0,0);
+        auto b = grid.first(cell);
+        auto e = grid.last(cell);
+        ASSERT_EQ(e - b, 1);
+        ASSERT_EQ(*b, geom[0]);
+    }
+
+    // test lookup of sphere2
+    {
+        int3 cell = int3(5,0,0);
+        auto b = grid.first(cell);
+        auto e = grid.last(cell);
+        ASSERT_EQ(e - b, 1);
+        ASSERT_EQ(*b, geom[1]);
+    }
+
+    // test lookup of nothing
+    {
+        int3 cell = int3(3,0,0);
+        auto b = grid.first(cell);
+        auto e = grid.last(cell);
+        ASSERT_EQ(e - b, 0);
+    }
+
+    // test lookup of sphere2
+    {
+        int3 cell = int3(6,1,1);
+        auto b = grid.first(cell);
+        auto e = grid.last(cell);
+        ASSERT_EQ(e - b, 1);
+        ASSERT_EQ(*b, geom[1]);
+    }
+
+    delete[] grid_data;
+    delete[] grid_pairs;
 }

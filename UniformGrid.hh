@@ -38,10 +38,11 @@ class UniformGrid {
         while (b != e) {
             size_t x0, y0, z0, x1, y1, z1;
             geom_cell_hits(res, scene_bounds, *b, x0, y0, z0, x1, y1, z1);
-            for (size_t x = x0; x <= x1; ++x) {
-                for (size_t y = y0; y <= y1; ++y) {
-                    for (size_t z = z0; z <= z1; ++z) {
-                        pair->first = *b;
+            for (size_t x = x0; x < x1; ++x) {
+                for (size_t y = y0; y < y1; ++y) {
+                    for (size_t z = z0; z < z1; ++z) {
+                        Geometry* g = *b;
+                        pair->first = g;
                         pair->second = data_index(int3(x, y, z));
                         ++pair;
                     }
@@ -66,7 +67,7 @@ class UniformGrid {
             data[cell_idx].first = i;
             while (i < n_pairs && geom_cell[i].second == cell_idx)
                 ++i;
-            data[cell_idx].second = i - 1;
+            data[cell_idx].second = i;
         }
         assert(i == n_pairs);
     }
@@ -217,7 +218,7 @@ class UniformGrid {
             size_t x0, y0, z0, x1, y1, z1;
             geom_cell_hits(resolution, scene_bounds, geom, x0, y0, z0, x1, y1,
                            z1);
-            pairs += (x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1);
+            pairs += (x1 - x0) * (y1 - y0) * (z1 - z0);
 
             ++b;
         }
