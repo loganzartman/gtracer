@@ -83,6 +83,12 @@ TEST(Vec3Test, length) {
     ASSERT_FLOAT_EQ(v.length(), 1 * sqrt(3));
 }
 
+TEST(Vec3Test, cross_1) {
+    float3 a(0,1,1);
+    float3 b(1,-1,3);
+    ASSERT_EQ(a.cross(b), float3(4,1,-1));
+}
+
 TEST(RaySphereTest, intersect) {
     // test simple ray-sphere intersect on x-axis
     float3 ray_origin(0, 0, 0);
@@ -368,10 +374,10 @@ TEST(UniformGridTest, grid_access) {
 
 TEST(UniformGridTest, grid_resolution) {
     AABB bounds(float3(0), float3(1, 2, 3));
-    float3 res = UniformGrid::resolution(bounds, 2, 6);
-    ASSERT_FLOAT_EQ(res.x, cbrt(2) * 1);
-    ASSERT_FLOAT_EQ(res.y, cbrt(2) * 2);
-    ASSERT_FLOAT_EQ(res.z, cbrt(2) * 3);
+    int3 res = UniformGrid::resolution(bounds, 2, 6);
+    ASSERT_EQ(res.x, ceil(cbrt(2) * 1));
+    ASSERT_EQ(res.y, ceil(cbrt(2) * 2));
+    ASSERT_EQ(res.z, ceil(cbrt(2) * 3));
 }
 
 TEST(UniformGridTest, grid_count_pairs) {
@@ -385,16 +391,11 @@ TEST(UniformGridTest, grid_count_pairs) {
     ASSERT_EQ(res.z, 4);
 
     UniformGrid g(res);
-    ASSERT_EQ(g.rx, 4);
-    ASSERT_EQ(g.ry, 4);
-    ASSERT_EQ(g.rz, 4);
+    ASSERT_EQ(g.res.x, 4);
+    ASSERT_EQ(g.res.y, 4);
+    ASSERT_EQ(g.res.z, 4);
 
-    size_t pairs = g.count_pairs(world_bounds, geom.begin(), geom.end());
+    size_t pairs = UniformGrid::count_pairs(res, world_bounds, geom.begin(),
+                                            geom.end());
     ASSERT_EQ(pairs, 8);
-}
-
-TEST(CrossProductTest, cross_1) {
-    float3 a(0,1,1);
-    float3 b(1,-1,3);
-    ASSERT_EQ(a.cross(b), float3(4,1,-1));
 }

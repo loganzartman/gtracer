@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
     Tri t(float3(0,10,0), float3(10,10,0), float3(5,10,10), mats["light"]);
     geom.push_back(&light);
-    geom.push_back(&ground);
+    // geom.push_back(&ground);
     geom.push_back(&b);
     geom.push_back(&t);
 

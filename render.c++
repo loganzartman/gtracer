@@ -2,8 +2,8 @@
 #include "Mat.hh"
 #include "Material.hh"
 #include "Sphere.hh"
-#include "Vec3.hh"
 #include "UniformGrid.hh"
+#include "Vec3.hh"
 #include "transform.hh"
 #include "util.hh"
 
@@ -20,11 +20,16 @@ using namespace std;
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
                 vector<Geometry *> geom, unsigned iteration,
                 unsigned n_threads) {
-
     // construct uniform grid
     AABB bounds = geometry_bounds(geom.begin(), geom.end());
-    float3 res = UniformGrid::resolution(bounds, geom.size());
-    UniformGrid grid(res);
+    int3 res = UniformGrid::resolution(bounds, geom.size());
+    size_t n_data = UniformGrid::data_size(res);
+    size_t n_pairs =
+        UniformGrid::count_pairs(res, bounds, geom.begin(), geom.end());
+    ugrid_data_t *grid_data = new ugrid_data_t[n_data];
+    ugrid_pair_t *grid_pairs = new ugrid_pair_t[n_pairs];
+    UniformGrid grid(res, bounds, grid_data, grid_pairs, n_pairs, geom.begin(),
+                     geom.end());
 
     // spawn threads
     CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
@@ -32,8 +37,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,      h,    pitch,  offset,
-                                    camera, geom, bounds, iteration, pixels};
+        args[i] = new CPUThreadArgs{w,    h,      pitch,     offset, camera,
+                                    geom, bounds, iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -52,6 +57,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
 
     delete[] args;
     delete[] threads;
+    delete[] grid_data;
+    delete[] grid_pairs;
 }
 
 void *cpu_render_thread(void *thread_arg) {

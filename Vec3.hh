@@ -167,4 +167,5 @@ struct Vec3 {
 };
 
 typedef Vec3<float> float3;
+typedef Vec3<int> int3;
 #endif
