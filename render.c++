@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -134,7 +135,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         Geometry *hit_geom;
         if (!cpu_ray_intersect(origin, direction, geom, intersection,
                                hit_geom)) {
-            light += float3(0) * color;
+            light += float3(1) * color;
             break;
         }
 
@@ -167,7 +168,6 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                 refraction_dir.normalize();
                 direction = refraction_dir;
             }
-            origin += direction * 0.005;
         } else {
             // diffuse material
             // generate random number on a sphere, but we want only
@@ -176,6 +176,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
             if (direction.dot(normal) < 0)
                 direction *= -1;
         }
+        origin += direction * 0.005;
+        direction.normalize();
     }
 
     return light;
@@ -203,6 +205,10 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
 
         if (geom[i]->intersect(ray_orig, ray_dir, t0, t1)) {
             // if t0 is negative, that's on the other side of the camera
+            if (t0 < 0 && t1 < 0)
+                continue;
+                //assert(0);
+
             if (t0 < 0)
                 t0 = t1;
 

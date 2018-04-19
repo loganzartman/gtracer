@@ -66,15 +66,15 @@ int main(int argc, char *argv[]) {
         {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.0, float3(0))},
         {"mirror", new Material(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0))},
         {"lens", new Material(float3(0.8, 0.8, 1.0), 1.0, 1.0, float3(0))},
-        {"light", new Material(float3(1, 0, 0), 0, 0, float3(10))}};
+        {"light", new Material(float3(1, 0, 0), 0, 0, float3(20))}};
     vector<Geometry *> geom;
     // vector<Sphere> spheres = construct_spheres_random(mats);
     // for (size_t i = 0; i < spheres.size(); ++i)
     // geom.push_back(&spheres[i]);
-    Sphere light(float3(10, 10, 0), 3, mats["light"]);
+    Sphere light(float3(5, 15, 5), 3, mats["light"]);
     Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
     Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
-    Tri t(float3(0,10,0), float3(10,10,0), float3(5,10,10), mats["light"]);
+    Tri t(float3(0,10,0), float3(10,10,0), float3(5,10,10), mats["red"]);
     geom.push_back(&light);
     // geom.push_back(&ground);
     geom.push_back(&b);
