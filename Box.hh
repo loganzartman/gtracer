@@ -1,9 +1,9 @@
 #ifndef BOX_HH
 #define BOX_HH
 
-#include <cmath>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
 #include "AABB.hh"
 #include "Geometry.hh"
 
@@ -26,28 +26,27 @@ class Box : public Geometry {
 
         // r.dir is unit direction vector of ray
         float3 invdir(1.f / r_dir.x, 1.f / r_dir.y, 1.f / r_dir.z);
-        // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
-        // r.org is origin of ray
-        float t1 = (box.xmin.x - r_orig.x)*invdir.x;
-        float t2 = (box.xmax.x - r_orig.x)*invdir.x;
-        float t3 = (box.xmin.y - r_orig.y)*invdir.y;
-        float t4 = (box.xmax.y - r_orig.y)*invdir.y;
-        float t5 = (box.xmin.z - r_orig.z)*invdir.z;
-        float t6 = (box.xmax.z - r_orig.z)*invdir.z;
+        // lb is the corner of AABB with minimal coordinates - left bottom, rt
+        // is maximal corner r.org is origin of ray
+        float t1 = (box.xmin.x - r_orig.x) * invdir.x;
+        float t2 = (box.xmax.x - r_orig.x) * invdir.x;
+        float t3 = (box.xmin.y - r_orig.y) * invdir.y;
+        float t4 = (box.xmax.y - r_orig.y) * invdir.y;
+        float t5 = (box.xmin.z - r_orig.z) * invdir.z;
+        float t6 = (box.xmax.z - r_orig.z) * invdir.z;
 
         float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
         float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
 
-        // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
-        if (tmax < 0)
-        {
+        // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is
+        // behind us
+        if (tmax < 0) {
             t = tmax;
             return false;
         }
 
         // if tmin > tmax, ray doesn't intersect AABB
-        if (tmin > tmax)
-        {
+        if (tmin > tmax) {
             t = tmax;
             return false;
         }
