@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Box.hh"
 #include "Material.hh"
 #include "Sphere.hh"
 #include "Tri.hh"
@@ -45,6 +46,8 @@ void gl_draw_fullscreen();
 std::vector<Sphere> construct_spheres(
     std::unordered_map<std::string, Material *> mats);
 std::vector<Sphere> construct_spheres_random(
+    std::unordered_map<std::string, Material *> mats);
+std::vector<Box> construct_boxes_random(
     std::unordered_map<std::string, Material *> mats);
 std::vector<Tri> construct_tris_random(
     std::unordered_map<std::string, Material *> mats);

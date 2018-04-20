@@ -63,27 +63,38 @@ int main(int argc, char *argv[]) {
         {"ground", new Material(float3(0.8, 0.8, 0.9), 0, 0.0, float3(0))},
         {"wood", new Material(float3(0.545, 0.271, 0.075), 0, 0.0, float3(0))},
         {"red", new Material(float3(0.618, 0.213, 0.175), 0, 0.0, float3(0))},
+        {"white", new Material(float3(0.950, 0.950, 0.950), 0, 0.0, float3(0))},
         {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.0, float3(0))},
         {"mirror", new Material(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0))},
         {"lens", new Material(float3(0.8, 0.8, 1.0), 1.0, 1.0, float3(0))},
-        {"light", new Material(float3(1, 0, 0), 0, 0, float3(20))}};
-    vector<Geometry *> geom;
+        {"light", new Material(float3(1, 0, 0), 0, 0, float3(10))},
+        {"lightr", new Material(float3(1, 0, 0), 0, 0, float3(30, 0, 0))},
+        {"lightg", new Material(float3(1, 0, 0), 0, 0, float3(0, 30, 0))},
+        {"lightb", new Material(float3(1, 0, 0), 0, 0, float3(0, 0, 30))}};
+    // vector<Geometry *> geom;
     // vector<Sphere> spheres = construct_spheres_random(mats);
     // for (size_t i = 0; i < spheres.size(); ++i)
     //     geom.push_back(&spheres[i]);
 
-    vector<Tri> tris = construct_tris_random(mats);
-    for (size_t i = 0; i < tris.size(); ++i)
-        geom.push_back(&tris[i]);
+    // vector<Box> boxes = construct_boxes_random(mats);
+    // for (size_t i = 0; i < boxes.size(); ++i)
+    //     geom.push_back(&boxes[i]);
 
-    // Sphere light(float3(5, 15, 5), 3, mats["light"]);
-    // Sphere ground(float3(0.0, -10000, -20), 10000, mats["ground"]);
-    // Box b(float3(-2, 4, -2), float3(2, 0, 2), mats["red"]);
-    // Tri t(float3(0,10,0), float3(10,10,0), float3(5,10,10), mats["red"]);
-    // geom.push_back(&light);
-    // // geom.push_back(&ground);
-    // geom.push_back(&b);
-    // geom.push_back(&t);
+    // vector<Tri> tris = construct_tris_random(mats);
+    // for (size_t i = 0; i < tris.size(); ++i)
+    //     geom.push_back(&tris[i]);
+
+    Sphere lightr(float3(-8, 2, 8), 1, mats["lightr"]);
+    Sphere lightg(float3(8, 4, 8), 1, mats["lightg"]);
+    Sphere lightb(float3(8, 6, -8), 1, mats["lightb"]);
+    Box ground(float3(-5, -0.5, -5), float3(5, -1.5, 5), mats["ground"]);
+    Box box(float3(-2, 4, -2), float3(2, 0, 2), mats["white"]);
+
+    // Box shaft(float3(-1, 7, -1), float3(1, 0, 1), mats["white"]);
+    // Sphere left(float3(-2, 0, 0), 2.5, mats["white"]);
+    // Sphere right(float3(2, 0, 0), 2.5, mats["white"]);
+    // Sphere tip(float3(0, 7, 0), 1.5, mats["white"]);
+    vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -349,6 +360,8 @@ vector<Sphere> construct_spheres_random(
     // spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000,
     // mats["ground"]));
 
+    spheres.push_back(Sphere(float3(0, 18, 0), 5, mats["light"]));
+
     for (int i = 0; i < 500; ++i) {
         float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
         float radius = randf(0.5, 1.0);
@@ -362,12 +375,31 @@ vector<Sphere> construct_spheres_random(
     return spheres;
 }
 
+vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
+    vector<Box> boxes;
+
+    // position, radius, material
+    // boxes.push_back(Sphere(float3(0.0, -10000, -20), 10000,
+    // mats["ground"]));
+
+    for (int i = 0; i < 20; ++i) {
+        float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
+        float size = randf(1, 2);
+        float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Material *mat = new Material(col, 0.f, 0.f, float3(0));
+        mats[to_string(i)] = mat;
+        boxes.push_back(Box(pos - size, pos + size, mat));
+    }
+
+    return boxes;
+}
+
 vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
     vector<Tri> tris;
 
     float3 la(-5, 15, -5);
-    float3 lb( 5, 15, -5);
-    float3 lc( 0, 15,  5);
+    float3 lb(5, 15, -5);
+    float3 lc(0, 15, 5);
     tris.push_back(Tri(la, lb, lc, mats["light"]));
 
     for (int i = 0; i < 100; ++i) {
