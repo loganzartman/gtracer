@@ -170,7 +170,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                 refraction_dir.normalize();
                 direction = refraction_dir;
             }
-        } else if (hit_geom->material()->reflection) {
+        } else if (hit_geom->material()->reflection > randf(0, 1)) {
             direction = direction.reflect(normal);
         } else {
             // diffuse material
@@ -180,8 +180,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
             if (direction.dot(normal) < 0)
                 direction *= -1;
         }
-        origin += direction * 0.005;
         direction.normalize();
+        origin += normal * 1e-6;
     }
 
     return light;
