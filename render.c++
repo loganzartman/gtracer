@@ -136,8 +136,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         // cast ray
         float3 intersection;
         Geometry *hit_geom;
-        if (!cpu_ray_intersect(origin, direction, geom, world_bounds, grid,
-                               intersection, hit_geom)) {
+        if (!cpu_ray_intersect_items(origin, direction, geom.begin(),
+                                     geom.end(), intersection, hit_geom)) {
             light += float3(0) * color;
             break;
         }
@@ -203,12 +203,86 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
                        vector<Geometry *> &geom, AABB world_bounds,
                        const UniformGrid &grid, float3 &intersection,
                        Geometry *&hit_geom) {
+    // find ray entry point into world bounds
+    const Box bbox(world_bounds);
+    float3 ray_entry;
+    if (world_bounds.contains(ray_orig))
+        ray_entry = ray_orig;
+    else {
+        float t;
+        if (!bbox.intersect(ray_orig, ray_dir, t))
+            return false;
+        ray_entry = ray_orig + ray_dir * t;
+    }
+
+    // compute voxel parameters
+    const float3 relative_entry = ray_entry - world_bounds.xmin;
+    int3 voxel_pos(floor(relative_entry.x / grid.res.x),
+                   floor(relative_entry.y / grid.res.y),
+                   floor(relative_entry.z / grid.res.z));
+    int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
+                    ray_dir.z < 0 ? -1 : 1);
+    int3 next_voxel = voxel_pos + voxel_step;
+
+    // compute t values at which ray crosses voxel boundaries
+    float3 t_max = (float3(next_voxel) - relative_entry) / ray_dir;
+    float3 t_delta = ray_dir * float3(voxel_step);  // compute t deltas
+
+    // handle div by zero
+    if (ray_dir.x == 0)
+        t_max.x = INFINITY, t_delta.x = INFINITY;
+    if (ray_dir.y == 0)
+        t_max.y = INFINITY, t_delta.y = INFINITY;
+    if (ray_dir.z == 0)
+        t_max.z = INFINITY, t_delta.z = INFINITY;
+
+    // traverse the grid
+    unsigned i = 0;
+    do {
+        if (t_max.x < t_max.y) {
+            if (t_max.x < t_max.z) {
+                voxel_pos.x += voxel_step.x;
+                if (voxel_pos.x > grid.res.x)
+                    return false;
+                t_max.x += t_delta.x;
+            } else {
+                voxel_pos.z += voxel_step.z;
+                if (voxel_pos.z > grid.res.z)
+                    return false;
+                t_max.z += t_delta.z;
+            }
+        } else {
+            if (t_max.y < t_max.z) {
+                voxel_pos.y += voxel_step.y;
+                if (voxel_pos.y > grid.res.y)
+                    return false;
+                t_max.y += t_delta.y;
+            } else {
+                voxel_pos.z += voxel_step.z;
+                if (voxel_pos.z > grid.res.z)
+                    return false;
+                t_max.z += t_delta.z;
+            }
+        }
+
+        // test objects
+        auto b = grid.first(voxel_pos);
+        auto e = grid.last(voxel_pos);
+        if (b == e)
+            continue;
+        if (cpu_ray_intersect_items(ray_orig, ray_dir, b, e, intersection,
+                                    hit_geom)) {
+            return true;
+        }
+    } while (++i < 10000);
+
     return false;
 }
 
 /**
  * @brief Classic, grid-free brute-force ray intersection
- * @details cpu_ray_intersect() should be used instead for best performance
+ * @details This is used as a component of cpu_ray_intersect
+ * It accepts input iterators and checks intersection for each item.
  *
  * @param[in] ray_orig Ray origin point
  * @param[in] ray_dir Ray direction as unit vector
@@ -217,21 +291,25 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
  * @param[out] hit_geom The geometry that was intersected
  * @return Whether there was an intersection
  */
-bool cpu_ray_intersect_nogrid(const float3& ray_orig, const float3& ray_dir,
-                              vector<Geometry*>& geom, float3& intersection,
-                              Geometry*& hit_geom) {
+template <typename II>
+bool cpu_ray_intersect_items(const float3 &ray_orig, const float3 &ray_dir,
+                             II b, II e, float3 &intersection,
+                             Geometry *&hit_geom) {
     float near_t = INFINITY;
     Geometry *near_geom = nullptr;
 
-    for (auto i = geom.begin(); i != geom.end(); ++i) {
-        Geometry *g = *i;
+    while (b != e) {
+        Geometry *g = *b;
         float t;
-        if (!g->intersect(ray_orig, ray_dir, t))
+        if (!g->intersect(ray_orig, ray_dir, t)) {
+            ++b;
             continue;
+        }
         if (t < near_t) {
             near_t = t;
             near_geom = g;
         }
+        ++b;
     }
 
     if (near_geom) {

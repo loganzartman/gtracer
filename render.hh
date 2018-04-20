@@ -32,9 +32,10 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
                        std::vector<Geometry *> &geom, AABB world_bounds,
                        const UniformGrid &grid, float3 &intersection,
                        Geometry *&hit_geom);
-bool cpu_ray_intersect_nogrid(const float3 &ray_orig, const float3 &ray_dir,
-                              std::vector<Geometry *> &geom,
-                              float3 &intersection, Geometry *&hit_geom);
+template <typename II>
+bool cpu_ray_intersect_items(const float3 &ray_orig, const float3 &ray_dir,
+                             II b, II e, float3 &intersection,
+                             Geometry *&hit_geom);
 float fresnel(float3 dir, float3 normal, float ior);
 
 #endif

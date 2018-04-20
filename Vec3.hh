@@ -24,6 +24,9 @@ struct Vec3 {
     Vec3(T v) : x(v), y(v), z(v) {}
     Vec3(T vx, T vy, T vz) : x(vx), y(vy), z(vz) {}
 
+    template <typename E>
+    Vec3(Vec3<E> other) : x((T)other.x), y((T)other.y), z((T)other.z) {}
+
     Vec3 &normalize() {
         T len2 = length2();
         if (len2 > 0) {
