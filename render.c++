@@ -193,14 +193,33 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
  * @param[in] ray_orig Ray origin point
  * @param[in] ray_dir Ray direction as unit vector
  * @param[in] geom Scene geometry
+ * @param[in] world_bounds an AABB for entire world (use geometry_bounds())
+ * @param[in] grid the UniformGrid acceleration structure
  * @param[out] intersection The point of intersection
- * @param[out] hit_geom The sphere that was intersected
+ * @param[out] hit_geom The geometry that was intersected
  * @return Whether there was an intersection
  */
 bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
                        vector<Geometry *> &geom, AABB world_bounds,
                        const UniformGrid &grid, float3 &intersection,
                        Geometry *&hit_geom) {
+    return false;
+}
+
+/**
+ * @brief Classic, grid-free brute-force ray intersection
+ * @details cpu_ray_intersect() should be used instead for best performance
+ *
+ * @param[in] ray_orig Ray origin point
+ * @param[in] ray_dir Ray direction as unit vector
+ * @param[in] geom Scene geometry
+ * @param[out] intersection The point of intersection
+ * @param[out] hit_geom The geometry that was intersected
+ * @return Whether there was an intersection
+ */
+bool cpu_ray_intersect_nogrid(const float3& ray_orig, const float3& ray_dir,
+                              vector<Geometry*>& geom, float3& intersection,
+                              Geometry*& hit_geom) {
     float near_t = INFINITY;
     Geometry *near_geom = nullptr;
 

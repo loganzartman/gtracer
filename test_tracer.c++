@@ -97,8 +97,8 @@ TEST(RaySphereTest, intersect) {
     float3 sphere_pos(3, 0, 0);
     float sphere_radius = 1;
     Sphere s(sphere_pos, sphere_radius);
-    float t0, t1;
-    ASSERT_TRUE(s.intersect(ray_origin, ray_direction, t0, t1));
+    float t;
+    ASSERT_TRUE(s.intersect(ray_origin, ray_direction, t));
 }
 
 TEST(RaySphereTest, intersect_negative) {
@@ -108,8 +108,8 @@ TEST(RaySphereTest, intersect_negative) {
     float3 sphere_pos(-3, 0, 0);
     float sphere_radius = 1;
     Sphere s(sphere_pos, sphere_radius);
-    float t0, t1;
-    ASSERT_TRUE(s.intersect(ray_origin, ray_direction, t0, t1));
+    float t;
+    ASSERT_TRUE(s.intersect(ray_origin, ray_direction, t));
 }
 
 TEST(RaySphereTest, intersect_inside) {
@@ -119,8 +119,8 @@ TEST(RaySphereTest, intersect_inside) {
     float3 sphere_pos(0.5, 0, 0);
     float sphere_radius = 2;
     Sphere s(sphere_pos, sphere_radius);
-    float t0, t1;
-    ASSERT_TRUE(s.intersect(ray_origin, ray_direction, t0, t1));
+    float t;
+    ASSERT_TRUE(s.intersect(ray_origin, ray_direction, t));
 }
 
 TEST(RaySphereTest, no_intersection) {
@@ -130,8 +130,8 @@ TEST(RaySphereTest, no_intersection) {
     float3 sphere_pos(3, 0, 0);
     float sphere_radius = 1;
     Sphere s(sphere_pos, sphere_radius);
-    float t0, t1;
-    ASSERT_FALSE(s.intersect(ray_origin, ray_direction, t0, t1));
+    float t;
+    ASSERT_FALSE(s.intersect(ray_origin, ray_direction, t));
 }
 
 TEST(CPURayIntersect, simple) {
@@ -143,7 +143,7 @@ TEST(CPURayIntersect, simple) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
@@ -157,7 +157,7 @@ TEST(CPURayIntersect, negative) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
@@ -171,7 +171,7 @@ TEST(CPURayIntersect, negative_2) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
@@ -185,7 +185,7 @@ TEST(CPURayIntersect, negative_3) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(-2, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
@@ -200,7 +200,7 @@ TEST(CPURayIntersect, two_negative) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(-1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
@@ -215,7 +215,7 @@ TEST(CPURayIntersect, two_negative_2) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(-3, 0, 0));
     ASSERT_EQ(hit_geom, geoms[1]);
 }
@@ -230,7 +230,7 @@ TEST(CPURayIntersect, two_negative_inside) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(-3, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
@@ -310,36 +310,34 @@ TEST(BoxTest, intersect_ray_1) {
     Box a(float3(1), float3(2));
     float3 r_orig(0);
     float3 r_dir(1);
-    float t0, t1;
-    ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
+    float t;
+    ASSERT_TRUE(a.intersect(r_orig, r_dir, t));
 }
 
 TEST(BoxTest, intersect_ray_2) {
     Box a(float3(1), float3(2));
     float3 r_orig(0, 2, 0);
     float3 r_dir(1);
-    float t0, t1;
-    ASSERT_FALSE(a.intersect(r_orig, r_dir, t0, t1));
+    float t;
+    ASSERT_FALSE(a.intersect(r_orig, r_dir, t));
 }
 
 TEST(TriTest, intersect_ray_1) {
     Tri a(float3(0), float3(1, 0, 0), float3(1, 0, 2));
     float3 r_orig(0.5, 1, 0.5);
     float3 r_dir(0, -1, 0);
-    float t0, t1;
-    ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
-    ASSERT_EQ(t0, 1);
-    ASSERT_EQ(t0, t1);
+    float t;
+    ASSERT_TRUE(a.intersect(r_orig, r_dir, t));
+    ASSERT_EQ(t, 1);
 }
 
 TEST(TriTest, intersect_ray_2) {
     Tri a(float3(0), float3(1, 0, 0), float3(1, 0, 2));
     float3 r_orig(-1.5, 1, -1.5);
     float3 r_dir(1, -0.5, 1);
-    float t0, t1;
-    ASSERT_TRUE(a.intersect(r_orig, r_dir, t0, t1));
-    ASSERT_EQ(t0, 2);
-    ASSERT_EQ(t0, t1);
+    float t;
+    ASSERT_TRUE(a.intersect(r_orig, r_dir, t));
+    ASSERT_EQ(t, 2);
 }
 
 TEST(TriTest, cpu_ray_intersect) {
@@ -352,7 +350,7 @@ TEST(TriTest, cpu_ray_intersect) {
     float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(
-        cpu_ray_intersect(ray_orig, ray_dir, geoms, intersection, hit_geom));
+        cpu_ray_intersect_nogrid(ray_orig, ray_dir, geoms, intersection, hit_geom));
     ASSERT_EQ(intersection, float3(0, 1, 0));
     ASSERT_EQ(hit_geom, geoms[1]);
 }
