@@ -139,11 +139,11 @@ struct Vec3 {
     }
 
     friend bool operator<=(const Vec3<T> &l, const Vec3<T> &r) {
-        return l < r || l == r;
+        return l.x <= r.x && l.y <= r.y && l.z <= r.z;
     }
 
     friend bool operator>=(const Vec3<T> &l, const Vec3<T> &r) {
-        return l > r || l == r;
+        return l.x >= r.x && l.y >= r.y && l.z >= r.z;
     }
 
     T length2() const { return x * x + y * y + z * z; }

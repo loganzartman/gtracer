@@ -71,30 +71,30 @@ int main(int argc, char *argv[]) {
         {"lightr", new Material(float3(1, 0, 0), 0, 0, float3(30, 0, 0))},
         {"lightg", new Material(float3(1, 0, 0), 0, 0, float3(0, 30, 0))},
         {"lightb", new Material(float3(1, 0, 0), 0, 0, float3(0, 0, 30))}};
-    // vector<Geometry *> geom;
+    vector<Geometry *> geom;
     // vector<Sphere> spheres = construct_spheres_random(mats);
     // for (size_t i = 0; i < spheres.size(); ++i)
     //     geom.push_back(&spheres[i]);
 
-    // vector<Box> boxes = construct_boxes_random(mats);
-    // for (size_t i = 0; i < boxes.size(); ++i)
-    //     geom.push_back(&boxes[i]);
+    vector<Box> boxes = construct_boxes_random(mats);
+    for (size_t i = 0; i < boxes.size(); ++i)
+        geom.push_back(&boxes[i]);
 
     // vector<Tri> tris = construct_tris_random(mats);
     // for (size_t i = 0; i < tris.size(); ++i)
     //     geom.push_back(&tris[i]);
 
-    Sphere lightr(float3(-8, 2, 8), 1, mats["lightr"]);
-    Sphere lightg(float3(8, 4, 8), 1, mats["lightg"]);
-    Sphere lightb(float3(8, 6, -8), 1, mats["lightb"]);
-    Box ground(float3(-5, -0.5, -5), float3(5, -1.5, 5), mats["ground"]);
-    Box box(float3(-2, 4, -2), float3(2, 0, 2), mats["white"]);
+    // Sphere lightr(float3(-8, 2, 8), 1, mats["lightr"]);
+    // Sphere lightg(float3(8, 4, 8), 1, mats["lightg"]);
+    // Sphere lightb(float3(8, 6, -8), 1, mats["lightb"]);
+    // Box ground(float3(-5, -0.5, -5), float3(5, -1.5, 5), mats["ground"]);
+    // Box box(float3(-2, 4, -2), float3(2, 0, 2), mats["white"]);
 
     // Box shaft(float3(-1, 7, -1), float3(1, 0, 1), mats["white"]);
     // Sphere left(float3(-2, 0, 0), 2.5, mats["white"]);
     // Sphere right(float3(2, 0, 0), 2.5, mats["white"]);
     // Sphere tip(float3(0, 7, 0), 1.5, mats["white"]);
-    vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
+    // vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
@@ -382,7 +382,7 @@ vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
     // boxes.push_back(Sphere(float3(0.0, -10000, -20), 10000,
     // mats["ground"]));
 
-    for (int i = 0; i < 20; ++i) {
+    for (int i = 0; i < 100; ++i) {
         float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
         float size = randf(1, 2);
         float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
