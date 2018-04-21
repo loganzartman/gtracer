@@ -16,6 +16,7 @@ typedef std::pair<Geometry*, size_t> ugrid_pair_t;
 class UniformGrid {
    public:
     const int3 res;
+    const float3 cell_size;
 
    private:
     ugrid_data_t* data;
@@ -30,7 +31,12 @@ class UniformGrid {
     template <typename RI>
     UniformGrid(int3 resolution, AABB scene_bounds, ugrid_data_t* data,
                 ugrid_pair_t* pairs, size_t n_pairs, RI b, RI e)
-        : res(resolution), data(data), geom_cell(pairs), n_pairs(n_pairs) {
+        : res(resolution),
+          cell_size((scene_bounds.xmax - scene_bounds.xmin) /
+                    float3(resolution)),
+          data(data),
+          geom_cell(pairs),
+          n_pairs(n_pairs) {
         using namespace std;
 
         // construct geometry/cell-index pairs

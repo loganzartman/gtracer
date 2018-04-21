@@ -29,9 +29,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
                 unsigned n_threads);
 void *cpu_render_thread(void *thread_arg);
 bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
-                       std::vector<Geometry *> &geom, AABB world_bounds,
-                       const UniformGrid &grid, float3 &intersection,
-                       Geometry *&hit_geom);
+                       AABB world_bounds, const UniformGrid &grid,
+                       float3 &intersection, Geometry *&hit_geom);
 template <typename II>
 bool cpu_ray_intersect_items(const float3 &ray_orig, const float3 &ray_dir,
                              II b, II e, float3 &intersection,

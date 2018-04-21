@@ -136,9 +136,9 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
         // cast ray
         float3 intersection;
         Geometry *hit_geom;
-        if (!cpu_ray_intersect_items(origin, direction, geom.begin(),
-                                     geom.end(), intersection, hit_geom)) {
-            light += float3(0) * color;
+        if (!cpu_ray_intersect(origin, direction, world_bounds, grid,
+                               intersection, hit_geom)) {
+            light += float3(1) * color;
             break;
         }
 
@@ -200,9 +200,8 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
  * @return Whether there was an intersection
  */
 bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
-                       vector<Geometry *> &geom, AABB world_bounds,
-                       const UniformGrid &grid, float3 &intersection,
-                       Geometry *&hit_geom) {
+                       AABB world_bounds, const UniformGrid &grid,
+                       float3 &intersection, Geometry *&hit_geom) {
     // find ray entry point into world bounds
     const Box bbox(world_bounds);
     float3 ray_entry;
@@ -217,16 +216,17 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
 
     // compute voxel parameters
     const float3 relative_entry = ray_entry - world_bounds.xmin;
-    int3 voxel_pos(floor(relative_entry.x / grid.res.x),
-                   floor(relative_entry.y / grid.res.y),
-                   floor(relative_entry.z / grid.res.z));
-    int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
-                    ray_dir.z < 0 ? -1 : 1);
-    int3 next_voxel = voxel_pos + voxel_step;
+    int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x + 1)),
+                   floor(relative_entry.y / (grid.cell_size.y + 1)),
+                   floor(relative_entry.z / (grid.cell_size.z + 1)));
+    const int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
+                          ray_dir.z < 0 ? -1 : 1);
+    const float3 next_voxel_bound = (voxel_pos + voxel_step) * grid.cell_size;
 
     // compute t values at which ray crosses voxel boundaries
-    float3 t_max = (float3(next_voxel) - relative_entry) / ray_dir;
-    float3 t_delta = ray_dir * float3(voxel_step);  // compute t deltas
+    float3 t_max = (next_voxel_bound - relative_entry) / ray_dir;
+    // compute t deltas
+    float3 t_delta = grid.cell_size / ray_dir * float3(voxel_step);
 
     // handle div by zero
     if (ray_dir.x == 0)
@@ -239,27 +239,27 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
     // traverse the grid
     unsigned i = 0;
     do {
-        if (t_max.x < t_max.y) {
-            if (t_max.x < t_max.z) {
+        if (fabs(t_max.x) < fabs(t_max.y)) {
+            if (fabs(t_max.x) < fabs(t_max.z)) {
                 voxel_pos.x += voxel_step.x;
-                if (voxel_pos.x > grid.res.x)
+                if (voxel_pos.x >= grid.res.x || voxel_pos.x < 0)
                     return false;
                 t_max.x += t_delta.x;
             } else {
                 voxel_pos.z += voxel_step.z;
-                if (voxel_pos.z > grid.res.z)
+                if (voxel_pos.z >= grid.res.z || voxel_pos.z < 0)
                     return false;
                 t_max.z += t_delta.z;
             }
         } else {
-            if (t_max.y < t_max.z) {
+            if (fabs(t_max.y) < fabs(t_max.z)) {
                 voxel_pos.y += voxel_step.y;
-                if (voxel_pos.y > grid.res.y)
+                if (voxel_pos.y >= grid.res.y || voxel_pos.y < 0)
                     return false;
                 t_max.y += t_delta.y;
             } else {
                 voxel_pos.z += voxel_step.z;
-                if (voxel_pos.z > grid.res.z)
+                if (voxel_pos.z >= grid.res.z || voxel_pos.z < 0)
                     return false;
                 t_max.z += t_delta.z;
             }

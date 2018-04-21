@@ -2,9 +2,9 @@ SDL_CFLAGS := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 
 CXX = g++
-override CXXFLAGS += -Wall -std=c++11 $(SDL_CFLAGS) -pthread $(OPTIM)
+override CXXFLAGS += -Wall -std=c++11 $(SDL_CFLAGS) -fsanitize=address -pthread $(OPTIM)
 OPTIM = -Ofast
-LDFLAGS = $(SDL_LDFLAGS)
+LDFLAGS = -lasan $(SDL_LDFLAGS)
 LDLIBS = -lGL -lGLEW
 
 TRACER_SRC = tracer.c++ render.c++ util.c++
