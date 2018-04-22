@@ -219,7 +219,9 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
     int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x + 1e-6)),
                    floor(relative_entry.y / (grid.cell_size.y + 1e-6)),
                    floor(relative_entry.z / (grid.cell_size.z + 1e-6)));
-    if (voxel_pos < 0 || voxel_pos >= grid.res)
+    if (voxel_pos.x < 0 || voxel_pos.y < 0 || voxel_pos.z < 0)
+        return false;
+    if (voxel_pos.x >= grid.res.x || voxel_pos.y >= grid.res.y || voxel_pos.z >= grid.res.z)
         return false;
     const int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
                           ray_dir.z < 0 ? -1 : 1);
@@ -238,9 +240,9 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
     if (ray_dir.z == 0)
         t_max.z = INFINITY, t_delta.z = INFINITY;
 
-    assert(voxel_pos >= 0);
-    assert(voxel_pos < grid.res);
-    
+    assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
+    assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y && voxel_pos.z < grid.res.z);
+
     // traverse the grid
     unsigned i = 0;
     do {
@@ -270,8 +272,8 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
             }
         }
 
-        assert(voxel_pos >= 0);
-        assert(voxel_pos < grid.res);
+        assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
+        assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y && voxel_pos.z < grid.res.z);
 
         // test objects
         auto b = grid.first(voxel_pos);

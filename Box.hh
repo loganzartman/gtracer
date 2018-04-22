@@ -56,7 +56,13 @@ class Box : public Geometry {
     }
 
     bool intersect(const Box &other) const {
-        return box.xmin <= other.box.xmax && box.xmax >= other.box.xmin;
+        if (box.xmin.x >= other.box.xmax.x || box.xmin.y >= other.box.xmax.y ||
+            box.xmin.z >= other.box.xmax.z)
+            return false;
+        if (box.xmax.x < other.box.xmin.x || box.xmax.y < other.box.xmin.y ||
+            box.xmax.z < other.box.xmin.z)
+            return false;
+        return true;
     }
 
     float3 normal(const float3 &r_dir, const float3 &intersection) const {

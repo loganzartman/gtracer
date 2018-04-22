@@ -24,8 +24,16 @@ struct Vec3 {
     Vec3(T v) : x(v), y(v), z(v) {}
     Vec3(T vx, T vy, T vz) : x(vx), y(vy), z(vz) {}
 
+    /**
+     * @brief Vector type conversion constructor
+     * @details Converting between vector types is allowed (i.e. multiply
+     * float3 by int3) but must be explicit to avoid unintended behavior.
+     * 
+     * @param other Vector to copy
+     * @tparam E Type of the other vector
+     */
     template <typename E>
-    Vec3(Vec3<E> other) : x((T)other.x), y((T)other.y), z((T)other.z) {}
+    explicit Vec3(const Vec3<E> &other) : x((T)other.x), y((T)other.y), z((T)other.z) {}
 
     Vec3 &normalize() {
         T len2 = length2();
@@ -130,21 +138,12 @@ struct Vec3 {
                fabs(l.z - r.z) < tol;
     }
 
-    friend bool operator<(const Vec3<T> &l, const Vec3<T> &r) {
-        return l.x < r.x && l.y < r.y && l.z < r.z;
+    friend bool operator!=(const Vec3<T> &l, const Vec3<T> &r) {
+        return !(l == r);
     }
 
-    friend bool operator>(const Vec3<T> &l, const Vec3<T> &r) {
-        return l.x > r.x && l.y > r.y && l.z > r.z;
-    }
-
-    friend bool operator<=(const Vec3<T> &l, const Vec3<T> &r) {
-        return l.x <= r.x && l.y <= r.y && l.z <= r.z;
-    }
-
-    friend bool operator>=(const Vec3<T> &l, const Vec3<T> &r) {
-        return l.x >= r.x && l.y >= r.y && l.z >= r.z;
-    }
+    /* Other relational ops (<, <=, >, >=) are intentionally not implemented as
+     * their behavior is ambiguous. */
 
     T length2() const { return x * x + y * y + z * z; }
 

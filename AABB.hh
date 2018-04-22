@@ -10,7 +10,10 @@ struct AABB {
 
     AABB(const float3 &a, const float3 &b) : xmin(min(a, b)), xmax(max(a, b)) {}
 
-    bool contains(const float3 &p) { return p >= xmin && p <= xmax; }
+    bool contains(const float3 &p) const {
+        return p.x >= xmin.x && p.y >= xmin.y && p.z >= xmin.z &&
+               p.x < xmax.x && p.y < xmin.y && p.z < xmin.z;
+    }
 
     AABB bounds() const { return *this; }
 };
