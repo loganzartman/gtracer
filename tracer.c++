@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <deque>
 
 #include "Box.hh"
 #include "Geometry.hh"
@@ -71,10 +72,10 @@ int main(int argc, char *argv[]) {
         {"lightr", new Material(float3(1, 0, 0), 0, 0, float3(30, 0, 0))},
         {"lightg", new Material(float3(1, 0, 0), 0, 0, float3(0, 30, 0))},
         {"lightb", new Material(float3(1, 0, 0), 0, 0, float3(0, 0, 30))}};
-    vector<Geometry *> geom;
-    vector<Sphere> spheres = construct_spheres_random(mats);
-    for (size_t i = 0; i < spheres.size(); ++i)
-        geom.push_back(&spheres[i]);
+    // vector<Geometry *> geom;
+    // vector<Sphere> spheres = construct_spheres_random(mats);
+    // for (size_t i = 0; i < spheres.size(); ++i)
+    //     geom.push_back(&spheres[i]);
 
     // vector<Box> boxes = construct_boxes_random(mats);
     // for (size_t i = 0; i < boxes.size(); ++i)
@@ -86,15 +87,27 @@ int main(int argc, char *argv[]) {
 
     // Sphere lightr(float3(-8, 2, 8), 1, mats["lightr"]);
     // Sphere lightg(float3(8, 4, 8), 1, mats["lightg"]);
-    // Sphere lightb(float3(8, 6, -8), 1, mats["lightb"]);
+    // Sphere lightb(float3(0, 0, 0), 5.2, mats["lightb"]);
     // Box ground(float3(-5, -0.5, -5), float3(5, -1.5, 5), mats["ground"]);
-    // Box box(float3(-2, 4, -2), float3(2, 0, 2), mats["white"]);
+    // Box box(float3(0.5, -5, -5), float3(-0.5, 5, 5), mats["red"]);
 
-    // Box shaft(float3(-1, 7, -1), float3(1, 0, 1), mats["white"]);
-    // Sphere left(float3(-2, 0, 0), 2.5, mats["white"]);
-    // Sphere right(float3(2, 0, 0), 2.5, mats["white"]);
-    // Sphere tip(float3(0, 7, 0), 1.5, mats["white"]);
     // vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
+    // vector<Geometry *> geom{&box, &lightb};
+
+    deque<Box> boxes;
+    vector<Geometry *> geom;
+    for (int x = -5; x <= 5; ++x) {
+        for (int y = -5; y <= 5; ++y) {
+            for (int z = -5; z <= 5; ++z) {
+                float3 pos(x, y, z);
+                stringstream s;
+                s << x << y << z << endl;
+                mats[s.str()] = new Material(float3((x + 5) / 10.f, (y + 5) / 10.f, (z + 5) / 10.f), 0, 0.f, float3(0));
+                boxes.push_back(Box(pos - 0.25, pos + 0.25 ,mats[s.str()]));
+                geom.push_back(&boxes.back());
+            }
+        }
+    }
 
     // prepare CPU pixel buffer
     size_t n_pixels = w * h * 4;
