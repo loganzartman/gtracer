@@ -214,15 +214,15 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
         ray_entry = ray_orig + ray_dir * t;
     }
 
+    const float3 world_size = world_bounds.xmax - world_bounds.xmin;
+    float3 relative_entry = ray_entry - world_bounds.xmin;
+    relative_entry = max(float3(0), relative_entry);
+    relative_entry = min(world_size, relative_entry);
+
     // compute voxel parameters
-    const float3 relative_entry = ray_entry - world_bounds.xmin;
     int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x + 1e-6)),
                    floor(relative_entry.y / (grid.cell_size.y + 1e-6)),
                    floor(relative_entry.z / (grid.cell_size.z + 1e-6)));
-    if (voxel_pos.x < 0 || voxel_pos.y < 0 || voxel_pos.z < 0)
-        return false;
-    if (voxel_pos.x >= grid.res.x || voxel_pos.y >= grid.res.y || voxel_pos.z >= grid.res.z)
-        return false;
     const int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
                           ray_dir.z < 0 ? -1 : 1);
     const float3 next_voxel_bound = float3(voxel_pos + voxel_step) * grid.cell_size;
@@ -246,6 +246,16 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
     // traverse the grid
     unsigned i = 0;
     do {
+        // test objects
+        auto b = grid.first(voxel_pos);
+        auto e = grid.last(voxel_pos);
+        if (b != e) {
+            if (cpu_ray_intersect_items(ray_orig, ray_dir, b, e, intersection,
+                                        hit_geom)) {
+                return true;
+            }
+        }
+
         if (fabs(t_max.x) < fabs(t_max.y)) {
             if (fabs(t_max.x) < fabs(t_max.z)) {
                 voxel_pos.x += voxel_step.x;
@@ -274,16 +284,6 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
 
         assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
         assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y && voxel_pos.z < grid.res.z);
-
-        // test objects
-        auto b = grid.first(voxel_pos);
-        auto e = grid.last(voxel_pos);
-        if (b == e)
-            continue;
-        if (cpu_ray_intersect_items(ray_orig, ray_dir, b, e, intersection,
-                                    hit_geom)) {
-            return true;
-        }
     } while (++i < 10000);
 
     return false;

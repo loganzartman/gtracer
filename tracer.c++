@@ -72,13 +72,13 @@ int main(int argc, char *argv[]) {
         {"lightg", new Material(float3(1, 0, 0), 0, 0, float3(0, 30, 0))},
         {"lightb", new Material(float3(1, 0, 0), 0, 0, float3(0, 0, 30))}};
     vector<Geometry *> geom;
-    // vector<Sphere> spheres = construct_spheres_random(mats);
-    // for (size_t i = 0; i < spheres.size(); ++i)
-    //     geom.push_back(&spheres[i]);
+    vector<Sphere> spheres = construct_spheres_random(mats);
+    for (size_t i = 0; i < spheres.size(); ++i)
+        geom.push_back(&spheres[i]);
 
-    vector<Box> boxes = construct_boxes_random(mats);
-    for (size_t i = 0; i < boxes.size(); ++i)
-        geom.push_back(&boxes[i]);
+    // vector<Box> boxes = construct_boxes_random(mats);
+    // for (size_t i = 0; i < boxes.size(); ++i)
+    //     geom.push_back(&boxes[i]);
 
     // vector<Tri> tris = construct_tris_random(mats);
     // for (size_t i = 0; i < tris.size(); ++i)
@@ -382,7 +382,7 @@ vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
     // boxes.push_back(Sphere(float3(0.0, -10000, -20), 10000,
     // mats["ground"]));
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 20; ++i) {
         float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
         float size = randf(1, 2);
         float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
@@ -402,8 +402,8 @@ vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
     float3 lc(0, 15, 5);
     tris.push_back(Tri(la, lb, lc, mats["light"]));
 
-    for (int i = 0; i < 100; ++i) {
-        float3 pos(randf(-10., 10.), randf(-5., 5.), randf(-10., 10.));
+    for (int i = 0; i < 5000; ++i) {
+        float3 pos(randf(-30., 30.), randf(-10., 10.), randf(-30., 30.));
         float3 a = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
         float3 b = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
         float3 c = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));

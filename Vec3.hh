@@ -58,13 +58,15 @@ struct Vec3 {
     }
 
     // shouldn't use fabs because we want to keep this generic
-    friend void vabs(Vec3 &v) {
+    friend Vec3<T> vabs(const Vec3<T> &v) {
+        Vec3<T> result = v;
         if (v.x < 0)
-            v.x = -v.x;
+            result.x = -v.x;
         if (v.y < 0)
-            v.y = -v.y;
+            result.y = -v.y;
         if (v.z < 0)
-            v.z = -v.z;
+            result.z = -v.z;
+        return result;
     }
 
     Vec3<T> reflect(const Vec3<T> &normal) const {

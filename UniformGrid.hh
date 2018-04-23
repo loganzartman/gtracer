@@ -143,10 +143,12 @@ class UniformGrid {
     };
 
     iterator first(int3 coord) const {
+        // return iterator(0, geom_cell);
         return iterator(data[data_index(coord)].first, geom_cell);
     }
 
     iterator last(int3 coord) const {
+        // return iterator(n_pairs, geom_cell);
         return iterator(data[data_index(coord)].second, geom_cell);
     }
 
