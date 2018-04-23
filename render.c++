@@ -24,7 +24,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
                 unsigned n_threads) {
     // construct uniform grid
     AABB bounds = geometry_bounds(geom.begin(), geom.end());
-    cout << "Bounds" << bounds.xmin.print() << ", " << bounds.xmax.print() << endl;
+    cout << "Bounds" << bounds.xmin << ", " << bounds.xmax << endl;
     int3 res = UniformGrid::resolution(bounds, geom.size());
     cout << "Grid " << res.x << "x" << res.y << "x" << res.z << endl;
     size_t n_data = UniformGrid::data_size(res);
