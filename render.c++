@@ -230,7 +230,7 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
     const int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
                           ray_dir.z < 0 ? -1 : 1);
 
-    const float3 next_voxel_bound = float3(voxel_pos + voxel_step) * grid.cell_size;
+    const float3 next_voxel_bound = float3(voxel_pos + max(0, voxel_step)) * grid.cell_size;
 
     // compute t values at which ray crosses voxel boundaries
     float3 t_max = (next_voxel_bound - relative_entry) / ray_dir;
