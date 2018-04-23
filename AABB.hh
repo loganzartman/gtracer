@@ -12,7 +12,7 @@ struct AABB {
 
     bool contains(const float3 &p) const {
         return p.x >= xmin.x && p.y >= xmin.y && p.z >= xmin.z &&
-               p.x <= xmax.x && p.y <= xmin.y && p.z <= xmin.z;
+               p.x <= xmax.x && p.y <= xmax.y && p.z <= xmax.z;
     }
 
     AABB bounds() const { return *this; }
