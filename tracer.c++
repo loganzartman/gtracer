@@ -25,6 +25,7 @@
 #include "tracer.hh"
 #include "transform.hh"
 #include "util.hh"
+#include "loader.hh"
 #include "render.cuh"
 
 using namespace std;
@@ -77,11 +78,17 @@ int main(int argc, char *argv[]) {
         {"lightr", new Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0))},
         {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
         {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
-    vector<Geometry *> geom;
+    /*vector<Geometry *> geom;
     vector<Sphere> spheres = construct_spheres_random(mats);
     for (size_t i = 0; i < spheres.size(); ++i)
         geom.push_back(&spheres[i]);
-
+    */
+    string file = "obj/test.obj";
+    vector<Float3> v;
+    load(file, v);
+    vector<Geometry*> geom;
+    triangulate(file, v, geom);
+ 
     // vector<Box> boxes = construct_boxes_random(mats);
     // for (size_t i = 0; i < boxes.size(); ++i)
     //     geom.push_back(&boxes[i]);

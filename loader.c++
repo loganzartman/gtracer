@@ -109,6 +109,9 @@ const vector<Geometry*>& triangulate(string filename, vector<Float3> vertices, v
 
         Geometry *obj = new Tri(vertices[one], vertices[two], vertices[three]);
         objs.push_back(obj);
+
+        getline(file, s);
+        i = 0;
     }
     return objs;
 }
