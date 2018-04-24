@@ -13,48 +13,48 @@
 #include "render.hh"
 
 TEST(Vec3Test, ctor) {
-    float3 v(1, 2, 3);
+    Float3 v(1, 2, 3);
     ASSERT_FLOAT_EQ(v.x, 1);
     ASSERT_FLOAT_EQ(v.y, 2);
     ASSERT_FLOAT_EQ(v.z, 3);
 }
 
 TEST(Vec3Test, add) {
-    float3 v(1, 2, 3);
-    float3 u(-1, -2, -3);
-    float3 result = v + u;
+    Float3 v(1, 2, 3);
+    Float3 u(-1, -2, -3);
+    Float3 result = v + u;
     ASSERT_FLOAT_EQ(result.x, 0);
     ASSERT_FLOAT_EQ(result.y, 0);
     ASSERT_FLOAT_EQ(result.z, 0);
 }
 
 TEST(Vec3Test, sub) {
-    float3 v(10, 20, 30);
-    float3 u(1, 2, 3);
-    float3 result = v - u;
+    Float3 v(10, 20, 30);
+    Float3 u(1, 2, 3);
+    Float3 result = v - u;
     ASSERT_FLOAT_EQ(result.x, 9);
     ASSERT_FLOAT_EQ(result.y, 18);
     ASSERT_FLOAT_EQ(result.z, 27);
 }
 
 TEST(Vec3Test, dot) {
-    float3 v(1, -2.5, 3);
-    float3 u(4, 5, -6);
+    Float3 v(1, -2.5, 3);
+    Float3 u(4, 5, -6);
     float result = v.dot(u);
     ASSERT_FLOAT_EQ(result, -26.5);
 }
 
 TEST(Vec3Test, reflect) {
-    float3 v(1, 1, 0);
-    float3 n(0, -1, 0);
-    float3 result = v.reflect(n);
+    Float3 v(1, 1, 0);
+    Float3 n(0, -1, 0);
+    Float3 result = v.reflect(n);
     ASSERT_FLOAT_EQ(result.x, 1);
     ASSERT_FLOAT_EQ(result.y, -1);
     ASSERT_FLOAT_EQ(result.z, 0);
 }
 
 TEST(Vec3Test, normalize) {
-    float3 v(2, 4, -8);
+    Float3 v(2, 4, -8);
     v.normalize();
     ASSERT_FLOAT_EQ(v.x, 1 / sqrt(21));
     ASSERT_FLOAT_EQ(v.y, 2 / sqrt(21));
@@ -63,38 +63,38 @@ TEST(Vec3Test, normalize) {
 
 TEST(Vec3Test, eq) {
     // test for good floating point equality check
-    float3 v(0);
+    Float3 v(0);
     for (int i = 0; i < 10; ++i)
-        v += float3(0.1);
-    float3 u(1);
+        v += Float3(0.1);
+    Float3 u(1);
     ASSERT_TRUE(v == u);
 }
 
 TEST(Vec3Test, eq_2) {
     // test for good floating point equality check
-    float3 v(0);
+    Float3 v(0);
     for (int i = 0; i < 10; ++i)
-        v += float3(0.09999);
-    float3 u(1);
+        v += Float3(0.09999);
+    Float3 u(1);
     ASSERT_FALSE(v == u);
 }
 
 TEST(Vec3Test, length) {
-    float3 v(1, 1, 1);
+    Float3 v(1, 1, 1);
     ASSERT_FLOAT_EQ(v.length(), 1 * sqrt(3));
 }
 
 TEST(Vec3Test, cross_1) {
-    float3 a(0, 1, 1);
-    float3 b(1, -1, 3);
-    ASSERT_EQ(a.cross(b), float3(4, 1, -1));
+    Float3 a(0, 1, 1);
+    Float3 b(1, -1, 3);
+    ASSERT_EQ(a.cross(b), Float3(4, 1, -1));
 }
 
 TEST(RaySphereTest, intersect) {
     // test simple ray-sphere intersect on x-axis
-    float3 ray_origin(0, 0, 0);
-    float3 ray_direction(1, 0, 0);
-    float3 sphere_pos(3, 0, 0);
+    Float3 ray_origin(0, 0, 0);
+    Float3 ray_direction(1, 0, 0);
+    Float3 sphere_pos(3, 0, 0);
     float sphere_radius = 1;
     Sphere s(sphere_pos, sphere_radius);
     float t;
@@ -103,9 +103,9 @@ TEST(RaySphereTest, intersect) {
 
 TEST(RaySphereTest, intersect_negative) {
     // test negative direction ray-sphere intersect with slight offset
-    float3 ray_origin(0, 0.1, 0);
-    float3 ray_direction(-1, 0, 0);
-    float3 sphere_pos(-3, 0, 0);
+    Float3 ray_origin(0, 0.1, 0);
+    Float3 ray_direction(-1, 0, 0);
+    Float3 sphere_pos(-3, 0, 0);
     float sphere_radius = 1;
     Sphere s(sphere_pos, sphere_radius);
     float t;
@@ -114,9 +114,9 @@ TEST(RaySphereTest, intersect_negative) {
 
 TEST(RaySphereTest, intersect_inside) {
     // test ray-sphere intersect with ray origin inside sphere
-    float3 ray_origin(0, 0, 0);
-    float3 ray_direction(1, 0, 0);
-    float3 sphere_pos(0.5, 0, 0);
+    Float3 ray_origin(0, 0, 0);
+    Float3 ray_direction(1, 0, 0);
+    Float3 sphere_pos(0.5, 0, 0);
     float sphere_radius = 2;
     Sphere s(sphere_pos, sphere_radius);
     float t;
@@ -125,9 +125,9 @@ TEST(RaySphereTest, intersect_inside) {
 
 TEST(RaySphereTest, no_intersection) {
     // test ray-sphere intersect with non-intersecting things
-    float3 ray_origin(0, 2, 0);
-    float3 ray_direction(1, 0, 0);
-    float3 sphere_pos(3, 0, 0);
+    Float3 ray_origin(0, 2, 0);
+    Float3 ray_direction(1, 0, 0);
+    Float3 sphere_pos(3, 0, 0);
     float sphere_radius = 1;
     Sphere s(sphere_pos, sphere_radius);
     float t;
@@ -135,103 +135,103 @@ TEST(RaySphereTest, no_intersection) {
 }
 
 TEST(CPURayIntersect, simple) {
-    float3 ray_orig(0, 0, 0);
-    float3 ray_dir(1, 0, 0);
-    Sphere sphere(float3(2, 0, 0), 1);
+    Float3 ray_orig(0, 0, 0);
+    Float3 ray_dir(1, 0, 0);
+    Sphere sphere(Float3(2, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(1, 0, 0));
+    ASSERT_EQ(intersection, Float3(1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
 
 TEST(CPURayIntersect, negative) {
-    float3 ray_orig(0, 0, 0);
-    float3 ray_dir(-1, 0, 0);
-    Sphere sphere(float3(-2, 0, 0), 1);
+    Float3 ray_orig(0, 0, 0);
+    Float3 ray_dir(-1, 0, 0);
+    Sphere sphere(Float3(-2, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(-1, 0, 0));
+    ASSERT_EQ(intersection, Float3(-1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
 
 TEST(CPURayIntersect, negative_2) {
-    float3 ray_orig(-2, 0, 0);
-    float3 ray_dir(1, 0, 0);
-    Sphere sphere(float3(0, 0, 0), 1);
+    Float3 ray_orig(-2, 0, 0);
+    Float3 ray_dir(1, 0, 0);
+    Sphere sphere(Float3(0, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(-1, 0, 0));
+    ASSERT_EQ(intersection, Float3(-1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
 
 TEST(CPURayIntersect, negative_3) {
-    float3 ray_orig(1, 0, 0);
-    float3 ray_dir(-1, 0, 0);
-    Sphere sphere(float3(-3, 0, 0), 1);
+    Float3 ray_orig(1, 0, 0);
+    Float3 ray_dir(-1, 0, 0);
+    Sphere sphere(Float3(-3, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(-2, 0, 0));
+    ASSERT_EQ(intersection, Float3(-2, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
 
 TEST(CPURayIntersect, two_negative) {
-    float3 ray_orig(0, 0, 0);
-    float3 ray_dir(-1, 0, 0);
-    Sphere sphere1(float3(-2, 0, 0), 1);
-    Sphere sphere2(float3(-4, 0, 0), 1);
+    Float3 ray_orig(0, 0, 0);
+    Float3 ray_dir(-1, 0, 0);
+    Sphere sphere1(Float3(-2, 0, 0), 1);
+    Sphere sphere2(Float3(-4, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere1, &sphere2};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(-1, 0, 0));
+    ASSERT_EQ(intersection, Float3(-1, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
 
 TEST(CPURayIntersect, two_negative_2) {
-    float3 ray_orig(4, 0, 0);
-    float3 ray_dir(-1, 0, 0);
-    Sphere sphere1(float3(-2, 1.1, 0), 1);
-    Sphere sphere2(float3(-4, 0, 0), 1);
+    Float3 ray_orig(4, 0, 0);
+    Float3 ray_dir(-1, 0, 0);
+    Sphere sphere1(Float3(-2, 1.1, 0), 1);
+    Sphere sphere2(Float3(-4, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere1, &sphere2};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(-3, 0, 0));
+    ASSERT_EQ(intersection, Float3(-3, 0, 0));
     ASSERT_EQ(hit_geom, geoms[1]);
 }
 
 TEST(CPURayIntersect, two_negative_inside) {
-    float3 ray_orig(-1.5, 0, 0);
-    float3 ray_dir(-1, 0, 0);
-    Sphere sphere1(float3(-2, 0, 0), 1);
-    Sphere sphere2(float3(-4, 0, 0), 1);
+    Float3 ray_orig(-1.5, 0, 0);
+    Float3 ray_dir(-1, 0, 0);
+    Sphere sphere1(Float3(-2, 0, 0), 1);
+    Sphere sphere2(Float3(-4, 0, 0), 1);
     std::vector<Geometry *> geoms{&sphere1, &sphere2};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(-3, 0, 0));
+    ASSERT_EQ(intersection, Float3(-3, 0, 0));
     ASSERT_EQ(hit_geom, geoms[0]);
 }
 
@@ -283,92 +283,92 @@ TEST(MatTest, multiply_vec3) {
 }
 
 TEST(BoxTest, intersect_box_1) {
-    Box a(float3(0), float3(1));
-    Box b(float3(2), float3(3));
+    Box a(Float3(0), Float3(1));
+    Box b(Float3(2), Float3(3));
     ASSERT_FALSE(a.intersect(b));
 }
 
 TEST(BoxTest, intersect_box_2) {
-    Box a(float3(0), float3(1));
-    Box b(float3(0.5), float3(1));
+    Box a(Float3(0), Float3(1));
+    Box b(Float3(0.5), Float3(1));
     ASSERT_TRUE(a.intersect(b));
 }
 
 TEST(BoxTest, intersect_box_3) {
-    Box a(float3(0), float3(1));
-    Box b(float3(0), float3(1));
+    Box a(Float3(0), Float3(1));
+    Box b(Float3(0), Float3(1));
     ASSERT_TRUE(a.intersect(b));
 }
 
 TEST(BoxTest, intersect_box_4) {
-    Box a(float3(0), float3(1));
-    Box b(float3(0.1), float3(0.9));
+    Box a(Float3(0), Float3(1));
+    Box b(Float3(0.1), Float3(0.9));
     ASSERT_TRUE(a.intersect(b));
 }
 
 TEST(BoxTest, intersect_ray_1) {
-    Box a(float3(1), float3(2));
-    float3 r_orig(0);
-    float3 r_dir(1);
+    Box a(Float3(1), Float3(2));
+    Float3 r_orig(0);
+    Float3 r_dir(1);
     float t;
     ASSERT_TRUE(a.intersect(r_orig, r_dir, t));
 }
 
 TEST(BoxTest, intersect_ray_2) {
-    Box a(float3(1), float3(2));
-    float3 r_orig(0, 2, 0);
-    float3 r_dir(1);
+    Box a(Float3(1), Float3(2));
+    Float3 r_orig(0, 2, 0);
+    Float3 r_dir(1);
     float t;
     ASSERT_FALSE(a.intersect(r_orig, r_dir, t));
 }
 
 TEST(TriTest, intersect_ray_1) {
-    Tri a(float3(0), float3(1, 0, 0), float3(1, 0, 2));
-    float3 r_orig(0.5, 1, 0.5);
-    float3 r_dir(0, -1, 0);
+    Tri a(Float3(0), Float3(1, 0, 0), Float3(1, 0, 2));
+    Float3 r_orig(0.5, 1, 0.5);
+    Float3 r_dir(0, -1, 0);
     float t;
     ASSERT_TRUE(a.intersect(r_orig, r_dir, t));
     ASSERT_EQ(t, 1);
 }
 
 TEST(TriTest, intersect_ray_2) {
-    Tri a(float3(0), float3(1, 0, 0), float3(1, 0, 2));
-    float3 r_orig(-1.5, 1, -1.5);
-    float3 r_dir(1, -0.5, 1);
+    Tri a(Float3(0), Float3(1, 0, 0), Float3(1, 0, 2));
+    Float3 r_orig(-1.5, 1, -1.5);
+    Float3 r_dir(1, -0.5, 1);
     float t;
     ASSERT_TRUE(a.intersect(r_orig, r_dir, t));
     ASSERT_EQ(t, 2);
 }
 
 TEST(TriTest, cpu_ray_intersect) {
-    float3 ray_orig(0, 2, 0);
-    float3 ray_dir(0, -1, 0);
-    Tri tri1(float3(0), float3(1, 0, 0), float3(1, 0, 2));
-    Tri tri2(float3(0, 1, 0), float3(1, 1, 0), float3(1, 1, 2));
+    Float3 ray_orig(0, 2, 0);
+    Float3 ray_dir(0, -1, 0);
+    Tri tri1(Float3(0), Float3(1, 0, 0), Float3(1, 0, 2));
+    Tri tri2(Float3(0, 1, 0), Float3(1, 1, 0), Float3(1, 1, 2));
     std::vector<Geometry *> geoms{&tri1, &tri2};
 
-    float3 intersection;
+    Float3 intersection;
     Geometry *hit_geom;
     ASSERT_TRUE(cpu_ray_intersect_items(ray_orig, ray_dir, geoms.begin(),
                                         geoms.end(), intersection, hit_geom));
-    ASSERT_EQ(intersection, float3(0, 1, 0));
+    ASSERT_EQ(intersection, Float3(0, 1, 0));
     ASSERT_EQ(hit_geom, geoms[1]);
 }
 
 TEST(UniformGridTest, grid_resolution) {
-    AABB bounds(float3(0), float3(1, 2, 3));
-    int3 res = UniformGrid::resolution(bounds, 2, 6);
+    AABB bounds(Float3(0), Float3(1, 2, 3));
+    Int3 res = UniformGrid::resolution(bounds, 2, 6);
     ASSERT_EQ(res.x, ceil(cbrt(2) * 1));
     ASSERT_EQ(res.y, ceil(cbrt(2) * 2));
     ASSERT_EQ(res.z, ceil(cbrt(2) * 3));
 }
 
 TEST(UniformGridTest, grid_count_pairs) {
-    AABB world_bounds(float3(0), float3(1));
-    Sphere s(float3(0.5), 0.2);
+    AABB world_bounds(Float3(0), Float3(1));
+    Sphere s(Float3(0.5), 0.2);
     std::vector<Geometry *> geom{&s};
 
-    int3 res = UniformGrid::resolution(world_bounds, 1, 64);
+    Int3 res = UniformGrid::resolution(world_bounds, 1, 64);
     ASSERT_EQ(res.x, 4);
     ASSERT_EQ(res.y, 4);
     ASSERT_EQ(res.z, 4);
@@ -380,13 +380,13 @@ TEST(UniformGridTest, grid_count_pairs) {
 
 TEST(UniformGridTest, acceptance) {
     // build scene
-    Sphere sphere1(float3(-2, 0, 0), 0.5f);
-    Sphere sphere2(float3(2, 0, 0), 0.5f);
+    Sphere sphere1(Float3(-2, 0, 0), 0.5f);
+    Sphere sphere2(Float3(2, 0, 0), 0.5f);
     std::vector<Geometry *> geom{&sphere1, &sphere2};
 
     // compute resolution
     AABB world_bounds = geometry_bounds(geom.begin(), geom.end());
-    int3 res = UniformGrid::resolution(world_bounds, geom.size());
+    Int3 res = UniformGrid::resolution(world_bounds, geom.size());
     ASSERT_EQ(res.x, 7);
     ASSERT_EQ(res.y, 2);
     ASSERT_EQ(res.z, 2);
@@ -408,7 +408,7 @@ TEST(UniformGridTest, acceptance) {
 
     // test lookup of sphere1
     {
-        int3 cell = int3(0, 0, 0);
+        Int3 cell = Int3(0, 0, 0);
         auto b = grid.first(cell);
         auto e = grid.last(cell);
         ASSERT_EQ(e - b, 1);
@@ -417,7 +417,7 @@ TEST(UniformGridTest, acceptance) {
 
     // test lookup of sphere2
     {
-        int3 cell = int3(5, 0, 0);
+        Int3 cell = Int3(5, 0, 0);
         auto b = grid.first(cell);
         auto e = grid.last(cell);
         ASSERT_EQ(e - b, 1);
@@ -426,7 +426,7 @@ TEST(UniformGridTest, acceptance) {
 
     // test lookup of nothing
     {
-        int3 cell = int3(3, 0, 0);
+        Int3 cell = Int3(3, 0, 0);
         auto b = grid.first(cell);
         auto e = grid.last(cell);
         ASSERT_EQ(e - b, 0);
@@ -434,7 +434,7 @@ TEST(UniformGridTest, acceptance) {
 
     // test lookup of sphere2
     {
-        int3 cell = int3(6, 1, 1);
+        Int3 cell = Int3(6, 1, 1);
         auto b = grid.first(cell);
         auto e = grid.last(cell);
         ASSERT_EQ(e - b, 1);

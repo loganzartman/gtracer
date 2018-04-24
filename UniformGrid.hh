@@ -15,25 +15,25 @@ typedef std::pair<Geometry*, size_t> ugrid_pair_t;
 
 class UniformGrid {
    public:
-    const int3 res;
-    const float3 cell_size;
+    const Int3 res;
+    const Float3 cell_size;
 
    private:
     ugrid_data_t* data;
     ugrid_pair_t* geom_cell;
     const size_t n_pairs;
 
-    size_t data_index(int3 coord) const {
+    size_t data_index(Int3 coord) const {
         return coord.z * res.y * res.x + coord.y * res.x + coord.x;
     }
 
    public:
     template <typename RI>
-    UniformGrid(int3 resolution, AABB scene_bounds, ugrid_data_t* data,
+    UniformGrid(Int3 resolution, AABB scene_bounds, ugrid_data_t* data,
                 ugrid_pair_t* pairs, size_t n_pairs, RI b, RI e)
         : res(resolution),
           cell_size((scene_bounds.xmax - scene_bounds.xmin) /
-                    float3(resolution)),
+                    Float3(resolution)),
           data(data),
           geom_cell(pairs),
           n_pairs(n_pairs) {
@@ -49,7 +49,7 @@ class UniformGrid {
                     for (size_t z = z0; z < z1; ++z) {
                         Geometry* g = *b;
                         pair->first = g;
-                        pair->second = data_index(int3(x, y, z));
+                        pair->second = data_index(Int3(x, y, z));
                         ++pair;
                     }
                 }
@@ -142,12 +142,12 @@ class UniformGrid {
         Geometry* operator*() const { return gc[index].first; }
     };
 
-    iterator first(int3 coord) const {
+    iterator first(Int3 coord) const {
         // return iterator(0, geom_cell);
         return iterator(data[data_index(coord)].first, geom_cell);
     }
 
-    iterator last(int3 coord) const {
+    iterator last(Int3 coord) const {
         // return iterator(n_pairs, geom_cell);
         return iterator(data[data_index(coord)].second, geom_cell);
     }
@@ -160,12 +160,12 @@ class UniformGrid {
      * @param density an arbitrary density factor
      * @return a grid resolution
      */
-    static int3 resolution(AABB bounds, int n, int density = 5) {
-        float3 d = bounds.xmax - bounds.xmin;
+    static Int3 resolution(AABB bounds, int n, int density = 5) {
+        Float3 d = bounds.xmax - bounds.xmin;
         float vol = d.x * d.y * d.z;
         float factor = cbrt(density * n / vol);
         d *= factor;
-        return int3(ceil(d.x), ceil(d.y), ceil(d.z));
+        return Int3(ceil(d.x), ceil(d.y), ceil(d.z));
     }
 
     /**
@@ -174,7 +174,7 @@ class UniformGrid {
      * @param resolution Resolution obtained with UniformGrid::resolution()
      * @return The number of elements of ugrid_data_t to allocate
      */
-    static size_t data_size(int3 resolution) {
+    static size_t data_size(Int3 resolution) {
         return (resolution.x + 1) * (resolution.y + 1) * (resolution.z + 1);
     }
 
@@ -191,17 +191,17 @@ class UniformGrid {
      * @param y1[out] coordinate
      * @param z1[out] coordinate
      */
-    static void geom_cell_hits(int3 resolution, AABB scene_bounds, Geometry* g,
+    static void geom_cell_hits(Int3 resolution, AABB scene_bounds, Geometry* g,
                                size_t& x0, size_t& y0, size_t& z0, size_t& x1,
                                size_t& y1, size_t& z1) {
         using namespace std;
         AABB bounds = g->bounds();
         AABB rel_bounds(bounds.xmin - scene_bounds.xmin,
                         bounds.xmax - scene_bounds.xmin);
-        float3 size = scene_bounds.xmax - scene_bounds.xmin;
-        float3 fresolution = float3(resolution.x, resolution.y, resolution.z);
-        float3 c0 = rel_bounds.xmin / size * fresolution;
-        float3 c1 = rel_bounds.xmax / size * fresolution;
+        Float3 size = scene_bounds.xmax - scene_bounds.xmin;
+        Float3 fresolution = Float3(resolution.x, resolution.y, resolution.z);
+        Float3 c0 = rel_bounds.xmin / size * fresolution;
+        Float3 c1 = rel_bounds.xmax / size * fresolution;
         size_t cx0 = floor(c0.x);
         size_t cy0 = floor(c0.y);
         size_t cz0 = floor(c0.z);
@@ -222,7 +222,7 @@ class UniformGrid {
      * @return Number of (geometry, cell) pairs
      */
     template <typename RI>
-    static size_t count_pairs(int3 resolution, AABB scene_bounds, RI b, RI e) {
+    static size_t count_pairs(Int3 resolution, AABB scene_bounds, RI b, RI e) {
         size_t pairs = 0;
 
         // compute geometry -> cell mappings

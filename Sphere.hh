@@ -10,20 +10,20 @@
 #include "Vec3.hh"
 
 struct Sphere : public Geometry {
-    float3 center;
+    Float3 center;
     float radius;
     const Material *mat;
 
-    Sphere(const float3 &c, const float &r) : Sphere(c, r, nullptr) {}
+    Sphere(const Float3 &c, const float &r) : Sphere(c, r, nullptr) {}
 
-    Sphere(const float3 &c, const float &r, const Material *m)
+    Sphere(const Float3 &c, const float &r, const Material *m)
         : center(c), radius(r), mat(m) {}
 
     const Material *material() const { return mat; }
 
-    bool intersect(const float3 &r_orig, const float3 &r_dir, float &t) const {
+    bool intersect(const Float3 &r_orig, const Float3 &r_dir, float &t) const {
         // draw a line between the center of the sphere and ray origin
-        float3 line = center - r_orig;
+        Float3 line = center - r_orig;
 
         // tca is the vector of line projected onto r_dir
         float tca = line.dot(r_dir);
@@ -51,12 +51,12 @@ struct Sphere : public Geometry {
         return true;
     }
 
-    float3 normal(const float3 &r_dir, const float3 &intersection) const {
+    Float3 normal(const Float3 &r_dir, const Float3 &intersection) const {
         return (intersection - center).normalize();
     }
 
     AABB bounds() const {
-        const float3 offset(radius);
+        const Float3 offset(radius);
         return AABB(center - offset, center + offset);
     }
 };

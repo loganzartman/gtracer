@@ -24,7 +24,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
                 unsigned n_threads) {
     // construct uniform grid
     AABB bounds = geometry_bounds(geom.begin(), geom.end());
-    int3 res = UniformGrid::resolution(bounds, geom.size());
+    Int3 res = UniformGrid::resolution(bounds, geom.size());
     size_t n_data = UniformGrid::data_size(res);
     size_t n_pairs =
         UniformGrid::count_pairs(res, bounds, geom.begin(), geom.end());
@@ -73,7 +73,7 @@ void *cpu_render_thread(void *thread_arg) {
     float angle = tan(0.5 * M_PI * fov / 180.0);
 
     Mat4f dir_camera = transform_clear_translate(args.camera);
-    float3 origin = args.camera * float3();
+    Float3 origin = args.camera * Float3();
 
     const size_t len = args.w * args.h;
     for (size_t p = args.offset; p < len; p += args.pitch) {
@@ -82,13 +82,13 @@ void *cpu_render_thread(void *thread_arg) {
         const size_t y = p / args.w;
 
         // do raytracing
-        float3 color;
+        Float3 color;
         for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
             //  compute the x and y magnitude of each vector
             float v_x =
                 (2 * ((x + randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
             float v_y = (1 - 2 * ((y + randf(0, 1)) * inv_h)) * angle;
-            float3 ray_dir = dir_camera * float3(v_x, v_y, -1);
+            Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
             color += cpu_trace(origin, ray_dir, args.geom, args.bounds,
@@ -98,12 +98,12 @@ void *cpu_render_thread(void *thread_arg) {
 
         // compute all-time average color
         const size_t idx = p * 4;
-        float3 dst = float3(args.pixels[idx], args.pixels[idx + 1],
+        Float3 dst = Float3(args.pixels[idx], args.pixels[idx + 1],
                             args.pixels[idx + 2]);
         float f = 1;
         if (args.iteration > 0)
             f = 1.f / args.iteration;
-        float3 blended = color * f + dst * (1 - f);
+        Float3 blended = color * f + dst * (1 - f);
 
         // write color
         args.pixels[idx] = blended.x;
@@ -124,21 +124,21 @@ void *cpu_render_thread(void *thread_arg) {
  * @param depth Maximum trace depth
  * @return Color computed for this primary ray
  */
-float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
+Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
                  vector<Geometry *> geom, AABB world_bounds,
                  const UniformGrid &grid, int depth) {
-    float3 color = 1.0;
-    float3 light = 0.0;
+    Float3 color = 1.0;
+    Float3 light = 0.0;
 
-    float3 origin = ray_orig;
-    float3 direction = ray_dir;
+    Float3 origin = ray_orig;
+    Float3 direction = ray_dir;
     for (int i = 0; i < depth; ++i) {
         // cast ray
-        float3 intersection;
+        Float3 intersection;
         Geometry *hit_geom;
         if (!cpu_ray_intersect(origin, direction, world_bounds, grid,
                                intersection, hit_geom)) {
-            light += float3(1) * color;
+            light += Float3(1) * color;
             break;
         }
 
@@ -150,7 +150,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
 
         color *= hit_geom->material()->surface_color;
         origin = intersection;
-        float3 normal = hit_geom->normal(ray_dir, intersection);
+        Float3 normal = hit_geom->normal(ray_dir, intersection);
 
         if (hit_geom->material()->transparency > randf(0, 1)) {
             float fresneleffect = fresnel(direction, normal, 1.1f);
@@ -165,7 +165,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
                     refr_i = 0.91;
                 float angle = normal.dot(direction);
                 float k = 1 - refr_i * refr_i * (1 - angle * angle);
-                float3 refraction_dir =
+                Float3 refraction_dir =
                     direction * refr_i + normal * (refr_i * angle - sqrt(k));
                 refraction_dir.normalize();
                 direction = refraction_dir;
@@ -176,7 +176,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
             // diffuse material
             // generate random number on a sphere, but we want only
             // vectors pointing in the same hemisphere as the normal
-            direction = float3::random_spherical();
+            direction = Float3::random_spherical();
             if (direction.dot(normal) < 0)
                 direction *= -1;
         }
@@ -199,12 +199,12 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
  * @param[out] hit_geom The geometry that was intersected
  * @return Whether there was an intersection
  */
-bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
+bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
                        AABB world_bounds, const UniformGrid &grid,
-                       float3 &intersection, Geometry *&hit_geom) {
+                       Float3 &intersection, Geometry *&hit_geom) {
     // find ray entry point into world bounds
     const Box bbox(world_bounds);
-    float3 ray_entry;
+    Float3 ray_entry;
     if (world_bounds.contains(ray_orig)) {
         ray_entry = ray_orig;
     } else {
@@ -214,26 +214,26 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
         ray_entry = ray_orig + ray_dir * t;
     }
 
-    const float3 world_size = world_bounds.xmax - world_bounds.xmin;
-    float3 relative_entry = ray_entry - world_bounds.xmin;
-    relative_entry = max(float3(0), relative_entry);
+    const Float3 world_size = world_bounds.xmax - world_bounds.xmin;
+    Float3 relative_entry = ray_entry - world_bounds.xmin;
+    relative_entry = max(Float3(0), relative_entry);
     relative_entry = min(world_size - 1e-5, relative_entry);
 
     // compute voxel parameters
-    int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x)),
+    Int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x)),
                    floor(relative_entry.y / (grid.cell_size.y)),
                    floor(relative_entry.z / (grid.cell_size.z)));
 
-    const int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
+    const Int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
                           ray_dir.z < 0 ? -1 : 1);
 
-    const float3 next_voxel_bound =
-        float3(voxel_pos + max(0, voxel_step)) * grid.cell_size;
+    const Float3 next_voxel_bound =
+        Float3(voxel_pos + max(0, voxel_step)) * grid.cell_size;
 
     // compute t values at which ray crosses voxel boundaries
-    float3 t_max = (next_voxel_bound - relative_entry) / ray_dir;
+    Float3 t_max = (next_voxel_bound - relative_entry) / ray_dir;
     // compute t deltas
-    float3 t_delta = grid.cell_size / ray_dir * float3(voxel_step);
+    Float3 t_delta = grid.cell_size / ray_dir * Float3(voxel_step);
 
     // assert(t_delta.x >= 0 && t_delta.y >= 0 && t_delta.z >= 0);
 
@@ -298,8 +298,8 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
 
 // unfortunate workaround to force template instantiation for tests
 template bool cpu_ray_intersect_items<vector<Geometry *>::iterator>(
-    const float3 &, const float3 &, vector<Geometry *>::iterator,
-    vector<Geometry *>::iterator, float3 &, Geometry *&);
+    const Float3 &, const Float3 &, vector<Geometry *>::iterator,
+    vector<Geometry *>::iterator, Float3 &, Geometry *&);
 
 /**
  * @brief Classic, grid-free brute-force ray intersection
@@ -314,8 +314,8 @@ template bool cpu_ray_intersect_items<vector<Geometry *>::iterator>(
  * @return Whether there was an intersection
  */
 template <typename II>
-bool cpu_ray_intersect_items(const float3 &ray_orig, const float3 &ray_dir,
-                             II b, II e, float3 &intersection,
+bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
+                             II b, II e, Float3 &intersection,
                              Geometry *&hit_geom) {
     float near_t = INFINITY;
     Geometry *near_geom = nullptr;
@@ -342,7 +342,7 @@ bool cpu_ray_intersect_items(const float3 &ray_orig, const float3 &ray_dir,
     return false;
 }
 
-float fresnel(float3 dir, float3 normal, float ior) {
+float fresnel(Float3 dir, Float3 normal, float ior) {
     float cosi = dir.dot(normal);
     float n1 = 1;
     float n2 = ior;

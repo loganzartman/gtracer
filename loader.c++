@@ -7,9 +7,9 @@
 
 using namespace std;
 
-vector<float3> load(string filename) {
+vector<Float3> load(string filename) {
     ifstream file(filename);
-    vector<float3> vertices;
+    vector<Float3> vertices;
     string s;
 
     while (!file.eof()) {
@@ -22,7 +22,7 @@ vector<float3> load(string filename) {
     int v = 0;
     while (s[0] == 'v') {
         i = 0;
-        float3 vertex;
+        Float3 vertex;
 
         while (s[i] == ' ')
             ++i;
