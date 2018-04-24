@@ -218,7 +218,7 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
     const float3 world_size = world_bounds.xmax - world_bounds.xmin;
     float3 relative_entry = ray_entry - world_bounds.xmin;
     relative_entry = max(float3(0), relative_entry);
-    relative_entry = min(world_size - 1e-6, relative_entry);
+    relative_entry = min(world_size - 1e-5, relative_entry);
 
     // compute voxel parameters
     int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x)),
