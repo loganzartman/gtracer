@@ -13,18 +13,18 @@ vector<float3> load(string filename) {
     string s;
 
     while (!file.eof()) {
-        file >> s;
+        getline(file, s);
         if (s[0] == 'v')
             break;
     }
-
+    
     int i;
     int v = 0;
     while (s[0] == 'v') {
         i = 0;
         float3 vertex;
 
-        while(s[i] == ' ')
+        while (s[i] == ' ')
             ++i;
 
         i+=2;
@@ -35,7 +35,7 @@ vector<float3> load(string filename) {
 
         vertex.x = stof(s.substr(j, k-j));
 
-        while(s[i] == ' ')
+        while (s[i] == ' ')
             ++i;
 
         int q = i, w = i;
@@ -44,18 +44,18 @@ vector<float3> load(string filename) {
 
         vertex.y = stof(s.substr(q, w-q));
         
-        while(s[i] == ' ')
+        while (s[i] == ' ')
             ++i;
 
         int a = i, b = i;
-        while (s[i] != ' ')
-            s = ++i;
+        while (s[i] != ' ' && i != s.length())
+            b = ++i;
 
         vertex.z = stof(s.substr(a, b-a));
         
         vertices.push_back(vertex);
         ++v;
-        file >> s;
+        getline(file, s);
     }
     return vertices;
 }
