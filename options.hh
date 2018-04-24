@@ -12,6 +12,7 @@ struct TracerArgs {
     int height;
     size_t iterations;
     unsigned threads;
+    bool gpu;
 };
 
 TracerArgs parse_args(int argc, char *argv[]) {
@@ -22,14 +23,15 @@ TracerArgs parse_args(int argc, char *argv[]) {
         {"width", optional_argument, NULL, 'w'},
         {"height", optional_argument, NULL, 'h'},
         {"threads", optional_argument, NULL, 't'},
+        {"gpu", no_argument, NULL, 'g'},
         {"help", no_argument, NULL, '?'}};
 
     const unsigned thread_count = thread::hardware_concurrency();
-    TracerArgs opts = {"", false, 640, 480, 0, thread_count};
+    TracerArgs opts = {"", false, 640, 480, 0, thread_count, false};
 
     int longindex = 0;
     char flag = 0;
-    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:", longopts,
+    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:g", longopts,
                                &longindex)) != -1) {
         switch (flag) {
             case 'o':
@@ -48,6 +50,9 @@ TracerArgs parse_args(int argc, char *argv[]) {
             case 't':
                 opts.threads = stoi(optarg);
                 break;
+            case 'g':
+                opts.gpu = true;
+                break;
             case '?':
             default:
                 cout << "Usage: tracer [options...]" << endl;
@@ -58,6 +63,7 @@ TracerArgs parse_args(int argc, char *argv[]) {
                 cout << " -w, --width      width of screen" << endl;
                 cout << " -h, --height     height of screen" << endl;
                 cout << " -t, --threads    number of CPU threads" << endl;
+                cout << " -g, --gpu        use GPU acceleration" << endl;
                 exit(-1);
         }
     }

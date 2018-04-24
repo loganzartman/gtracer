@@ -24,12 +24,17 @@
 #include "tracer.hh"
 #include "transform.hh"
 #include "util.hh"
+#include "render.cuh"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
     cout << "Using " << args.threads << " CPU threads." << endl;
+
+    if (args.gpu) {
+        cuda_test();
+    }
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, args.width,
