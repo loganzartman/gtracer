@@ -48,7 +48,7 @@ vector<float3> load(string filename) {
             ++i;
 
         int a = i, b = i;
-        while (s[i] != ' ' && i != s.length())
+        while (s[i] != ' ' && static_cast<size_t>(i) != s.length())
             b = ++i;
 
         vertex.z = stof(s.substr(a, b-a));
