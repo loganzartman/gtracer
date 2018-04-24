@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Vec3.hh"
+#include "loader.hh"
 
 using namespace std;
 
