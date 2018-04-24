@@ -1,13 +1,15 @@
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+#include "Vec3.hh"
 
 using namespace std;
 
-void load(string filename) {
-    ifstream file;
-    file.open(filename);
-    
+vector<float3> load(string filename) {
+    ifstream file(filename);
     vector<float3> vertices;
-
     string s;
 
     while (!file.eof()) {
@@ -24,13 +26,36 @@ void load(string filename) {
 
         while(s[i] == ' ')
             ++i;
+
         i+=2;
+
         int j = i, k = i;
         while (s[i] != ' ')
             k = ++i;
 
-        vertex.x = 0f;
-        vertex.y = 0f;
-        vertex.z = 0f;
+        vertex.x = stof(s.substr(j, k-j));
+
+        while(s[i] == ' ')
+            ++i;
+
+        int q = i, w = i;
+        while (s[i] != ' ')
+            w = ++i;
+
+        vertex.y = stof(s.substr(q, w-q));
+        
+        while(s[i] == ' ')
+            ++i;
+
+        int a = i, b = i;
+        while (s[i] != ' ')
+            s = ++i;
+
+        vertex.z = stof(s.substr(a, b-a));
+        
+        vertices.push_back(vertex);
+        ++v;
+        file >> s;
     }
+    return vertices;
 }
