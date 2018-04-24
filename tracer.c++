@@ -49,10 +49,9 @@ int main(int argc, char *argv[]) {
     glewInit();
     gl_init_viewport(w, h);
     GLuint buffer_id = 0, texture_id = 0;
+    texture_id = gl_create_texture(w, h);
     if (args.gpu) {
         buffer_id = gl_create_buffer(w, h);
-    } else {
-        texture_id = gl_create_texture(w, h);
     }
 
     bool running = true;
