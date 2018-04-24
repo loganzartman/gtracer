@@ -88,15 +88,15 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < spheres.size(); ++i)
         geom.push_back(&spheres[i]);
     */
-    string file = "obj/trtl_b.obj";
+
     struct stat attr;
-    stat(file.c_str(), &attr);
+    stat(args.infile.c_str(), &attr);
     auto last_modified = ctime(&attr.st_mtime);
 
     vector<Float3> v;
-    load(file, v, 100);
+    load(args.infile, v, 100);
     vector<Geometry*> geom;
-    triangulate(file, v, geom, mats["white"]);
+    triangulate(args.infile, v, geom, mats["white"]);
 
     Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
     Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
@@ -221,12 +221,12 @@ int main(int argc, char *argv[]) {
             break;
 
         struct stat attr;
-        stat(file.c_str(), &attr);
+        stat(args.infile.c_str(), &attr);
         if (ctime(&attr.st_mtime) != last_modified) {
             vector<Float3> v;
-            load(file, v, 100);
+            load(args.infile, v, 100);
             vector<Geometry*> geom;
-            triangulate(file, v, geom, mats["white"]);
+            triangulate(args.infile, v, geom, mats["white"]);
         }
 
         // limit framerate

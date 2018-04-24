@@ -7,6 +7,7 @@
 
 struct TracerArgs {
     std::string outfile;
+    std::string infile;
     bool output;
     int width;
     int height;
@@ -14,6 +15,19 @@ struct TracerArgs {
     unsigned threads;
     bool gpu;
 };
+
+void print_usage() {
+    using namespace std;
+    cout << "Usage: tracer [options...] file.obj" << endl;
+    cout << " -o, --outfile    output the image to a bitmap file"
+         << endl;
+    cout << " -n, --iterations run for a given number of iterations"
+         << endl;
+    cout << " -w, --width      width of screen" << endl;
+    cout << " -h, --height     height of screen" << endl;
+    cout << " -t, --threads    number of CPU threads" << endl;
+    cout << " -g, --gpu        use GPU acceleration" << endl;
+}
 
 TracerArgs parse_args(int argc, char *argv[]) {
     using namespace std;
@@ -27,7 +41,7 @@ TracerArgs parse_args(int argc, char *argv[]) {
         {"help", no_argument, NULL, '?'}};
 
     const unsigned thread_count = thread::hardware_concurrency();
-    TracerArgs opts = {"", false, 640, 480, 0, thread_count, false};
+    TracerArgs opts = {"", "", false, 640, 480, 0, thread_count, false};
 
     int longindex = 0;
     char flag = 0;
@@ -55,17 +69,18 @@ TracerArgs parse_args(int argc, char *argv[]) {
                 break;
             case '?':
             default:
-                cout << "Usage: tracer [options...]" << endl;
-                cout << " -o, --outfile    output the image to a bitmap file"
-                     << endl;
-                cout << " -n, --iterations run for a given number of iterations"
-                     << endl;
-                cout << " -w, --width      width of screen" << endl;
-                cout << " -h, --height     height of screen" << endl;
-                cout << " -t, --threads    number of CPU threads" << endl;
-                cout << " -g, --gpu        use GPU acceleration" << endl;
+                print_usage();
                 exit(-1);
         }
+    }
+
+    if(optind < argc){
+        opts.infile = argv[optind];
+        optind++;
+    }else{
+        cout << "No input file specified." << endl;
+        print_usage();
+        exit(-1);
     }
 
     return opts;
