@@ -4,59 +4,82 @@
 #include <vector>
 
 #include "Vec3.hh"
+#include "Tri.hh"
+#include "Geometry.hh"
 #include "loader.hh"
 
 using namespace std;
 
-vector<Float3> load(string filename) {
+const vector<Float3>& load(string filename, vector<Float3>& vertices, float scale) {
     ifstream file(filename);
-    vector<Float3> vertices;
     string s;
+
+    if (!file.is_open()) {
+        cerr << "Error opening file" << endl;
+        exit(0);
+    }
+
+    string command;
+    while (!file.eof()) {
+        file >> command;
+        if (command == "v") {
+            float one, two, three;
+            file >> one >> two >> three;
+            Float3 vertex(one, two, three);
+            vertices.push_back(vertex * scale);
+        } else {
+            // noop
+        }
+    }
+
+    return vertices;
+}
+
+const vector<Geometry*>& triangulate(string filename, vector<Float3> vertices, vector<Geometry*>& objs, const Material* mat) {
+    ifstream file(filename); 
+    string s;
+
+    if (!file.is_open()) {
+        cerr << "Error opening file" << endl;
+        exit(0);
+    }
 
     while (!file.eof()) {
         getline(file, s);
-        if (s[0] == 'v')
+        if (s[0] == 'f')
             break;
     }
     
-    int i;
-    int v = 0;
-    while (s[0] == 'v') {
-        i = 0;
-        Float3 vertex;
-
-        while (s[i] == ' ')
+    int i = 0;
+    while(s[0] == 'f') {
+        while(s[i] == 'f' || s[i] == ' ')
             ++i;
-
-        i+=2;
 
         int j = i, k = i;
         while (s[i] != ' ')
             k = ++i;
 
-        vertex.x = stof(s.substr(j, k-j));
+        int one = stof(s.substr(j, k - j));
 
-        while (s[i] == ' ')
-            ++i;
+        ++i;
+        j = i, k = i;
+        while(s[i] != ' ')
+            k = ++i;
 
-        int q = i, w = i;
-        while (s[i] != ' ')
-            w = ++i;
+        int two = stof(s.substr(j, k - j));
+ 
+        ++i;
+        j = i, k = i;
+        while(s[i] != ' ' && static_cast<size_t>(i) != s.length())
+            k = ++i;
 
-        vertex.y = stof(s.substr(q, w-q));
-        
-        while (s[i] == ' ')
-            ++i;
+        int three = stof(s.substr(j, k - j));
 
-        int a = i, b = i;
-        while (s[i] != ' ' && static_cast<size_t>(i) != s.length())
-            b = ++i;
+        Geometry *obj = new Tri(vertices[one-1], vertices[two-1], vertices[three-1], mat);
+        objs.push_back(obj);
 
-        vertex.z = stof(s.substr(a, b-a));
-        
-        vertices.push_back(vertex);
-        ++v;
         getline(file, s);
+        i = 0;
     }
-    return vertices;
+    return objs;
 }

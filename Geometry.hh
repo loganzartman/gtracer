@@ -29,6 +29,7 @@ AABB geometry_bounds(II b, II e) {
         return AABB(0, 0);
 
     AABB bounds = (*b)->bounds();
+    unsigned i = 0;
     ++b;
 
     while (b != e) {
@@ -36,6 +37,7 @@ AABB geometry_bounds(II b, II e) {
         bounds = AABB(min(bounds.xmin, candidate.xmin),
                       max(bounds.xmax, candidate.xmax));
         ++b;
+        ++i;
     }
     return bounds;
 }

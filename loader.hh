@@ -7,8 +7,9 @@
 #include <vector>
 
 #include "Vec3.hh"
+#include "Geometry.hh"
 
-
-std::vector<Float3> load(std::string filename);
+const std::vector<Float3>& load(std::string filename, std::vector<Float3>& vertices, float scale);
+const std::vector<Geometry*>& triangulate(std::string filename, std::vector<Float3> vertices, std::vector<Geometry*>& objs, const Material* mat);
 
 #endif

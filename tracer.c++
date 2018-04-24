@@ -26,6 +26,7 @@
 #include "transform.hh"
 #include "util.hh"
 #include "cuda_render.hh"
+#include "loader.hh"
 
 using namespace std;
 
@@ -74,19 +75,33 @@ int main(int argc, char *argv[]) {
         {"metal", new Material(Float3(0.377, 0.377, 0.377), 0, 0.0, Float3(0))},
         {"mirror", new Material(Float3(0.8, 0.8, 1.0), 0, 1.0, Float3(0))},
         {"lens", new Material(Float3(0.8, 0.8, 1.0), 1.0, 1.0, Float3(0))},
-        {"light", new Material(Float3(1, 0, 0), 0, 0, Float3(10))},
+        {"light", new Material(Float3(1, 0, 0), 0, 0, Float3(20))},
         {"lightr", new Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0))},
         {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
         {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
-    vector<Geometry *> geom;
+    /*vector<Geometry *> geom;
     vector<Sphere> spheres = construct_spheres_random(mats);
     for (size_t i = 0; i < spheres.size(); ++i)
         geom.push_back(&spheres[i]);
+    */
+    string file = "obj/bunny.obj";
+    vector<Float3> v;
+    load(file, v, 100);
+    vector<Geometry*> geom;
+    triangulate(file, v, geom, mats["white"]);
 
+    Sphere spr(Float3(-10, 30, -10), 4, mats["lightr"]);
+    Sphere spg(Float3(0, 30, 20), 4, mats["lightg"]);
+    Sphere spb(Float3(10, 30, 10), 4, mats["lightb"]);
+    geom.push_back(&spr);
+    geom.push_back(&spg);
+    geom.push_back(&spb);
+ 
     // vector<Box> boxes = construct_boxes_random(mats);
     // for (size_t i = 0; i < boxes.size(); ++i)
     //     geom.push_back(&boxes[i]);
 
+    // vector<Geometry *> geom;
     // vector<Tri> tris = construct_tris_random(mats);
     // for (size_t i = 0; i < tris.size(); ++i)
     //     geom.push_back(&tris[i]);
