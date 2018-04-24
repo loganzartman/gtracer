@@ -8,10 +8,10 @@
 class Geometry {
    public:
     virtual const Material *material() const = 0;
-    virtual bool intersect(const float3 &r_orig, const float3 &r_dir,
+    virtual bool intersect(const Float3 &r_orig, const Float3 &r_dir,
                            float &t) const = 0;
-    virtual float3 normal(const float3 &r_dir,
-                          const float3 &intersection) const = 0;
+    virtual Float3 normal(const Float3 &r_dir,
+                          const Float3 &intersection) const = 0;
     virtual AABB bounds() const = 0;
 };
 

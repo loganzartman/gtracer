@@ -33,10 +33,6 @@ int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
     cout << "Using " << args.threads << " CPU threads." << endl;
 
-    if (args.gpu) {
-        cuda_test();
-    }
-
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, args.width,
                                           args.height, SDL_WINDOW_OPENGL);
@@ -52,36 +48,39 @@ int main(int argc, char *argv[]) {
     SDL_GetWindowSize(window, &w, &h);
     glewInit();
     gl_init_viewport(w, h);
-    // GLuint buffer_id = gl_create_buffer(w, h);  // for gpu
-    GLuint texture_id = gl_create_texture(w, h);
+    GLuint buffer_id = 0, texture_id = 0;
+    texture_id = gl_create_texture(w, h);
+    if (args.gpu) {
+        buffer_id = gl_create_buffer(w, h);
+    }
 
     bool running = true;
     SDL_Event event;
 
     // state for orbit controls
     float mouse_x = 0, mouse_y = 0;
-    float3 orbit_pos(0.3, 0, 0);
+    Float3 orbit_pos(0.3, 0, 0);
     float orbit_zoom = 30;
-    float3 trans(0);
+    Float3 trans(0);
 
     // scene geometry
     // surface color, transparency, reflectivity, emission color
     unordered_map<string, Material *> mats = {
-        {"ground", new Material(float3(0.8, 0.8, 0.9), 0, 0.0, float3(0))},
-        {"wood", new Material(float3(0.545, 0.271, 0.075), 0, 0.0, float3(0))},
-        {"red", new Material(float3(0.618, 0.213, 0.175), 0, 0.0, float3(0))},
-        {"white", new Material(float3(0.950, 0.950, 0.950), 0, 0.0, float3(0))},
-        {"metal", new Material(float3(0.377, 0.377, 0.377), 0, 0.0, float3(0))},
-        {"mirror", new Material(float3(0.8, 0.8, 1.0), 0, 1.0, float3(0))},
-        {"lens", new Material(float3(0.8, 0.8, 1.0), 1.0, 1.0, float3(0))},
-        {"light", new Material(float3(1, 0, 0), 0, 0, float3(10))},
-        {"lightr", new Material(float3(1, 0, 0), 0, 0, float3(30, 0, 0))},
-        {"lightg", new Material(float3(1, 0, 0), 0, 0, float3(0, 30, 0))},
-        {"lightb", new Material(float3(1, 0, 0), 0, 0, float3(0, 0, 30))}};
-    // vector<Geometry *> geom;
-    // vector<Sphere> spheres = construct_spheres_random(mats);
-    // for (size_t i = 0; i < spheres.size(); ++i)
-    //     geom.push_back(&spheres[i]);
+        {"ground", new Material(Float3(0.8, 0.8, 0.9), 0, 0.0, Float3(0))},
+        {"wood", new Material(Float3(0.545, 0.271, 0.075), 0, 0.0, Float3(0))},
+        {"red", new Material(Float3(0.618, 0.213, 0.175), 0, 0.0, Float3(0))},
+        {"white", new Material(Float3(0.950, 0.950, 0.950), 0, 0.0, Float3(0))},
+        {"metal", new Material(Float3(0.377, 0.377, 0.377), 0, 0.0, Float3(0))},
+        {"mirror", new Material(Float3(0.8, 0.8, 1.0), 0, 1.0, Float3(0))},
+        {"lens", new Material(Float3(0.8, 0.8, 1.0), 1.0, 1.0, Float3(0))},
+        {"light", new Material(Float3(1, 0, 0), 0, 0, Float3(10))},
+        {"lightr", new Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0))},
+        {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
+        {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
+    vector<Geometry *> geom;
+    vector<Sphere> spheres = construct_spheres_random(mats);
+    for (size_t i = 0; i < spheres.size(); ++i)
+        geom.push_back(&spheres[i]);
 
     // vector<Box> boxes = construct_boxes_random(mats);
     // for (size_t i = 0; i < boxes.size(); ++i)
@@ -91,34 +90,37 @@ int main(int argc, char *argv[]) {
     // for (size_t i = 0; i < tris.size(); ++i)
     //     geom.push_back(&tris[i]);
 
-    // Sphere lightr(float3(-8, 2, 8), 1, mats["lightr"]);
-    // Sphere lightg(float3(8, 4, 8), 1, mats["lightg"]);
-    // Sphere lightb(float3(0, 0, 0), 5.2, mats["lightb"]);
-    // Box ground(float3(-5, -0.5, -5), float3(5, -1.5, 5), mats["ground"]);
-    // Box box(float3(0.5, -5, -5), float3(-0.5, 5, 5), mats["red"]);
+    // Sphere lightr(Float3(-8, 2, 8), 1, mats["lightr"]);
+    // Sphere lightg(Float3(8, 4, 8), 1, mats["lightg"]);
+    // Sphere lightb(Float3(0, 0, 0), 5.2, mats["lightb"]);
+    // Box ground(Float3(-5, -0.5, -5), Float3(5, -1.5, 5), mats["ground"]);
+    // Box box(Float3(0.5, -5, -5), Float3(-0.5, 5, 5), mats["red"]);
 
     // vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
     // vector<Geometry *> geom{&box, &lightb};
 
-    deque<Box> boxes;
-    vector<Geometry *> geom;
-    for (int x = -5; x <= 5; ++x) {
-        for (int y = -5; y <= 5; ++y) {
-            for (int z = -5; z <= 5; ++z) {
-                float3 pos(x, y, z);
-                stringstream s;
-                s << x << y << z << endl;
-                mats[s.str()] = new Material(float3((x + 5) / 10.f, (y + 5) / 10.f, (z + 5) / 10.f), 0, 0.f, float3(0));
-                boxes.push_back(Box(pos - 0.25, pos + 0.25 ,mats[s.str()]));
-                geom.push_back(&boxes.back());
-            }
-        }
-    }
+    // deque<Box> boxes;
+    // vector<Geometry *> geom;
+    // for (int x = -5; x <= 5; ++x) {
+    //     for (int y = -5; y <= 5; ++y) {
+    //         for (int z = -5; z <= 5; ++z) {
+    //             Float3 pos(x, y, z);
+    //             stringstream s;
+    //             s << x << y << z << endl;
+    //             mats[s.str()] = new Material(Float3((x + 5) / 10.f, (y + 5) / 10.f, (z + 5) / 10.f), 0, 0.f, Float3(0));
+    //             boxes.push_back(Box(pos - 0.25, pos + 0.25 ,mats[s.str()]));
+    //             geom.push_back(&boxes.back());
+    //         }
+    //     }
+    // }
 
     // prepare CPU pixel buffer
-    size_t n_pixels = w * h * 4;
-    float *pixels = new float[n_pixels];  // obv only do this once
-    fill_n(pixels, n_pixels, 0);
+    float *pixels = nullptr;
+    if (!args.gpu) {
+        size_t n_pixels = w * h * 4;
+        pixels = new float[n_pixels];
+        fill_n(pixels, n_pixels, 0);
+    }
 
     unsigned iteration = 0;
     while (running) {
@@ -135,7 +137,7 @@ int main(int argc, char *argv[]) {
                 if (event.motion.state & SDL_BUTTON_LMASK) {
                     iteration = 0;  // reset progress
                     orbit_pos +=
-                        (float3(y, x, 0) - float3(mouse_y, mouse_x, 0)) * 0.005;
+                        (Float3(y, x, 0) - Float3(mouse_y, mouse_x, 0)) * 0.005;
                 }
                 mouse_x = x;
                 mouse_y = y;
@@ -170,22 +172,24 @@ int main(int argc, char *argv[]) {
         orbit_pos.x = max(-(float)M_PI / 2, min((float)M_PI / 2, orbit_pos.x));
 
         // compute orbit camera transform
-        camera = camera * transform_translate(float3(trans.x, 0, trans.z));
+        camera = camera * transform_translate(Float3(trans.x, 0, trans.z));
         camera = camera * transform_rotateY(orbit_pos.y);
         camera = camera * transform_rotateX(-orbit_pos.x);
-        camera = camera * transform_translate(float3(0, 0, orbit_zoom));
+        camera = camera * transform_translate(Float3(0, 0, orbit_zoom));
 
         // do raytracing
-        cpu_render(pixels, w, h, camera, geom, iteration, args.threads);
+        if (args.gpu) {
+            // GPU rendering mode
+            cuda_render(buffer_id, w, h, camera, geom, iteration);
+            gl_buf2tex(w, h, buffer_id, texture_id); // copy buffer to texture
+        } else {
+            // CPU rendering mode
+            cpu_render(pixels, w, h, camera, geom, iteration, args.threads);
+            gl_data2tex(w, h, pixels, texture_id); // copy buffer to texture
+        }
 
-        // copy texture to GPU
-        // gl_buf2tex(w, h, buffer_id, texture_id); // only necessary for gpu
-        gl_data2tex(w, h, pixels, texture_id);
-
-        // render buffer
-        gl_draw_tex(texture_id);
-
-        SDL_GL_SwapWindow(window);  // update window
+        gl_draw_tex(texture_id); // render buffer
+        SDL_GL_SwapWindow(window); // update window
 
         // check for completion
         ++iteration;
@@ -196,14 +200,17 @@ int main(int argc, char *argv[]) {
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
         cout << "\e[1G\e[0K"
-             << "iteration " << iteration << ". " << (1000 / dt) << "fps"
+             << "iteration " << iteration << ". " << (1000.f / dt) << "fps"
              << flush;
         SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
     }
 
     // output rendered image
     if (args.output) {
-        // TODO: copy data back from GPU when in GPU mode
+        if (args.gpu) {
+            // TODO: copy data back from GPU when in GPU mode
+            assert(false);
+        }
         output_bmp(pixels, w, h, args.outfile);
     }
 
@@ -286,7 +293,7 @@ GLuint gl_create_texture(int w, int h) {
  * @param[in] w width of the texture/buffer
  * @param[in] h height of the texture/buffer
  */
-void gl_buf2tex(GLuint buffer_id, GLuint texture_id, int w, int h) {
+void gl_buf2tex(int w, int h, GLuint buffer_id, GLuint texture_id) {
     // select buffer and texture
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -301,7 +308,7 @@ void gl_buf2tex(GLuint buffer_id, GLuint texture_id, int w, int h) {
 /**
  * @brief Copy pixel data on the CPU to an existing texture
  * @details Used to display data rendered into a buffer.
- * The pixel data must be in RGBA float32 format.
+ * The pixel data must be in RGBA Float32 format.
  * @param[in] buffer_id the buffer ID
  * @param[in] texture_id the texture ID
  * @param[in] w width of the texture/buffer
@@ -359,14 +366,14 @@ void gl_draw_fullscreen() {
 vector<Sphere> construct_spheres(unordered_map<string, Material *> mats) {
     vector<Sphere> spheres;
     // position, radius, material
-    spheres.push_back(Sphere(float3(0.0, -10004, -20), 10000, mats["metal"]));
+    spheres.push_back(Sphere(Float3(0.0, -10004, -20), 10000, mats["metal"]));
 
-    spheres.push_back(Sphere(float3(0.0, 0, 0), 4, mats["mirror"]));
-    spheres.push_back(Sphere(float3(5.0, -1, 5), 2, mats["mirror"]));
-    spheres.push_back(Sphere(float3(5.0, 0, -5), 3, mats["metal"]));
-    spheres.push_back(Sphere(float3(-5.5, 0, 5), 3, mats["wood"]));
+    spheres.push_back(Sphere(Float3(0.0, 0, 0), 4, mats["mirror"]));
+    spheres.push_back(Sphere(Float3(5.0, -1, 5), 2, mats["mirror"]));
+    spheres.push_back(Sphere(Float3(5.0, 0, -5), 3, mats["metal"]));
+    spheres.push_back(Sphere(Float3(-5.5, 0, 5), 3, mats["wood"]));
     // light
-    spheres.push_back(Sphere(float3(0.0, 20, 5), 3, mats["light"]));
+    spheres.push_back(Sphere(Float3(0.0, 20, 5), 3, mats["light"]));
 
     return spheres;
 }
@@ -376,17 +383,17 @@ vector<Sphere> construct_spheres_random(
     vector<Sphere> spheres;
 
     // position, radius, material
-    // spheres.push_back(Sphere(float3(0.0, -10000, -20), 10000,
+    // spheres.push_back(Sphere(Float3(0.0, -10000, -20), 10000,
     // mats["ground"]));
 
-    spheres.push_back(Sphere(float3(0, 18, 0), 5, mats["light"]));
+    spheres.push_back(Sphere(Float3(0, 18, 0), 5, mats["light"]));
 
     for (int i = 0; i < 500; ++i) {
-        float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
+        Float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
         float radius = randf(0.5, 1.0);
-        float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
         Material *mat =
-            new Material(col, randf(0., 1.), randf(0., 0.5), float3(0));
+            new Material(col, randf(0., 1.), randf(0., 0.5), Float3(0));
         mats[to_string(i)] = mat;
         spheres.push_back(Sphere(pos, radius, mat));
     }
@@ -398,14 +405,14 @@ vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
     vector<Box> boxes;
 
     // position, radius, material
-    // boxes.push_back(Sphere(float3(0.0, -10000, -20), 10000,
+    // boxes.push_back(Sphere(Float3(0.0, -10000, -20), 10000,
     // mats["ground"]));
 
     for (int i = 0; i < 20; ++i) {
-        float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
+        Float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
         float size = randf(1, 2);
-        float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
-        Material *mat = new Material(col, 0.f, 0.f, float3(0));
+        Float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Material *mat = new Material(col, 0.f, 0.f, Float3(0));
         mats[to_string(i)] = mat;
         boxes.push_back(Box(pos - size, pos + size, mat));
     }
@@ -416,19 +423,19 @@ vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
 vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
     vector<Tri> tris;
 
-    float3 la(-5, 15, -5);
-    float3 lb(5, 15, -5);
-    float3 lc(0, 15, 5);
+    Float3 la(-5, 15, -5);
+    Float3 lb(5, 15, -5);
+    Float3 lc(0, 15, 5);
     tris.push_back(Tri(la, lb, lc, mats["light"]));
 
     for (int i = 0; i < 5000; ++i) {
-        float3 pos(randf(-30., 30.), randf(-10., 10.), randf(-30., 30.));
-        float3 a = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        float3 b = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        float3 c = pos + float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Float3 pos(randf(-30., 30.), randf(-10., 10.), randf(-30., 30.));
+        Float3 a = pos + Float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        Float3 b = pos + Float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        Float3 c = pos + Float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
+        Float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
         Material *mat =
-            new Material(col, randf(0., 1.), randf(0., 0.5), float3(0));
+            new Material(col, randf(0., 1.), randf(0., 0.5), Float3(0));
         mats[to_string(i)] = mat;
         tris.push_back(Tri(a, b, c, mat));
     }
@@ -439,7 +446,7 @@ vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
 /**
  * @brief Output a pixel array to a bitmap
  *
- * @param[in] pixels an RGBA float32 array
+ * @param[in] pixels an RGBA Float32 array
  * @param[in] w width of the input array in pixels
  * @param[in] h height of the input array in pixels
  * @param[in] outfile path to output to

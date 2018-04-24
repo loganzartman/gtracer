@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const vector<float3>& load(string filename, vector<float3>& vertices) {
+const vector<Float3>& load(string filename, vector<Float3>& vertices) {
     ifstream file(filename);
     string s;
 
@@ -29,7 +29,7 @@ const vector<float3>& load(string filename, vector<float3>& vertices) {
     int v = 0;
     while (s[0] == 'v') {
         i = 0;
-        float3 vertex;
+        Float3 vertex;
 
         while (s[i] == ' ')
             ++i;
@@ -67,7 +67,7 @@ const vector<float3>& load(string filename, vector<float3>& vertices) {
     return vertices;
 }
 
-const vector<Geometry*>& triangulate(string filename, vector<float3> vertices, vector<Geometry*>& objs) {
+const vector<Geometry*>& triangulate(string filename, vector<Float3> vertices, vector<Geometry*>& objs) {
     ifstream file(filename); 
     string s;
 

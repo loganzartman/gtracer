@@ -9,7 +9,7 @@
 #include "Vec3.hh"
 #include "Geometry.hh"
 
-std::vector<float3> load(std::string filename);
-const std::vector<Geometry*>& triangulate(std::string filename, std::vector<float3> vertices);
+const std::vector<Float3>& load(std::string filename, std::vector<Float3>& vertices);
+const std::vector<Geometry*>& triangulate(std::string filename, std::vector<Float3> vertices, std::vector<Geometry*>& objs);
 
 #endif
