@@ -89,9 +89,7 @@ int main(int argc, char *argv[]) {
         geom.push_back(&spheres[i]);
     */
 
-    struct stat attr;
-    stat(args.infile.c_str(), &attr);
-    auto last_modified = ctime(&attr.st_mtime);
+    unsigned long last_modified = 0;
 
     vector<Float3> v;
     load(args.infile, v, 100);
@@ -221,12 +219,23 @@ int main(int argc, char *argv[]) {
             break;
 
         struct stat attr;
-        stat(args.infile.c_str(), &attr);
-        if (ctime(&attr.st_mtime) != last_modified) {
-            vector<Float3> v;
-            load(args.infile, v, 100);
-            vector<Geometry*> geom;
-            triangulate(args.infile, v, geom, mats["white"]);
+        if(!stat(args.infile.c_str(), &attr)) {
+            unsigned long time = (unsigned long) attr.st_mtime;
+            cout << time << endl;
+            if (last_modified == 0)
+                last_modified = time;
+            else if (time != last_modified) {
+                cout << "UPDATING ASSETS " << last_modified << " -> " << time << endl;
+                last_modified = time;
+                vector<Float3> nv;
+                load(args.infile, nv, 100);
+                geom.clear();
+                triangulate(args.infile, nv, geom, mats["white"]);
+
+                geom.push_back(&spr);
+    geom.push_back(&spg);
+    geom.push_back(&spb);
+            }
         }
 
         // limit framerate
