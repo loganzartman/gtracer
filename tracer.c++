@@ -2,6 +2,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -85,6 +89,10 @@ int main(int argc, char *argv[]) {
         geom.push_back(&spheres[i]);
     */
     string file = "obj/trtl_b.obj";
+    struct stat attr;
+    stat(file.c_str(), &attr);
+    auto last_modified = ctime(&attr.st_mtime);
+
     vector<Float3> v;
     load(file, v, 100);
     vector<Geometry*> geom;
@@ -211,6 +219,15 @@ int main(int argc, char *argv[]) {
         ++iteration;
         if (args.iterations > 0 && iteration >= args.iterations)
             break;
+
+        struct stat attr;
+        stat(file.c_str(), &attr);
+        if (ctime(&attr.st_mtime) != last_modified) {
+            vector<Float3> v;
+            load(file, v, 100);
+            vector<Geometry*> geom;
+            triangulate(file, v, geom, mats["white"]);
+        }
 
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
