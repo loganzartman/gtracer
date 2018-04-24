@@ -90,11 +90,9 @@ int main(int argc, char *argv[]) {
     */
 
     unsigned long last_modified = 0;
-
-    vector<Float3> v;
-    load(args.infile, v, 100);
+    
     vector<Geometry*> geom;
-    triangulate(args.infile, v, geom, mats["white"]);
+    load(args.infile, geom, 100, mats["white"]);
 
     Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
     Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
@@ -228,13 +226,12 @@ int main(int argc, char *argv[]) {
                 cout << "UPDATING ASSETS " << last_modified << " -> " << time << endl;
                 last_modified = time;
                 vector<Float3> nv;
-                load(args.infile, nv, 100);
                 geom.clear();
-                triangulate(args.infile, nv, geom, mats["white"]);
+                load(args.infile, geom, 100, mats["white"]);
 
                 geom.push_back(&spr);
-    geom.push_back(&spg);
-    geom.push_back(&spb);
+                geom.push_back(&spg);
+                geom.push_back(&spb);
             }
         }
 

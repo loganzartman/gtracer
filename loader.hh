@@ -8,8 +8,8 @@
 
 #include "Vec3.hh"
 #include "Geometry.hh"
+#include "Material.hh"
 
-const std::vector<Float3>& load(std::string filename, std::vector<Float3>& vertices, float scale);
-const std::vector<Geometry*>& triangulate(std::string filename, std::vector<Float3> vertices, std::vector<Geometry*>& objs, const Material* mat);
+const std::vector<Geometry*>& load(std::string filename, std::vector<Geometry*>& objs, float scale, const Material* mat);
 
 #endif
