@@ -18,7 +18,7 @@ endif
 # c++ variables
 CXX = g++
 override CXXFLAGS += -Wall -std=c++11 $(SDL_CFLAGS) -pthread $(OPTIM)
-OPTIM = -O0 -g
+OPTIM = -Ofast
 LDFLAGS = $(SDL_LDFLAGS) -L$(CUDADIR)
 LDLIBS = -lGL -lGLEW -lcuda -lcudart
 TRACER_SRC = tracer.c++ render.c++ util.c++ loader.c++
@@ -30,7 +30,7 @@ NVCC     = nvcc
 CUDA_SRC = render.cu
 CUDA_HH  = render.cuh
 CUDA_OBJ = $(CUDA_SRC:%.cu=%.cu.o)
-NVFLAGS  = -std=c++11 -arch=sm_52 -O0 -g
+NVFLAGS  = -std=c++11 -arch=sm_52 -O3
 
 all: tracer
 
