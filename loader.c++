@@ -1,17 +1,18 @@
-#include <string>
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fstream>
+#include <string>
 #include <vector>
 
-#include "Vec3.hh"
-#include "Tri.hh"
 #include "Geometry.hh"
+#include "Tri.hh"
+#include "Vec3.hh"
 #include "loader.hh"
 
 using namespace std;
 
-const vector<Geometry*>& load(string filename, vector<Geometry*>& objs, float scale, const Material* mat) {
+const vector<Geometry*>& load(string filename, vector<Geometry*>& objs,
+                              float scale, const Material* mat) {
     ifstream file(filename);
     string s;
 
@@ -49,7 +50,8 @@ const vector<Geometry*>& load(string filename, vector<Geometry*>& objs, float sc
             ssthree >> three;
 
             // create triangle
-            Geometry *obj = new Tri(vertices[one-1], vertices[two-1], vertices[three-1], mat);
+            Geometry* obj = new Tri(vertices[one - 1], vertices[two - 1],
+                                    vertices[three - 1], mat);
             objs.push_back(obj);
         } else {
             // noop

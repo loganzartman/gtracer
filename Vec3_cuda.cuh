@@ -6,9 +6,12 @@
 #include <iostream>
 #include "util.hh"
 
-template <typename T> struct Vec3;
-template<> struct Vec3<float>;
-template<> struct Vec3<int>;
+template <typename T>
+struct Vec3;
+template <>
+struct Vec3<float>;
+template <>
+struct Vec3<int>;
 
 template <typename T>
 Vec3<T> operator+(const Vec3<T> &l, const Vec3<T> &r) {
@@ -81,7 +84,9 @@ Vec3<T> &operator/=(Vec3<T> &l, const Vec3<T> &r) {
 }
 
 template <typename T>
-Vec3<T> operator-(const Vec3<T> &v) { return Vec3<T>(-v.x, -v.y, -v.z); }
+Vec3<T> operator-(const Vec3<T> &v) {
+    return Vec3<T>(-v.x, -v.y, -v.z);
+}
 
 template <typename T>
 Vec3<T> min(const Vec3<T> &a, const Vec3<T> &b) {
@@ -95,14 +100,14 @@ Vec3<T> max(const Vec3<T> &a, const Vec3<T> &b) {
     return Vec3<T>(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
 }
 
-template<>
+template <>
 struct Vec3<int> {
-	int3 i;
-	int& x = i.x;
-	int& y = i.y;
-	int& z = i.z;
+    int3 i;
+    int &x = i.x;
+    int &y = i.y;
+    int &z = i.z;
 
-	Vec3() : i(make_int3(0, 0, 0)) {}
+    Vec3() : i(make_int3(0, 0, 0)) {}
     Vec3(int v) : i(make_int3(v, v, v)) {}
     Vec3(int vx, int vy, int vz) : i(make_int3(vx, vy, vz)) {}
 
@@ -110,25 +115,26 @@ struct Vec3<int> {
      * @brief Vector type conversion constructor
      * @details Converting between vector types is allowed (i.e. multiply
      * Float3 by Int3) but must be explicit to avoid unintended behavior.
-     * 
+     *
      * @param other Vector to copy
      * @tparam E Type of the other vector
      */
     template <typename E>
-    explicit Vec3(const Vec3<E> &other) : x((int)other.x), y((int)other.y), z((int)other.z) {}
+    explicit Vec3(const Vec3<E> &other)
+        : x((int)other.x), y((int)other.y), z((int)other.z) {}
 
-    Vec3<int>& operator=(const Vec3<int>& other) {
-    	i = other.i;
-    	return *this;
+    Vec3<int> &operator=(const Vec3<int> &other) {
+        i = other.i;
+        return *this;
     }
 };
 
-template<>
+template <>
 struct Vec3<float> {
     float3 f;
-    float& x = f.x;
-    float& y = f.y;
-    float& z = f.z;
+    float &x = f.x;
+    float &y = f.y;
+    float &z = f.z;
 
     Vec3() : f(make_float3(0, 0, 0)) {}
     Vec3(float v) : f(make_float3(v, v, v)) {}
@@ -138,16 +144,17 @@ struct Vec3<float> {
      * @brief Vector type conversion constructor
      * @details Converting between vector types is allowed (i.e. multiply
      * Float3 by Int3) but must be explicit to avoid unintended behavior.
-     * 
+     *
      * @param other Vector to copy
      * @tparam E Type of the other vector
      */
     template <typename E>
-    explicit Vec3(const Vec3<E> &other) : x((float)other.x), y((float)other.y), z((float)other.z) {}
+    explicit Vec3(const Vec3<E> &other)
+        : x((float)other.x), y((float)other.y), z((float)other.z) {}
 
-    Vec3<float>& operator=(const Vec3<float>& other) {
-    	f = other.f;
-    	return *this;
+    Vec3<float> &operator=(const Vec3<float> &other) {
+        f = other.f;
+        return *this;
     }
 
     Vec3 &normalize() {
@@ -162,7 +169,9 @@ struct Vec3<float> {
         return *this;
     }
 
-    float dot(const Vec3<float> &o) const { return x * o.x + y * o.y + z * o.z; }
+    float dot(const Vec3<float> &o) const {
+        return x * o.x + y * o.y + z * o.z;
+    }
 
     Vec3<float> cross(const Vec3<float> &o) const {
         Vec3<float> result;
@@ -173,8 +182,8 @@ struct Vec3<float> {
     }
 
     Vec3<float> reflect(const Vec3<float> &normal) const {
-    	return *this - normal * (2 * (this->dot(normal)));
-	}
+        return *this - normal * (2 * (this->dot(normal)));
+    }
 
     // shouldn't use fabs because we want to keep this generic
     friend Vec3<float> vabs(const Vec3<float> &v) {
@@ -198,11 +207,10 @@ struct Vec3<float> {
         return !(l == r);
     }
 
-    friend std::ostream& operator<<(std::ostream& o, const Vec3<float> &v) {
+    friend std::ostream &operator<<(std::ostream &o, const Vec3<float> &v) {
         o << "(" << v.x << ", " << v.y << ", " << v.z << ")";
         return o;
     }
-
 
     /* Other relational ops (<, <=, >, >=) are intentionally not implemented as
      * their behavior is ambiguous. */
