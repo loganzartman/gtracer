@@ -199,7 +199,7 @@ float3 cpu_trace(const float3 &ray_orig, const float3 &ray_dir,
  * @param[out] hit_geom The geometry that was intersected
  * @return Whether there was an intersection
  */
-bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
+bool cpu_ray_intersect(const float3 &ray_orig, const float3 &ray_dir,
                        AABB world_bounds, const UniformGrid &grid,
                        float3 &intersection, Geometry *&hit_geom) {
     // find ray entry point into world bounds
@@ -207,8 +207,7 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
     float3 ray_entry;
     if (world_bounds.contains(ray_orig)) {
         ray_entry = ray_orig;
-    }
-    else {
+    } else {
         float t;
         if (!bbox.intersect(ray_orig, ray_dir, t))
             return false;
@@ -228,7 +227,8 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
     const int3 voxel_step(ray_dir.x < 0 ? -1 : 1, ray_dir.y < 0 ? -1 : 1,
                           ray_dir.z < 0 ? -1 : 1);
 
-    const float3 next_voxel_bound = float3(voxel_pos + max(0, voxel_step)) * grid.cell_size;
+    const float3 next_voxel_bound =
+        float3(voxel_pos + max(0, voxel_step)) * grid.cell_size;
 
     // compute t values at which ray crosses voxel boundaries
     float3 t_max = (next_voxel_bound - relative_entry) / ray_dir;
@@ -246,7 +246,8 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
         t_max.z = INFINITY, t_delta.z = INFINITY;
 
     assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
-    assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y && voxel_pos.z < grid.res.z);
+    assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y &&
+           voxel_pos.z < grid.res.z);
 
     // traverse the grid
     unsigned i = 0;
@@ -288,11 +289,17 @@ bool cpu_ray_intersect(const float3 &ray_orig, const float3& ray_dir,
         }
 
         assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
-        assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y && voxel_pos.z < grid.res.z);
+        assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y &&
+               voxel_pos.z < grid.res.z);
     } while (++i < 10000);
 
     return false;
 }
+
+// unfortunate workaround to force template instantiation for tests
+template bool cpu_ray_intersect_items<vector<Geometry *>::iterator>(
+    const float3 &, const float3 &, vector<Geometry *>::iterator,
+    vector<Geometry *>::iterator, float3 &, Geometry *&);
 
 /**
  * @brief Classic, grid-free brute-force ray intersection
