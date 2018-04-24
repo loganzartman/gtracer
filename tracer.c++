@@ -84,11 +84,10 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < spheres.size(); ++i)
         geom.push_back(&spheres[i]);
     */
-    string file = "obj/trtl_b.obj";
     vector<Float3> v;
-    load(file, v, 100);
+    load(args.infile, v, 100);
     vector<Geometry*> geom;
-    triangulate(file, v, geom, mats["white"]);
+    triangulate(args.infile, v, geom, mats["white"]);
 
     Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
     Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
