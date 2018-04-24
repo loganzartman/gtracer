@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include <cassert>
 #include <iostream>
 #include <cuda_gl_interop.h>
 #include "cuda_render.cuh"
@@ -15,7 +16,7 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f& camera,
     std::vector<Geometry*> geom, unsigned iteration) {
     using namespace std;   
     
-    size_t size;
+    const size_t size_pixels = w * h;
     float *mem_ptr;
     cudaArray *array_ptr;
 
@@ -24,12 +25,13 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f& camera,
     cudaGraphicsMapResources(1, &cuda_buffer, cuda_stream);
     cudaGraphicsMapResources(1, &cuda_texture, cuda_stream);
     
+    size_t size_mapped;
     cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
-    cudaGraphicsResourceGetMappedPointer((void **)&mem_ptr, &size, cuda_buffer);
-    size /= sizeof(float);
+    cudaGraphicsResourceGetMappedPointer((void **)&mem_ptr, &size_mapped, cuda_buffer);
+    assert(size_mapped == size_pixels * 4 * sizeof(float)); // RGBA32F
 
     // run kernel
-    const int num_blocks = (w * h + BLOCK_SIZE - 1) / BLOCK_SIZE;
+    const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_test_kernel<<<num_blocks, BLOCK_SIZE>>>(w, h, mem_ptr);
     
     // unmap resources
@@ -48,8 +50,8 @@ void cuda_render_test_kernel(size_t w, size_t h, float *mem_ptr) {
 
     for (size_t i = index; i < w * h; i += stride) {
         const size_t idx = i * 4;
-        const size_t x = index % w;
-        const size_t y = index / w;
+        const size_t x = i % w;
+        const size_t y = i / w;
         mem_ptr[idx + 0] = (float)x / w;
         mem_ptr[idx + 1] = (float)y / w;
         mem_ptr[idx + 2] = 1.f - fabs(((float)y / h) - 0.5f) * 2;

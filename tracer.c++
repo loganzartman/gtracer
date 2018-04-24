@@ -36,7 +36,6 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
-    cout << "Using " << args.threads << " CPU threads." << endl;
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, args.width,
@@ -83,56 +82,17 @@ int main(int argc, char *argv[]) {
         {"lightr", new Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0))},
         {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
         {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
-    /*vector<Geometry *> geom;
-    vector<Sphere> spheres = construct_spheres_random(mats);
-    for (size_t i = 0; i < spheres.size(); ++i)
-        geom.push_back(&spheres[i]);
-    */
 
     unsigned long last_modified = 0;
     
     vector<Geometry*> geom;
     load(args.infile, geom, 100, mats["white"]);
-
     Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
     Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
     Sphere spb(Float3(20, 20, 20), 7, mats["lightb"]);
     geom.push_back(&spr);
     geom.push_back(&spg);
     geom.push_back(&spb);
- 
-    // vector<Box> boxes = construct_boxes_random(mats);
-    // for (size_t i = 0; i < boxes.size(); ++i)
-    //     geom.push_back(&boxes[i]);
-
-    // vector<Geometry *> geom;
-    // vector<Tri> tris = construct_tris_random(mats);
-    // for (size_t i = 0; i < tris.size(); ++i)
-    //     geom.push_back(&tris[i]);
-
-    // Sphere lightr(Float3(-8, 2, 8), 1, mats["lightr"]);
-    // Sphere lightg(Float3(8, 4, 8), 1, mats["lightg"]);
-    // Sphere lightb(Float3(0, 0, 0), 5.2, mats["lightb"]);
-    // Box ground(Float3(-5, -0.5, -5), Float3(5, -1.5, 5), mats["ground"]);
-    // Box box(Float3(0.5, -5, -5), Float3(-0.5, 5, 5), mats["red"]);
-
-    // vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
-    // vector<Geometry *> geom{&box, &lightb};
-
-    // deque<Box> boxes;
-    // vector<Geometry *> geom;
-    // for (int x = -5; x <= 5; ++x) {
-    //     for (int y = -5; y <= 5; ++y) {
-    //         for (int z = -5; z <= 5; ++z) {
-    //             Float3 pos(x, y, z);
-    //             stringstream s;
-    //             s << x << y << z << endl;
-    //             mats[s.str()] = new Material(Float3((x + 5) / 10.f, (y + 5) / 10.f, (z + 5) / 10.f), 0, 0.f, Float3(0));
-    //             boxes.push_back(Box(pos - 0.25, pos + 0.25 ,mats[s.str()]));
-    //             geom.push_back(&boxes.back());
-    //         }
-    //     }
-    // }
 
     // prepare CPU pixel buffer
     float *pixels = nullptr;
@@ -219,11 +179,10 @@ int main(int argc, char *argv[]) {
         struct stat attr;
         if(!stat(args.infile.c_str(), &attr)) {
             unsigned long time = (unsigned long) attr.st_mtime;
-            cout << time << endl;
             if (last_modified == 0)
                 last_modified = time;
             else if (time != last_modified) {
-                cout << "UPDATING ASSETS " << last_modified << " -> " << time << endl;
+                cout << "Updating assets! " << last_modified << " -> " << time << endl;
                 last_modified = time;
                 vector<Float3> nv;
                 geom.clear();
