@@ -84,15 +84,15 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < spheres.size(); ++i)
         geom.push_back(&spheres[i]);
     */
-    string file = "obj/bunny.obj";
+    string file = "obj/trtl_b.obj";
     vector<Float3> v;
     load(file, v, 100);
     vector<Geometry*> geom;
     triangulate(file, v, geom, mats["white"]);
 
-    Sphere spr(Float3(-10, 30, -10), 4, mats["lightr"]);
-    Sphere spg(Float3(0, 30, 20), 4, mats["lightg"]);
-    Sphere spb(Float3(10, 30, 10), 4, mats["lightb"]);
+    Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
+    Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
+    Sphere spb(Float3(20, 20, 20), 7, mats["lightb"]);
     geom.push_back(&spr);
     geom.push_back(&spg);
     geom.push_back(&spb);
