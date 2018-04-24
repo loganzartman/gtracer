@@ -25,7 +25,7 @@
 #include "tracer.hh"
 #include "transform.hh"
 #include "util.hh"
-#include "render.cuh"
+#include "cuda_render.hh"
 
 using namespace std;
 
@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
     texture_id = gl_create_texture(w, h);
     if (args.gpu) {
         buffer_id = gl_create_buffer(w, h);
+        cuda_init(texture_id, buffer_id);
     }
 
     bool running = true;
@@ -248,17 +249,21 @@ void gl_init_viewport(int w, int h) {
  * @brief Creates a pixel unpack buffer.
  * @param[in] w desired width
  * @param[in] h desired height
+ * @param[in] texture_id the texture to bind to
  * @return the new buffer ID
  */
 GLuint gl_create_buffer(int w, int h) {
     GLuint buffer_id;
     // get a buffer ID
     glGenBuffers(1, &buffer_id);
+    gl_check();
     // set it as the current unpack buffer (a PBO)
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer_id);
+    gl_check();
     // allocate data for the buffer
     glBufferData(GL_PIXEL_UNPACK_BUFFER, w * h * 4 * sizeof(float), nullptr,
                  GL_DYNAMIC_COPY);
+    gl_check();
     // unbind
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     gl_check();
