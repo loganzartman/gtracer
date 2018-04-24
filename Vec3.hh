@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <sstream>
+#include <ostream>
 #include "util.hh"
 
 template <typename T>
@@ -144,6 +144,12 @@ struct Vec3 {
         return !(l == r);
     }
 
+    friend std::ostream& operator<<(std::ostream& o, const Vec3<T> &v) {
+        o << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+        return o;
+    }
+
+
     /* Other relational ops (<, <=, >, >=) are intentionally not implemented as
      * their behavior is ambiguous. */
 
@@ -161,12 +167,6 @@ struct Vec3 {
         result.y = sin(theta) * sin(phi);
         result.z = cos(theta);
         return result;
-    }
-
-    std::string print() const {
-        std::ostringstream o;
-        o << "(" << x << ", " << y << ", " << z << ")";
-        return o.str();
     }
 };
 
