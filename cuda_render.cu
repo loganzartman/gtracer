@@ -48,7 +48,8 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
 }
 
 /**
- * @brief Unmap resources and destroy stream created by cuda_init()
+ * @brief Destroy resource
+ * 
  */
 void cuda_destroy() {
     // unmap resources
