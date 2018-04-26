@@ -10,6 +10,17 @@ cudaGraphicsResource_t cuda_buffer;
 cudaGraphicsResource_t cuda_texture;
 cudaStream_t cuda_stream;
 
-__global__ void cuda_render_test_kernel(size_t w, size_t h, float *mem_ptr);
+struct CUDAKernelArgs {
+    size_t w;
+    size_t h;
+    // Mat4f &camera;
+    // std::vector<Geometry *> &geom;
+    // AABB bounds;
+    // const UniformGrid &grid;
+    unsigned iteration;
+    float *pixels;
+};
+
+__global__ void cuda_render_kernel(CUDAKernelArgs args);
 
 #endif
