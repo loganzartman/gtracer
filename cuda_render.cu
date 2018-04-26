@@ -53,9 +53,10 @@ __global__ void cuda_render_test_kernel(size_t w, size_t h, float *mem_ptr) {
         const size_t idx = i * 4;
         const size_t x = i % w;
         const size_t y = i / w;
+        float f = (Float3(x, y, 0) / Float3(w, h, 1) - Float3(0.5, 0.5, 0)).length();
         mem_ptr[idx + 0] = (float)x / w;
-        mem_ptr[idx + 1] = (float)y / w;
-        mem_ptr[idx + 2] = 1.f - fabs(((float)y / h) - 0.5f) * 2;
+        mem_ptr[idx + 1] = (float)y / h;
+        mem_ptr[idx + 2] = f;
         mem_ptr[idx + 3] = 1.f;
     }
 }
