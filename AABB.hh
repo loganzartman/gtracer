@@ -10,10 +10,10 @@ struct AABB {
 
     AABB(const Float3 &a, const Float3 &b) : xmin(min(a, b)), xmax(max(a, b)) {}
 
-    AABB& operator=(const AABB& other) {
-    	xmin = other.xmin;
-    	xmax = other.xmax;
-    	return *this;
+    AABB &operator=(const AABB &other) {
+        xmin = other.xmin;
+        xmax = other.xmax;
+        return *this;
     }
 
     bool contains(const Float3 &p) const {

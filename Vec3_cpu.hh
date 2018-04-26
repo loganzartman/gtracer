@@ -28,12 +28,13 @@ struct Vec3 {
      * @brief Vector type conversion constructor
      * @details Converting between vector types is allowed (i.e. multiply
      * Float3 by Int3) but must be explicit to avoid unintended behavior.
-     * 
+     *
      * @param other Vector to copy
      * @tparam E Type of the other vector
      */
     template <typename E>
-    explicit Vec3(const Vec3<E> &other) : x((T)other.x), y((T)other.y), z((T)other.z) {}
+    explicit Vec3(const Vec3<E> &other)
+        : x((T)other.x), y((T)other.y), z((T)other.z) {}
 
     Vec3 &normalize() {
         T len2 = length2();
@@ -144,11 +145,10 @@ struct Vec3 {
         return !(l == r);
     }
 
-    friend std::ostream& operator<<(std::ostream& o, const Vec3<T> &v) {
+    friend std::ostream &operator<<(std::ostream &o, const Vec3<T> &v) {
         o << "(" << v.x << ", " << v.y << ", " << v.z << ")";
         return o;
     }
-
 
     /* Other relational ops (<, <=, >, >=) are intentionally not implemented as
      * their behavior is ambiguous. */

@@ -10,12 +10,12 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <deque>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <deque>
 
 #include "Box.hh"
 #include "Geometry.hh"
@@ -24,19 +24,18 @@
 #include "Sphere.hh"
 #include "Tri.hh"
 #include "Vec3.hh"
+#include "cuda_render.hh"
+#include "loader.hh"
 #include "options.hh"
 #include "render.hh"
 #include "tracer.hh"
 #include "transform.hh"
 #include "util.hh"
-#include "cuda_render.hh"
-#include "loader.hh"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
     TracerArgs args = parse_args(argc, argv);
-    cout << "Using " << args.threads << " CPU threads." << endl;
 
     // Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
     SDL_Window *window = SDL_CreateWindow("raytracer", 0, 0, args.width,
@@ -83,60 +82,17 @@ int main(int argc, char *argv[]) {
         {"lightr", new Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0))},
         {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
         {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
-    /*vector<Geometry *> geom;
-    vector<Sphere> spheres = construct_spheres_random(mats);
-    for (size_t i = 0; i < spheres.size(); ++i)
-        geom.push_back(&spheres[i]);
-    */
 
-    struct stat attr;
-    stat(args.infile.c_str(), &attr);
-    auto last_modified = ctime(&attr.st_mtime);
+    unsigned long last_modified = 0;
 
-    vector<Float3> v;
-    load(args.infile, v, 100);
-    vector<Geometry*> geom;
-    triangulate(args.infile, v, geom, mats["white"]);
-
+    vector<Geometry *> geom;
+    load(args.infile, geom, 100, mats["white"]);
     Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
     Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
     Sphere spb(Float3(20, 20, 20), 7, mats["lightb"]);
     geom.push_back(&spr);
     geom.push_back(&spg);
     geom.push_back(&spb);
- 
-    // vector<Box> boxes = construct_boxes_random(mats);
-    // for (size_t i = 0; i < boxes.size(); ++i)
-    //     geom.push_back(&boxes[i]);
-
-    // vector<Geometry *> geom;
-    // vector<Tri> tris = construct_tris_random(mats);
-    // for (size_t i = 0; i < tris.size(); ++i)
-    //     geom.push_back(&tris[i]);
-
-    // Sphere lightr(Float3(-8, 2, 8), 1, mats["lightr"]);
-    // Sphere lightg(Float3(8, 4, 8), 1, mats["lightg"]);
-    // Sphere lightb(Float3(0, 0, 0), 5.2, mats["lightb"]);
-    // Box ground(Float3(-5, -0.5, -5), Float3(5, -1.5, 5), mats["ground"]);
-    // Box box(Float3(0.5, -5, -5), Float3(-0.5, 5, 5), mats["red"]);
-
-    // vector<Geometry *> geom{&lightr, &lightg, &lightb, &ground, &box};
-    // vector<Geometry *> geom{&box, &lightb};
-
-    // deque<Box> boxes;
-    // vector<Geometry *> geom;
-    // for (int x = -5; x <= 5; ++x) {
-    //     for (int y = -5; y <= 5; ++y) {
-    //         for (int z = -5; z <= 5; ++z) {
-    //             Float3 pos(x, y, z);
-    //             stringstream s;
-    //             s << x << y << z << endl;
-    //             mats[s.str()] = new Material(Float3((x + 5) / 10.f, (y + 5) / 10.f, (z + 5) / 10.f), 0, 0.f, Float3(0));
-    //             boxes.push_back(Box(pos - 0.25, pos + 0.25 ,mats[s.str()]));
-    //             geom.push_back(&boxes.back());
-    //         }
-    //     }
-    // }
 
     // prepare CPU pixel buffer
     float *pixels = nullptr;
@@ -205,15 +161,15 @@ int main(int argc, char *argv[]) {
         if (args.gpu) {
             // GPU rendering mode
             cuda_render(buffer_id, w, h, camera, geom, iteration);
-            gl_buf2tex(w, h, buffer_id, texture_id); // copy buffer to texture
+            gl_buf2tex(w, h, buffer_id, texture_id);  // copy buffer to texture
         } else {
             // CPU rendering mode
             cpu_render(pixels, w, h, camera, geom, iteration, args.threads);
-            gl_data2tex(w, h, pixels, texture_id); // copy buffer to texture
+            gl_data2tex(w, h, pixels, texture_id);  // copy buffer to texture
         }
 
-        gl_draw_tex(texture_id); // render buffer
-        SDL_GL_SwapWindow(window); // update window
+        gl_draw_tex(texture_id);    // render buffer
+        SDL_GL_SwapWindow(window);  // update window
 
         // check for completion
         ++iteration;
@@ -221,12 +177,22 @@ int main(int argc, char *argv[]) {
             break;
 
         struct stat attr;
-        stat(args.infile.c_str(), &attr);
-        if (ctime(&attr.st_mtime) != last_modified) {
-            vector<Float3> v;
-            load(args.infile, v, 100);
-            vector<Geometry*> geom;
-            triangulate(args.infile, v, geom, mats["white"]);
+        if (!stat(args.infile.c_str(), &attr)) {
+            unsigned long time = (unsigned long)attr.st_mtime;
+            if (last_modified == 0)
+                last_modified = time;
+            else if (time != last_modified) {
+                cout << "Updating assets! " << last_modified << " -> " << time
+                     << endl;
+                last_modified = time;
+                vector<Float3> nv;
+                geom.clear();
+                load(args.infile, geom, 100, mats["white"]);
+
+                geom.push_back(&spr);
+                geom.push_back(&spg);
+                geom.push_back(&spb);
+            }
         }
 
         // limit framerate
@@ -246,6 +212,10 @@ int main(int argc, char *argv[]) {
         }
         output_bmp(pixels, w, h, args.outfile);
     }
+
+    // GPU teardown
+    if (args.gpu)
+        cuda_destroy();
 
     // Once finished with OpenGL functions, the SDL_GLContext can be deleted.
     SDL_GL_DeleteContext(glcontext);
