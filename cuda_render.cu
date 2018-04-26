@@ -4,6 +4,14 @@
 #include <iostream>
 #include "cuda_render.cuh"
 
+/**
+ * @brief Initializes CUDA resources.
+ * @detail Called once upon program start. Registers GL texture and buffer
+ * for CUDA/GL interop; creates stream and maps buffer and texture to stream.
+ * 
+ * @param texture_id ID of the GL texture
+ * @param buffer_id  ID of the GL buffer
+ */
 void cuda_init(GLuint texture_id, GLuint buffer_id) {
     // register GL buffer and texture as CUDA resources
     cudaGraphicsGLRegisterBuffer(&cuda_buffer, buffer_id,
@@ -13,7 +21,7 @@ void cuda_init(GLuint texture_id, GLuint buffer_id) {
 
     // create CUDA stream
     cudaStreamCreate(&cuda_stream);
-    
+
     // map resources
     cudaGraphicsMapResources(1, &cuda_buffer, cuda_stream);
     cudaGraphicsMapResources(1, &cuda_texture, cuda_stream);
@@ -26,7 +34,7 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     const size_t size_pixels = w * h;
     float *mem_ptr;
     cudaArray *array_ptr;
-    
+
     size_t size_mapped;
     cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
     cudaGraphicsResourceGetMappedPointer((void **)&mem_ptr, &size_mapped,
@@ -39,6 +47,10 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
 }
 
+/**
+ * @brief Destroy resource
+ * 
+ */
 void cuda_destroy() {
     // unmap resources
     cudaGraphicsUnmapResources(1, &cuda_buffer, cuda_stream);
@@ -46,6 +58,10 @@ void cuda_destroy() {
     cudaStreamDestroy(cuda_stream);
 }
 
+/**
+ * @brief Path tracing kernel
+ * @param args current state 
+ */
 __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     const size_t index = blockIdx.x * blockDim.x + threadIdx.x;
     const size_t stride = blockDim.x * gridDim.x;
