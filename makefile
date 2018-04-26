@@ -17,7 +17,7 @@ endif
 
 # c++ variables
 CXX = g++
-override CXXFLAGS += -Wall -std=c++11 $(SDL_CFLAGS) -pthread $(OPTIM)
+override CXXFLAGS += -Wall -Wextra -std=c++11 $(SDL_CFLAGS) -pthread $(OPTIM)
 OPTIM = -Ofast
 LDFLAGS = $(SDL_LDFLAGS) -L$(CUDADIR)
 LDLIBS = -lGL -lGLEW -lcuda -lcudart
