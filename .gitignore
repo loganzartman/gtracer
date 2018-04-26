@@ -1,7 +1,10 @@
 .*.swp
+.*.py
 
 # binaries
 *.o
 tracer
 test_tracer
+
+# images
 *.bmp
