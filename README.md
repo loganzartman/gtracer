@@ -1,9 +1,11 @@
-# CS 378 Raytracer
+# gtracer
+*GPU-accelerated path tracing*
 Austin Atchley, Logan Zartman
 
 ## Dependencies
 * SDL2
 * GLEW
+* CUDA
 * Google Test
 
 ## Building
