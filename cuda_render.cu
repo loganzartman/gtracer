@@ -12,6 +12,11 @@ void cuda_init(GLuint texture_id, GLuint buffer_id) {
                                 cudaGraphicsRegisterFlagsNone);
 
     // create CUDA stream
+    cudaStreamCreate(&cuda_stream);
+    
+    // map resources
+    cudaGraphicsMapResources(1, &cuda_buffer, cuda_stream);
+    cudaGraphicsMapResources(1, &cuda_texture, cuda_stream);
 }
 
 void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
@@ -21,12 +26,7 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     const size_t size_pixels = w * h;
     float *mem_ptr;
     cudaArray *array_ptr;
-
-    // map resources
-    cudaStreamCreate(&cuda_stream);
-    cudaGraphicsMapResources(1, &cuda_buffer, cuda_stream);
-    cudaGraphicsMapResources(1, &cuda_texture, cuda_stream);
-
+    
     size_t size_mapped;
     cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
     cudaGraphicsResourceGetMappedPointer((void **)&mem_ptr, &size_mapped,
@@ -37,14 +37,14 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     CUDAKernelArgs args = {w, h, iteration, mem_ptr};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
+}
 
+void cuda_destroy() {
     // unmap resources
     cudaGraphicsUnmapResources(1, &cuda_buffer, cuda_stream);
     cudaGraphicsUnmapResources(1, &cuda_texture, cuda_stream);
     cudaStreamDestroy(cuda_stream);
 }
-
-void cuda_destroy() {}
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     const size_t index = blockIdx.x * blockDim.x + threadIdx.x;

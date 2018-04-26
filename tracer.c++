@@ -213,6 +213,10 @@ int main(int argc, char *argv[]) {
         output_bmp(pixels, w, h, args.outfile);
     }
 
+    // GPU teardown
+    if (args.gpu)
+        cuda_destroy();
+
     // Once finished with OpenGL functions, the SDL_GLContext can be deleted.
     SDL_GL_DeleteContext(glcontext);
     sdl_check();
