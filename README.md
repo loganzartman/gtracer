@@ -1,5 +1,6 @@
 # gtracer
 *GPU-accelerated path tracing*
+
 Austin Atchley, Logan Zartman
 
 ## Dependencies
