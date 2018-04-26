@@ -47,18 +47,6 @@ int main(int argc, char *argv[]) {
     sdl_check();
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    // Initalize OpenGL
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    glewInit();
-    gl_init_viewport(w, h);
-    GLuint buffer_id = 0, texture_id = 0;
-    texture_id = gl_create_texture(w, h);
-    if (args.gpu) {
-        buffer_id = gl_create_buffer(w, h);
-        cuda_init(texture_id, buffer_id);
-    }
-
     bool running = true;
     SDL_Event event;
 
@@ -93,6 +81,18 @@ int main(int argc, char *argv[]) {
     geom.push_back(&spr);
     geom.push_back(&spg);
     geom.push_back(&spb);
+
+    // Initalize OpenGL
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    glewInit();
+    gl_init_viewport(w, h);
+    GLuint buffer_id = 0, texture_id = 0;
+    texture_id = gl_create_texture(w, h);
+    if (args.gpu) {
+        buffer_id = gl_create_buffer(w, h);
+        cuda_init(texture_id, buffer_id, geom); 
+    }
 
     // prepare CPU pixel buffer
     float *pixels = nullptr;
