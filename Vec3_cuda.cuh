@@ -14,71 +14,61 @@ template <>
 struct Vec3<int>;
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator+(const Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> operator+(const Vec3<T> &l, const Vec3<T> &r) {
     Vec3<T> result(l);
     return result += r;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator-(const Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> operator-(const Vec3<T> &l, const Vec3<T> &r) {
     Vec3<T> result(l);
     return result -= r;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator*(const Vec3<T> &l, const T &r) {
+__host__ __device__ Vec3<T> operator*(const Vec3<T> &l, const T &r) {
     Vec3<T> result(l);
     return result *= r;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator/(const Vec3<T> &l, const T &r) {
+__host__ __device__ Vec3<T> operator/(const Vec3<T> &l, const T &r) {
     Vec3<T> result(l);
     return result *= 1.f / r;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator*(const Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> operator*(const Vec3<T> &l, const Vec3<T> &r) {
     Vec3<T> result(l);
     return result *= r;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator/(const Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> operator/(const Vec3<T> &l, const Vec3<T> &r) {
     Vec3<T> result(l);
     return result /= r;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> &operator+=(Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> &operator+=(Vec3<T> &l, const Vec3<T> &r) {
     l.x += r.x, l.y += r.y, l.z += r.z;
     return l;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> &operator-=(Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> &operator-=(Vec3<T> &l, const Vec3<T> &r) {
     l.x -= r.x, l.y -= r.y, l.z -= r.z;
     return l;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> &operator*=(Vec3<T> &l, const T &f) {
+__host__ __device__ Vec3<T> &operator*=(Vec3<T> &l, const T &f) {
     l.x *= f, l.y *= f, l.z *= f;
     return l;
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> &operator*=(Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> &operator*=(Vec3<T> &l, const Vec3<T> &r) {
     l.x *= r.x;
     l.y *= r.y;
     l.z *= r.z;
@@ -86,8 +76,7 @@ Vec3<T> &operator*=(Vec3<T> &l, const Vec3<T> &r) {
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> &operator/=(Vec3<T> &l, const Vec3<T> &r) {
+__host__ __device__ Vec3<T> &operator/=(Vec3<T> &l, const Vec3<T> &r) {
     l.x /= r.x;
     l.y /= r.y;
     l.z /= r.z;
@@ -95,41 +84,35 @@ Vec3<T> &operator/=(Vec3<T> &l, const Vec3<T> &r) {
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> operator-(const Vec3<T> &v) {
+__host__ __device__ Vec3<T> operator-(const Vec3<T> &v) {
     return Vec3<T>(-v.x, -v.y, -v.z);
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> min(const Vec3<T> &a, const Vec3<T> &b) {
+__host__ __device__ Vec3<T> min(const Vec3<T> &a, const Vec3<T> &b) {
     using namespace std;
     return Vec3<T>(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
 }
 
 template <typename T>
-__host__ __device__
-Vec3<T> max(const Vec3<T> &a, const Vec3<T> &b) {
+__host__ __device__ Vec3<T> max(const Vec3<T> &a, const Vec3<T> &b) {
     using namespace std;
     return Vec3<T>(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
 }
 
 template <>
-__host__ __device__
-struct Vec3<int> {
+__host__ __device__ struct Vec3<int> {
     int3 i;
     int &x = i.x;
     int &y = i.y;
     int &z = i.z;
 
-    __host__ __device__
-    Vec3() : i(make_int3(0, 0, 0)) {}
-    
-    __host__ __device__
-    Vec3(int v) : i(make_int3(v, v, v)) {}
-    
-    __host__ __device__
-    Vec3(int vx, int vy, int vz) : i(make_int3(vx, vy, vz)) {}
+    __host__ __device__ Vec3() : i(make_int3(0, 0, 0)) {}
+
+    __host__ __device__ Vec3(int v) : i(make_int3(v, v, v)) {}
+
+    __host__ __device__ Vec3(int vx, int vy, int vz)
+        : i(make_int3(vx, vy, vz)) {}
 
     /**
      * @brief Vector type conversion constructor
@@ -140,33 +123,28 @@ struct Vec3<int> {
      * @tparam E Type of the other vector
      */
     template <typename E>
-    __host__ __device__
-    explicit Vec3(const Vec3<E> &other)
+    __host__ __device__ explicit Vec3(const Vec3<E> &other)
         : x((int)other.x), y((int)other.y), z((int)other.z) {}
 
-    __host__ __device__
-    Vec3<int> &operator=(const Vec3<int> &other) {
+    __host__ __device__ Vec3<int> &operator=(const Vec3<int> &other) {
         i = other.i;
         return *this;
     }
 };
 
 template <>
-__host__ __device__
-struct Vec3<float> {
+__host__ __device__ struct Vec3<float> {
     float3 f;
     float &x = f.x;
     float &y = f.y;
     float &z = f.z;
 
-    __host__ __device__
-    Vec3() : f(make_float3(0, 0, 0)) {}
-    
-    __host__ __device__
-    Vec3(float v) : f(make_float3(v, v, v)) {}
-    
-    __host__ __device__
-    Vec3(float vx, float vy, float vz) : f(make_float3(vx, vy, vz)) {}
+    __host__ __device__ Vec3() : f(make_float3(0, 0, 0)) {}
+
+    __host__ __device__ Vec3(float v) : f(make_float3(v, v, v)) {}
+
+    __host__ __device__ Vec3(float vx, float vy, float vz)
+        : f(make_float3(vx, vy, vz)) {}
 
     /**
      * @brief Vector type conversion constructor
@@ -177,18 +155,15 @@ struct Vec3<float> {
      * @tparam E Type of the other vector
      */
     template <typename E>
-    __host__ __device__
-    explicit Vec3(const Vec3<E> &other)
+    __host__ __device__ explicit Vec3(const Vec3<E> &other)
         : x((float)other.x), y((float)other.y), z((float)other.z) {}
 
-    __host__ __device__
-    Vec3<float> &operator=(const Vec3<float> &other) {
+    __host__ __device__ Vec3<float> &operator=(const Vec3<float> &other) {
         f = other.f;
         return *this;
     }
 
-    __host__ __device__
-    Vec3 &normalize() {
+    __host__ __device__ Vec3 &normalize() {
         float len2 = length2();
         if (len2 > 0) {
             float scalar = 1 / sqrt(len2);
@@ -200,13 +175,11 @@ struct Vec3<float> {
         return *this;
     }
 
-    __host__ __device__
-    float dot(const Vec3<float> &o) const {
+    __host__ __device__ float dot(const Vec3<float> &o) const {
         return x * o.x + y * o.y + z * o.z;
     }
 
-    __host__ __device__
-    Vec3<float> cross(const Vec3<float> &o) const {
+    __host__ __device__ Vec3<float> cross(const Vec3<float> &o) const {
         Vec3<float> result;
         result.x = y * o.z - z * o.y;
         result.y = z * o.x - x * o.z;
@@ -214,14 +187,12 @@ struct Vec3<float> {
         return result;
     }
 
-    __host__ __device__
-    Vec3<float> reflect(const Vec3<float> &normal) const {
+    __host__ __device__ Vec3<float> reflect(const Vec3<float> &normal) const {
         return *this - normal * (2 * (this->dot(normal)));
     }
 
     // shouldn't use fabs because we want to keep this generic
-    __host__ __device__
-    friend Vec3<float> vabs(const Vec3<float> &v) {
+    __host__ __device__ friend Vec3<float> vabs(const Vec3<float> &v) {
         Vec3<float> result = v;
         if (v.x < 0)
             result.x = -v.x;
@@ -232,15 +203,15 @@ struct Vec3<float> {
         return result;
     }
 
-    __host__ __device__
-    friend bool operator==(const Vec3<float> &l, const Vec3<float> &r) {
+    __host__ __device__ friend bool operator==(const Vec3<float> &l,
+                                               const Vec3<float> &r) {
         const float tol = 1e-6f;
         return fabs(l.x - r.x) < tol && fabs(l.y - r.y) < tol &&
                fabs(l.z - r.z) < tol;
     }
 
-    __host__ __device__
-    friend bool operator!=(const Vec3<float> &l, const Vec3<float> &r) {
+    __host__ __device__ friend bool operator!=(const Vec3<float> &l,
+                                               const Vec3<float> &r) {
         return !(l == r);
     }
 
@@ -252,14 +223,11 @@ struct Vec3<float> {
     /* Other relational ops (<, <=, >, >=) are intentionally not implemented as
      * their behavior is ambiguous. */
 
-    __host__ __device__
-    float length2() const { return x * x + y * y + z * z; }
+    __host__ __device__ float length2() const { return x * x + y * y + z * z; }
 
-    __host__ __device__
-    float length() const { return sqrt(length2()); }
+    __host__ __device__ float length() const { return sqrt(length2()); }
 
-    __host__ __device__
-    static Vec3<float> random_spherical() {
+    __host__ __device__ static Vec3<float> random_spherical() {
         Vec3<float> result;
         float phi = randf(0., M_PI * 2);
         float costheta = randf(-1., 1.);

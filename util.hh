@@ -6,7 +6,7 @@
 #if __CUDACC__
 #define HOSTDEV __host__ __device__
 #else
-#define HOSTDEV 
+#define HOSTDEV
 #endif
 
 float randf(float lo, float hi);
