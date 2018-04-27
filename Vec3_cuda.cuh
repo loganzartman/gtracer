@@ -1,7 +1,6 @@
 #ifndef VEC3_CUDA_HH
 #define VEC3_CUDA_HH
 // #include <helper_math.h>
-#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include "util.hh"
@@ -12,6 +11,16 @@ template <>
 struct Vec3<float>;
 template <>
 struct Vec3<int>;
+
+template <typename T>
+__host__ __device__ Vec3<T> vmin(const Vec3<T> &a, const Vec3<T> &b) {
+    return Vec3<T>(util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z));
+}
+
+template <typename T>
+__host__ __device__ Vec3<T> vmax(const Vec3<T> &a, const Vec3<T> &b) {
+    return Vec3<T>(util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z));
+}
 
 template <typename T>
 __host__ __device__ Vec3<T> operator+(const Vec3<T> &l, const Vec3<T> &r) {
@@ -86,18 +95,6 @@ __host__ __device__ Vec3<T> &operator/=(Vec3<T> &l, const Vec3<T> &r) {
 template <typename T>
 __host__ __device__ Vec3<T> operator-(const Vec3<T> &v) {
     return Vec3<T>(-v.x, -v.y, -v.z);
-}
-
-template <typename T>
-__host__ __device__ Vec3<T> min(const Vec3<T> &a, const Vec3<T> &b) {
-    using namespace std;
-    return Vec3<T>(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
-}
-
-template <typename T>
-__host__ __device__ Vec3<T> max(const Vec3<T> &a, const Vec3<T> &b) {
-    using namespace std;
-    return Vec3<T>(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
 }
 
 template <>
@@ -229,8 +226,8 @@ __host__ __device__ struct Vec3<float> {
 
     __host__ __device__ static Vec3<float> random_spherical() {
         Vec3<float> result;
-        float phi = randf(0., M_PI * 2);
-        float costheta = randf(-1., 1.);
+        float phi = util::randf(0., M_PI * 2);
+        float costheta = util::randf(-1., 1.);
 
         float theta = acos(costheta);
         result.x = sin(theta) * cos(phi);

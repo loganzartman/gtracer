@@ -8,20 +8,21 @@
 #include "Geometry.hh"
 #include "Material.hh"
 #include "Vec3.hh"
+#include "util.hh"
 
 struct Sphere : public Geometry {
     Float3 center;
     float radius;
     const Material *mat;
 
-    Sphere(const Float3 &c, const float &r) : Sphere(c, r, nullptr) {}
+    HOSTDEV Sphere(const Float3 &c, const float &r) : Sphere(c, r, nullptr) {}
 
-    Sphere(const Float3 &c, const float &r, const Material *m)
+    HOSTDEV Sphere(const Float3 &c, const float &r, const Material *m)
         : center(c), radius(r), mat(m) {}
 
-    const Material *material() const { return mat; }
+    HOSTDEV const Material *material() const { return mat; }
 
-    bool intersect(const Float3 &r_orig, const Float3 &r_dir, float &t) const {
+    HOSTDEV bool intersect(const Float3 &r_orig, const Float3 &r_dir, float &t) const {
         // draw a line between the center of the sphere and ray origin
         Float3 line = center - r_orig;
 
@@ -42,20 +43,20 @@ struct Sphere : public Geometry {
         // AKA how far down the ray the collision occurs
         float t0 = tca - rad_of_inter;
         float t1 = tca + rad_of_inter;
-        t = std::min(t0, t1);
+        t = util::min(t0, t1);
         if (t < 0)
-            t = std::max(t0, t1);
+            t = util::max(t0, t1);
         if (t < 0)
             return false;
 
         return true;
     }
 
-    Float3 normal(const Float3 &r_dir, const Float3 &intersection) const {
+    HOSTDEV Float3 normal(const Float3 &r_dir, const Float3 &intersection) const {
         return (intersection - center).normalize();
     }
 
-    AABB bounds() const {
+    HOSTDEV AABB bounds() const {
         const Float3 offset(radius);
         return AABB(center - offset, center + offset);
     }

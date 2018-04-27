@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
         }
 
         // limit orbit controls
-        orbit_pos.x = max(-(float)M_PI / 2, min((float)M_PI / 2, orbit_pos.x));
+        orbit_pos.x = util::max(-(float)M_PI / 2, util::min((float)M_PI / 2, orbit_pos.x));
 
         // compute orbit camera transform
         camera = camera * transform_translate(Float3(trans.x, 0, trans.z));
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
         cout << "\e[1G\e[0K"
              << "iteration " << iteration << ". " << (1000.f / dt) << "fps"
              << flush;
-        SDL_Delay(max(0l, 1000 / TARGET_FPS - dt));
+        SDL_Delay(util::max(0l, 1000 / TARGET_FPS - dt));
     }
 
     // output rendered image
@@ -396,11 +396,11 @@ vector<Sphere> construct_spheres_random(
     spheres.push_back(Sphere(Float3(0, 18, 0), 5, mats["light"]));
 
     for (int i = 0; i < 500; ++i) {
-        Float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
-        float radius = randf(0.5, 1.0);
-        Float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Float3 pos(util::randf(-20., 20.), util::randf(-10., 10.), util::randf(-20., 20.));
+        float radius = util::randf(0.5, 1.0);
+        Float3 col(util::randf(0.0, 1.0), util::randf(0.0, 1.0), util::randf(0., 1.));
         Material *mat =
-            new Material(col, randf(0., 1.), randf(0., 0.5), Float3(0));
+            new Material(col, util::randf(0., 1.), util::randf(0., 0.5), Float3(0));
         mats[to_string(i)] = mat;
         spheres.push_back(Sphere(pos, radius, mat));
     }
@@ -416,9 +416,9 @@ vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
     // mats["ground"]));
 
     for (int i = 0; i < 20; ++i) {
-        Float3 pos(randf(-20., 20.), randf(-10., 10.), randf(-20., 20.));
-        float size = randf(1, 2);
-        Float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Float3 pos(util::randf(-20., 20.), util::randf(-10., 10.), util::randf(-20., 20.));
+        float size = util::randf(1, 2);
+        Float3 col(util::randf(0.0, 1.0), util::randf(0.0, 1.0), util::randf(0., 1.));
         Material *mat = new Material(col, 0.f, 0.f, Float3(0));
         mats[to_string(i)] = mat;
         boxes.push_back(Box(pos - size, pos + size, mat));
@@ -436,13 +436,13 @@ vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
     tris.push_back(Tri(la, lb, lc, mats["light"]));
 
     for (int i = 0; i < 5000; ++i) {
-        Float3 pos(randf(-30., 30.), randf(-10., 10.), randf(-30., 30.));
-        Float3 a = pos + Float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        Float3 b = pos + Float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        Float3 c = pos + Float3(randf(-1, 1), randf(-1, 1), randf(-1, 1));
-        Float3 col(randf(0.0, 1.0), randf(0.0, 1.0), randf(0., 1.));
+        Float3 pos(util::randf(-30., 30.), util::randf(-10., 10.), util::randf(-30., 30.));
+        Float3 a = pos + Float3(util::randf(-1, 1), util::randf(-1, 1), util::randf(-1, 1));
+        Float3 b = pos + Float3(util::randf(-1, 1), util::randf(-1, 1), util::randf(-1, 1));
+        Float3 c = pos + Float3(util::randf(-1, 1), util::randf(-1, 1), util::randf(-1, 1));
+        Float3 col(util::randf(0.0, 1.0), util::randf(0.0, 1.0), util::randf(0., 1.));
         Material *mat =
-            new Material(col, randf(0., 1.), randf(0., 0.5), Float3(0));
+            new Material(col, util::randf(0., 1.), util::randf(0., 0.5), Float3(0));
         mats[to_string(i)] = mat;
         tris.push_back(Tri(a, b, c, mat));
     }

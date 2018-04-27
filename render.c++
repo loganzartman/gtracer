@@ -86,8 +86,8 @@ void *cpu_render_thread(void *thread_arg) {
         for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
             //  compute the x and y magnitude of each vector
             float v_x =
-                (2 * ((x + randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
-            float v_y = (1 - 2 * ((y + randf(0, 1)) * inv_h)) * angle;
+                (2 * ((x + util::randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
+            float v_y = (1 - 2 * ((y + util::randf(0, 1)) * inv_h)) * angle;
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
@@ -152,9 +152,9 @@ Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
         origin = intersection;
         Float3 normal = hit_geom->normal(ray_dir, intersection);
 
-        if (hit_geom->material()->transparency > randf(0, 1)) {
+        if (hit_geom->material()->transparency > util::randf(0, 1)) {
             float fresneleffect = fresnel(direction, normal, 1.1f);
-            if (randf(0, 1) < fresneleffect) {
+            if (util::randf(0, 1) < fresneleffect) {
                 // reflective material
                 direction = direction.reflect(normal);
             } else {
@@ -170,7 +170,7 @@ Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
                 refraction_dir.normalize();
                 direction = refraction_dir;
             }
-        } else if (hit_geom->material()->reflection > randf(0, 1)) {
+        } else if (hit_geom->material()->reflection > util::randf(0, 1)) {
             direction = direction.reflect(normal);
         } else {
             // diffuse material
@@ -189,6 +189,7 @@ Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
 
 /**
  * @brief Finds the nearest intersection between a ray and scene geometry.
+ * @detail Uses traversal algorithm proposed by Amanatides and Woo (1987).
  *
  * @param[in] ray_orig Ray origin point
  * @param[in] ray_dir Ray direction as unit vector
@@ -216,8 +217,8 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
 
     const Float3 world_size = world_bounds.xmax - world_bounds.xmin;
     Float3 relative_entry = ray_entry - world_bounds.xmin;
-    relative_entry = max(Float3(0), relative_entry);
-    relative_entry = min(world_size - 1e-5, relative_entry);
+    relative_entry = vmax(Float3(0), relative_entry);
+    relative_entry = vmin(world_size - 1e-5, relative_entry); // good tolerance
 
     // compute voxel parameters
     Int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x)),
@@ -228,7 +229,7 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
                           ray_dir.z < 0 ? -1 : 1);
 
     const Float3 next_voxel_bound =
-        Float3(voxel_pos + max(0, voxel_step)) * grid.cell_size;
+        Float3(voxel_pos + vmax(Int3(0), voxel_step)) * grid.cell_size;
 
     // compute t values at which ray crosses voxel boundaries
     Float3 t_max = (next_voxel_bound - relative_entry) / ray_dir;
@@ -291,7 +292,7 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
         assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
         assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y &&
                voxel_pos.z < grid.res.z);
-    } while (++i < 10000);
+    } while (++i < 10000); // arbitrary traversal length limit
 
     return false;
 }
@@ -349,11 +350,11 @@ float fresnel(Float3 dir, Float3 normal, float ior) {
     if (cosi > 0.f)
         swap(n1, n2);
 
-    float sint = (n1 / n2) * sqrt(max(0.f, 1.f - cosi * cosi));
+    float sint = (n1 / n2) * sqrt(util::max(0.f, 1.f - cosi * cosi));
     if (sint >= 1.f)  // total internal relfection
         return 1.f;
 
-    float cost = sqrt(max(0.f, 1.f - sint * sint));
+    float cost = sqrt(util::max(0.f, 1.f - sint * sint));
     cosi = abs(cosi);
 
     float Rs = ((n2 * cosi) - (n1 * cost)) / ((n2 * cosi) + (n1 * cost));

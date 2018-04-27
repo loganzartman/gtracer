@@ -1,23 +1,12 @@
 #ifndef VEC3_CPU_HH
 #define VEC3_CPU_HH
 
-#include <algorithm>
 #include <cmath>
 #include <ostream>
 #include "util.hh"
 
 template <typename T>
 struct Vec3 {
-    friend Vec3<T> min(const Vec3<T> &a, const Vec3<T> &b) {
-        using namespace std;
-        return Vec3<T>(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
-    }
-
-    friend Vec3<T> max(const Vec3<T> &a, const Vec3<T> &b) {
-        using namespace std;
-        return Vec3<T>(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
-    }
-
     T x, y, z;
 
     Vec3() : x(0), y(0), z(0) {}
@@ -159,8 +148,8 @@ struct Vec3 {
 
     static Vec3<T> random_spherical() {
         Vec3<T> result;
-        T phi = randf(0., M_PI * 2);
-        T costheta = randf(-1., 1.);
+        T phi = util::randf(0., M_PI * 2);
+        T costheta = util::randf(-1., 1.);
 
         T theta = acos(costheta);
         result.x = sin(theta) * cos(phi);
@@ -169,6 +158,16 @@ struct Vec3 {
         return result;
     }
 };
+
+template <typename T>
+Vec3<T> vmin(const Vec3<T> &a, const Vec3<T> &b) {
+    return Vec3<T>(util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z));
+}
+
+template <typename T>
+Vec3<T> vmax(const Vec3<T> &a, const Vec3<T> &b) {
+    return Vec3<T>(util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z));
+}
 
 typedef Vec3<float> Float3;
 typedef Vec3<int> Int3;

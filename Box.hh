@@ -1,28 +1,27 @@
 #ifndef BOX_HH
 #define BOX_HH
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include "AABB.hh"
 #include "Geometry.hh"
+#include "util.hh"
 
 class Box : public Geometry {
     AABB box;
     const Material *mat;
 
    public:
-    Box(const AABB &box) : box(box) {}
-    Box(const AABB &box, Material *mat) : box(box), mat(mat) {}
-    Box(const Float3 &a, const Float3 &b) : box(a, b) {}
-    Box(const Float3 &a, const Float3 &b, const Material *mat)
+    HOSTDEV Box(const AABB &box) : box(box) {}
+    HOSTDEV Box(const AABB &box, Material *mat) : box(box), mat(mat) {}
+    HOSTDEV Box(const Float3 &a, const Float3 &b) : box(a, b) {}
+    HOSTDEV Box(const Float3 &a, const Float3 &b, const Material *mat)
         : box(a, b), mat(mat) {}
 
-    const Material *material() const { return mat; }
+    HOSTDEV const Material *material() const { return mat; }
 
-    bool intersect(const Float3 &r_orig, const Float3 &r_dir, float &t) const {
+    HOSTDEV bool intersect(const Float3 &r_orig, const Float3 &r_dir, float &t) const {
         // https://gamedev.stackexchange.com/a/18459
-        using namespace std;
 
         // r.dir is unit direction vector of ray
         Float3 invdir(1.f / r_dir.x, 1.f / r_dir.y, 1.f / r_dir.z);
@@ -35,8 +34,8 @@ class Box : public Geometry {
         float t5 = (box.xmin.z - r_orig.z) * invdir.z;
         float t6 = (box.xmax.z - r_orig.z) * invdir.z;
 
-        float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
-        float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+        float tmin = util::max(util::max(util::min(t1, t2), util::min(t3, t4)), util::min(t5, t6));
+        float tmax = util::min(util::min(util::max(t1, t2), util::max(t3, t4)), util::max(t5, t6));
 
         // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is
         // behind us
@@ -55,7 +54,7 @@ class Box : public Geometry {
         return true;
     }
 
-    bool intersect(const Box &other) const {
+    HOSTDEV bool intersect(const Box &other) const {
         if (box.xmin.x > other.box.xmax.x || box.xmin.y > other.box.xmax.y ||
             box.xmin.z > other.box.xmax.z)
             return false;
@@ -65,24 +64,24 @@ class Box : public Geometry {
         return true;
     }
 
-    Float3 normal(const Float3 &r_dir, const Float3 &intersection) const {
+    HOSTDEV Float3 normal(const Float3 &r_dir, const Float3 &intersection) const {
         const Float3 x_axis = Float3(1, 0, 0);
         const Float3 y_axis = Float3(0, 1, 0);
         const Float3 z_axis = Float3(0, 0, 1);
 
-        Float3 p = intersection - (box.xmin * 0.5 + box.xmax * 0.5);
+        Float3 p = intersection - (box.xmin * 0.5f + box.xmax * 0.5f);
         p = p / (box.xmax - box.xmin);
         float dx = p.dot(x_axis), dy = p.dot(y_axis), dz = p.dot(z_axis);
         float adx = fabs(dx), ady = fabs(dy), adz = fabs(dz);
         if (adx > ady && adx > adz)
-            return dx < 0 ? x_axis * -1 : x_axis;
+            return dx < 0 ? x_axis * -1.f : x_axis;
         else if (ady > adx && ady > adz)
-            return dy < 0 ? y_axis * -1 : y_axis;
+            return dy < 0 ? y_axis * -1.f : y_axis;
         else
-            return dz < 0 ? z_axis * -1 : z_axis;
+            return dz < 0 ? z_axis * -1.f : z_axis;
     }
 
-    AABB bounds() const { return box; }
+    HOSTDEV AABB bounds() const { return box; }
 };
 
 #endif

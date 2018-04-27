@@ -1,7 +1,6 @@
 #ifndef TRIANGLE_HH
 #define TRIANGLE_HH
 
-#include <algorithm>
 #include <cassert>
 #include <vector>
 
@@ -12,16 +11,16 @@ class Tri : public Geometry {
     Float3 a, b, c;
     const Material* mat;
 
-   public:
-    Tri(const Float3& a, const Float3& b, const Float3& c,
+   public: 
+    HOSTDEV Tri(const Float3& a, const Float3& b, const Float3& c,
         const Material* mat = nullptr)
         : a(a), b(b), c(c), mat(mat) {}
-    Tri(const std::vector<Float3>& p, const Material* mat = nullptr)
+    HOSTDEV Tri(const std::vector<Float3>& p, const Material* mat = nullptr)
         : a(p[0]), b(p[1]), c(p[2]), mat(mat) {
         assert(p.size() == 3);
     }
 
-    bool intersect(const Float3& r_orig, const Float3& r_dir, float& t) const {
+    HOSTDEV bool intersect(const Float3& r_orig, const Float3& r_dir, float& t) const {
         // edges between points
         const Float3 ab = b - a;
         const Float3 ac = c - a;
@@ -54,18 +53,18 @@ class Tri : public Geometry {
         return true;
     }
 
-    Float3 normal(const Float3& r_dir, const Float3& intersection) const {
+    HOSTDEV Float3 normal(const Float3& r_dir, const Float3& intersection) const {
         const Float3 ab = b - a;
         const Float3 ac = c - a;
 
         return ab.cross(ac).normalize();
     }
 
-    const Material* material() const { return mat; }
+    HOSTDEV const Material* material() const { return mat; }
 
-    AABB bounds() const {
-        Float3 min_corner(min(min(a, b), c));
-        Float3 max_corner(max(max(a, b), c));
+    HOSTDEV AABB bounds() const {
+        Float3 min_corner(vmin(vmin(a, b), c));
+        Float3 max_corner(vmax(vmax(a, b), c));
         return AABB(min_corner, max_corner);
     }
 };

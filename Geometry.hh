@@ -4,15 +4,23 @@
 #include "AABB.hh"
 #include "Material.hh"
 #include "Vec3.hh"
+#include "util.hh"
+
+enum class GeomType {
+    Sphere,
+    Box,
+    Tri
+};
 
 class Geometry {
    public:
-    virtual const Material *material() const = 0;
-    virtual bool intersect(const Float3 &r_orig, const Float3 &r_dir,
+    HOSTDEV virtual const Material *material() const = 0;
+    HOSTDEV virtual bool intersect(const Float3 &r_orig, const Float3 &r_dir,
                            float &t) const = 0;
-    virtual Float3 normal(const Float3 &r_dir,
+    HOSTDEV virtual Float3 normal(const Float3 &r_dir,
                           const Float3 &intersection) const = 0;
-    virtual AABB bounds() const = 0;
+    HOSTDEV virtual AABB bounds() const = 0;
+    HOSTDEV virtual int check() const {return 7;}
 };
 
 /**
@@ -34,8 +42,8 @@ AABB geometry_bounds(II b, II e) {
 
     while (b != e) {
         AABB candidate = (*b)->bounds();
-        bounds = AABB(min(bounds.xmin, candidate.xmin),
-                      max(bounds.xmax, candidate.xmax));
+        bounds = AABB(vmin(bounds.xmin, candidate.xmin),
+                      vmax(bounds.xmax, candidate.xmax));
         ++b;
         ++i;
     }

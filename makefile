@@ -4,13 +4,13 @@ SDL_LDFLAGS := $(shell sdl2-config --libs)
 
 # feature detection
 ifneq ($(wildcard /opt/cuda-8.0/.),)
-	CUDADIR = /opt/cuda-8.0/lib64  # UTCS lab machines
+	CUDADIR = /opt/cuda-8.0/lib64  # lab machines
 else
 	CUDADIR = /opt/cuda/lib64      # alternative
 endif
 
 ifneq ($(shell which python3),)
-	PY = python3 # UTCS lab machines
+	PY = python3 # lab machines
 else
 	PY = python  # alternative
 endif
@@ -18,11 +18,11 @@ endif
 # c++ variables
 CXX = g++
 override CXXFLAGS += -Wall -Wextra -std=c++11 $(SDL_CFLAGS) -pthread $(OPTIM)
-OPTIM = -Ofast
+OPTIM = -O0 -g 
 LDFLAGS = $(SDL_LDFLAGS) -L$(CUDADIR)
 LDLIBS = -lGL -lGLEW -lcuda -lcudart
-TRACER_SRC = tracer.c++ render.c++ util.c++ loader.c++
-TRACER_HH  = Vec3.hh Mat.hh transform.hh AABB.hh Tri.hh Geometry.hh Sphere.hh Box.hh UniformGrid.hh transform.hh util.hh cuda_render.hh
+TRACER_SRC = tracer.c++ render.c++ loader.c++
+TRACER_HH  = util.hh Vec3.hh Mat.hh transform.hh AABB.hh Tri.hh Geometry.hh Sphere.hh Box.hh UniformGrid.hh transform.hh util.hh cuda_render.hh
 TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
 # cuda variables
@@ -30,7 +30,7 @@ NVCC     = nvcc
 CUDA_SRC = cuda_render.cu
 CUDA_HH  = cuda_render.cuh
 CUDA_OBJ = $(CUDA_SRC:%.cu=%.cu.o)
-NVFLAGS  = -std=c++11 -arch=sm_52 -O3
+NVFLAGS  = -std=c++11 -arch=sm_52 -O0 -G -g
 
 all: tracer
 
