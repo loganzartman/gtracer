@@ -5,26 +5,15 @@
 #include <cassert>
 #include <cmath>
 #include "AABB.hh"
-#include "Geometry.hh"
+#include "GeomData.hh"
 #include "Material.hh"
 #include "Vec3.hh"
 #include "util.hh"
 
-struct Sphere : public Geometry {
-    Float3 center;
-    float radius;
-    const Material *mat;
-
-    HOSTDEV Sphere(const Float3 &c, const float &r) : Sphere(c, r, nullptr) {}
-
-    HOSTDEV Sphere(const Float3 &c, const float &r, const Material *m)
-        : center(c), radius(r), mat(m) {}
-
-    HOSTDEV const Material *material() const { return mat; }
-
-    HOSTDEV bool intersect(const Float3 &r_orig, const Float3 &r_dir, float &t) const {
+struct Sphere {
+    HOSTDEV static bool intersect(const SphereData& data, const Float3 &r_orig, const Float3 &r_dir, float &t) {
         // draw a line between the center of the sphere and ray origin
-        Float3 line = center - r_orig;
+        Float3 line = data.center - r_orig;
 
         // tca is the vector of line projected onto r_dir
         float tca = line.dot(r_dir);
@@ -32,12 +21,12 @@ struct Sphere : public Geometry {
             return false;
 
         float dist2 = line.dot(line) - tca * tca;
-        if (dist2 > radius * radius)  // the radius is too short to span dist
+        if (dist2 > data.radius * data.radius)  // the radius is too short to span dist
             return false;
 
         // to get the radius of intersection, compute how much
         // of r_dir is in the sphere
-        float rad_of_inter = sqrt(radius * radius - dist2);
+        float rad_of_inter = sqrt(data.radius * data.radius - dist2);
 
         // t0 and t1 are parametric coefficients of the original ray
         // AKA how far down the ray the collision occurs
@@ -52,13 +41,13 @@ struct Sphere : public Geometry {
         return true;
     }
 
-    HOSTDEV Float3 normal(const Float3 &r_dir, const Float3 &intersection) const {
-        return (intersection - center).normalize();
+    HOSTDEV static Float3 normal(const SphereData& data, const Float3 &r_dir, const Float3 &intersection) {
+        return (intersection - data.center).normalize();
     }
 
-    HOSTDEV AABB bounds() const {
-        const Float3 offset(radius);
-        return AABB(center - offset, center + offset);
+    HOSTDEV static AABB bounds(const SphereData& data) {
+        const Float3 offset(data.radius);
+        return AABB(data.center - offset, data.center + offset);
     }
 };
 

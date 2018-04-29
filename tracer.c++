@@ -74,9 +74,9 @@ int main(int argc, char *argv[]) {
     unsigned long last_modified = 0;
     vector<Geometry *> geom;
     load(args.infile, geom, 100, mats["white"]);
-    Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
-    Sphere spg(Float3(0, 20, 20), 7, mats["lightg"]);
-    Sphere spb(Float3(20, 20, 20), 7, mats["lightb"]);
+    Geometry spr(SphereData{Float3(-20, 20, -20), 7}, mats["lightr"]);
+    Geometry spg(SphereData{Float3(0, 20, 20), 7}, mats["lightg"]);
+    Geometry spb(SphereData{Float3(20, 20, 20), 7}, mats["lightb"]);
     geom.push_back(&spr);
     geom.push_back(&spg);
     geom.push_back(&spb);
@@ -364,94 +364,6 @@ void gl_draw_fullscreen() {
     glVertex3f(1, 0, 0);
     glEnd();
     gl_check();
-}
-
-// 3D Object Creation
-
-/**
- * @brief Construct an array of spheres to render
- * @param[in] num_spheres used to specify the amount
- * of spheres in the constructed array
- * @return A pointer to the constructed array
- */
-vector<Sphere> construct_spheres(unordered_map<string, Material *> mats) {
-    vector<Sphere> spheres;
-    // position, radius, material
-    spheres.push_back(Sphere(Float3(0.0, -10004, -20), 10000, mats["metal"]));
-
-    spheres.push_back(Sphere(Float3(0.0, 0, 0), 4, mats["mirror"]));
-    spheres.push_back(Sphere(Float3(5.0, -1, 5), 2, mats["mirror"]));
-    spheres.push_back(Sphere(Float3(5.0, 0, -5), 3, mats["metal"]));
-    spheres.push_back(Sphere(Float3(-5.5, 0, 5), 3, mats["wood"]));
-    // light
-    spheres.push_back(Sphere(Float3(0.0, 20, 5), 3, mats["light"]));
-
-    return spheres;
-}
-
-vector<Sphere> construct_spheres_random(
-    unordered_map<string, Material *> mats) {
-    vector<Sphere> spheres;
-
-    // position, radius, material
-    // spheres.push_back(Sphere(Float3(0.0, -10000, -20), 10000,
-    // mats["ground"]));
-
-    spheres.push_back(Sphere(Float3(0, 18, 0), 5, mats["light"]));
-
-    for (int i = 0; i < 500; ++i) {
-        Float3 pos(util::randf(-20., 20.), util::randf(-10., 10.), util::randf(-20., 20.));
-        float radius = util::randf(0.5, 1.0);
-        Float3 col(util::randf(0.0, 1.0), util::randf(0.0, 1.0), util::randf(0., 1.));
-        Material *mat =
-            new Material(col, util::randf(0., 1.), util::randf(0., 0.5), Float3(0));
-        mats[to_string(i)] = mat;
-        spheres.push_back(Sphere(pos, radius, mat));
-    }
-
-    return spheres;
-}
-
-vector<Box> construct_boxes_random(unordered_map<string, Material *> mats) {
-    vector<Box> boxes;
-
-    // position, radius, material
-    // boxes.push_back(Sphere(Float3(0.0, -10000, -20), 10000,
-    // mats["ground"]));
-
-    for (int i = 0; i < 20; ++i) {
-        Float3 pos(util::randf(-20., 20.), util::randf(-10., 10.), util::randf(-20., 20.));
-        float size = util::randf(1, 2);
-        Float3 col(util::randf(0.0, 1.0), util::randf(0.0, 1.0), util::randf(0., 1.));
-        Material *mat = new Material(col, 0.f, 0.f, Float3(0));
-        mats[to_string(i)] = mat;
-        boxes.push_back(Box(pos - size, pos + size, mat));
-    }
-
-    return boxes;
-}
-
-vector<Tri> construct_tris_random(unordered_map<string, Material *> mats) {
-    vector<Tri> tris;
-
-    Float3 la(-5, 15, -5);
-    Float3 lb(5, 15, -5);
-    Float3 lc(0, 15, 5);
-    tris.push_back(Tri(la, lb, lc, mats["light"]));
-
-    for (int i = 0; i < 5000; ++i) {
-        Float3 pos(util::randf(-30., 30.), util::randf(-10., 10.), util::randf(-30., 30.));
-        Float3 a = pos + Float3(util::randf(-1, 1), util::randf(-1, 1), util::randf(-1, 1));
-        Float3 b = pos + Float3(util::randf(-1, 1), util::randf(-1, 1), util::randf(-1, 1));
-        Float3 c = pos + Float3(util::randf(-1, 1), util::randf(-1, 1), util::randf(-1, 1));
-        Float3 col(util::randf(0.0, 1.0), util::randf(0.0, 1.0), util::randf(0., 1.));
-        Material *mat =
-            new Material(col, util::randf(0., 1.), util::randf(0., 0.5), Float3(0));
-        mats[to_string(i)] = mat;
-        tris.push_back(Tri(a, b, c, mat));
-    }
-
-    return tris;
 }
 
 /**

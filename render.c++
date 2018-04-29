@@ -206,7 +206,7 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
                        AABB world_bounds, const UniformGrid &grid,
                        Float3 &intersection, Geometry *&hit_geom) {
     // find ray entry point into world bounds
-    const Box bbox(world_bounds);
+    const Geometry bbox(BoxData{world_bounds});
     Float3 ray_entry;
     if (world_bounds.contains(ray_orig)) {
         ray_entry = ray_orig;

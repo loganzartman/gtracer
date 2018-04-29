@@ -2,28 +2,15 @@
 #define TRIANGLE_HH
 
 #include <cassert>
-#include <vector>
 
-#include "Geometry.hh"
+#include "GeomData.hh"
 #include "Vec3.hh"
 
-class Tri : public Geometry {
-    Float3 a, b, c;
-    const Material* mat;
-
-   public: 
-    HOSTDEV Tri(const Float3& a, const Float3& b, const Float3& c,
-        const Material* mat = nullptr)
-        : a(a), b(b), c(c), mat(mat) {}
-    HOSTDEV Tri(const std::vector<Float3>& p, const Material* mat = nullptr)
-        : a(p[0]), b(p[1]), c(p[2]), mat(mat) {
-        assert(p.size() == 3);
-    }
-
-    HOSTDEV bool intersect(const Float3& r_orig, const Float3& r_dir, float& t) const {
+struct Tri {
+    HOSTDEV static bool intersect(const TriData &data, const Float3& r_orig, const Float3& r_dir, float& t) {
         // edges between points
-        const Float3 ab = b - a;
-        const Float3 ac = c - a;
+        const Float3 ab = data.b - data.a;
+        const Float3 ac = data.c - data.a;
 
         Float3 p = r_dir.cross(ac);
         float det = ab.dot(p);
@@ -33,7 +20,7 @@ class Tri : public Geometry {
 
         float inv_det = 1 / det;
 
-        Float3 tvec = r_orig - a;
+        Float3 tvec = r_orig - data.a;
         float u = tvec.dot(p) * inv_det;
         if (u < 0 || u > 1)
             return false;
@@ -53,18 +40,16 @@ class Tri : public Geometry {
         return true;
     }
 
-    HOSTDEV Float3 normal(const Float3& r_dir, const Float3& intersection) const {
-        const Float3 ab = b - a;
-        const Float3 ac = c - a;
+    HOSTDEV static Float3 normal(const TriData &data, const Float3& r_dir, const Float3& intersection) {
+        const Float3 ab = data.b - data.a;
+        const Float3 ac = data.c - data.a;
 
         return ab.cross(ac).normalize();
     }
 
-    HOSTDEV const Material* material() const { return mat; }
-
-    HOSTDEV AABB bounds() const {
-        Float3 min_corner(vmin(vmin(a, b), c));
-        Float3 max_corner(vmax(vmax(a, b), c));
+    HOSTDEV static AABB bounds(const TriData &data) {
+        Float3 min_corner(vmin(vmin(data.a, data.b), data.c));
+        Float3 max_corner(vmax(vmax(data.a, data.b), data.c));
         return AABB(min_corner, max_corner);
     }
 };

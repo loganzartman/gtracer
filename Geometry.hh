@@ -1,26 +1,77 @@
 #ifndef GEOMETRY_HH
 #define GEOMETRY_HH
 
+#include <cassert>
 #include "AABB.hh"
 #include "Material.hh"
+#include "Sphere.hh"
+#include "GeomData.hh"
+#include "Tri.hh"
+#include "Box.hh"
 #include "Vec3.hh"
 #include "util.hh"
 
 enum class GeomType {
     Sphere,
-    Box,
-    Tri
+    Tri,
+    Box
 };
 
 class Geometry {
    public:
-    HOSTDEV virtual const Material *material() const = 0;
-    HOSTDEV virtual bool intersect(const Float3 &r_orig, const Float3 &r_dir,
-                           float &t) const = 0;
-    HOSTDEV virtual Float3 normal(const Float3 &r_dir,
-                          const Float3 &intersection) const = 0;
-    HOSTDEV virtual AABB bounds() const = 0;
-    HOSTDEV virtual int check() const {return 7;}
+    GeomType type;
+    GeomData data;
+    const Material* mat;
+
+    Geometry(GeomType type, GeomData data, const Material* mat = nullptr) : type(type), data(data), mat(mat) {}
+    Geometry(SphereData data, const Material* mat = nullptr) : type(GeomType::Sphere), data(data), mat(mat) {}
+    Geometry(TriData data, const Material* mat = nullptr) : type(GeomType::Tri), data(data), mat(mat) {}
+    Geometry(BoxData data, const Material* mat = nullptr) : type(GeomType::Box), data(data), mat(mat) {}
+
+    HOSTDEV const Material* material() const {
+        return mat;
+    }
+
+    HOSTDEV bool intersect(const Float3 &r_orig, const Float3 &r_dir,
+                           float &t) const {
+        switch (type) {
+            case GeomType::Sphere:
+                return Sphere::intersect(data.sphere, r_orig, r_dir, t);
+            case GeomType::Tri:
+                return Tri::intersect(data.tri, r_orig, r_dir, t);
+            case GeomType::Box:
+                return Box::intersect(data.box, r_orig, r_dir, t);
+            default:
+                assert(false);
+        }
+    }
+    
+    HOSTDEV Float3 normal(const Float3 &r_dir,
+                          const Float3 &intersection) const {
+        switch (type) {
+            case GeomType::Sphere:
+                return Sphere::normal(data.sphere, r_dir, intersection);
+            case GeomType::Tri:
+                return Tri::normal(data.tri, r_dir, intersection);
+            case GeomType::Box:
+                return Box::normal(data.box, r_dir, intersection);
+            default:
+                assert(false);
+        }
+    }
+    
+    HOSTDEV AABB bounds() const {
+        switch (type) {
+            case GeomType::Sphere:
+                return Sphere::bounds(data.sphere);
+            case GeomType::Tri:
+                return Tri::bounds(data.tri);
+            case GeomType::Box:
+                return Box::bounds(data.box);
+            default:
+                assert(false);
+        }
+    }
 };
 
 /**
