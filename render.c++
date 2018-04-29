@@ -18,7 +18,7 @@
 #include <stdexcept>
 
 #define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(0)
+#define SKY_COLOR Float3(1)
 
 using namespace std;
 

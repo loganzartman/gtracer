@@ -58,7 +58,8 @@ int main(int argc, char *argv[]) {
 
     // surface color, transparency, reflectivity, emission color
     vector<Material> mats{
-        Material(Float3(0.950, 0.950, 0.950), 0, 0.0, Float3(0)),  // white
+        Material(Float3(0.950, 0.950, 0.950), 0.0, 0.0, Float3(0)),  // white
+        Material(Float3(0.950, 0.123, 0.098), 0.0, 0.0, Float3(0)),  // red
         Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0)),         // lightr
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),         // lightg
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))          // lightb
@@ -71,10 +72,11 @@ int main(int argc, char *argv[]) {
     unsigned long last_modified = 0;
     vector<Geometry> geom;
     load(args.infile, geom, 100, &mat_array[0]);
-    geom.push_back(
-        Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[1]));
-    geom.push_back(Geometry(SphereData{Float3(0, 20, 20), 7}, &mat_array[2]));
-    geom.push_back(Geometry(SphereData{Float3(20, 20, 20), 7}, &mat_array[3]));
+    geom.push_back(Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))}, &mat_array[1]));
+    // geom.push_back(
+    //     Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
+    // geom.push_back(Geometry(SphereData{Float3(0, 20, 20), 7}, &mat_array[3]));
+    // geom.push_back(Geometry(SphereData{Float3(20, 20, 20), 7}, &mat_array[4]));
 
     Geometry *geom_array = (Geometry *)util::hostdev_alloc(
         geom.size() * sizeof(Geometry), args.gpu);
