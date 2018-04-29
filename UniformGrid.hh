@@ -164,13 +164,11 @@ class UniformGrid {
     }
 
     HOSTDEV iterator first() const {
-        // return iterator(0, 0);
-        return iterator(data[data_index(0)].first, geom_cell);
+        return iterator(0, geom_cell);
     }
 
     HOSTDEV iterator last() const {
-        // return iterator(n_pairs, res);
-        return iterator(data[data_index(res)].second, geom_cell);
+        return iterator(n_pairs, geom_cell);
     }
 
 
