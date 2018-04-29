@@ -56,7 +56,6 @@ int main(int argc, char *argv[]) {
     float orbit_zoom = 30;
     Float3 trans(0);
 
-    // scene geometry
     // surface color, transparency, reflectivity, emission color
     unordered_map<string, Material *> mats = {
         {"ground", new Material(Float3(0.8, 0.8, 0.9), 0, 0.0, Float3(0))},
@@ -71,8 +70,8 @@ int main(int argc, char *argv[]) {
         {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
         {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
 
+    // load geometry
     unsigned long last_modified = 0;
-
     vector<Geometry *> geom;
     load(args.infile, geom, 100, mats["white"]);
     Sphere spr(Float3(-20, 20, -20), 7, mats["lightr"]);
@@ -81,6 +80,9 @@ int main(int argc, char *argv[]) {
     geom.push_back(&spr);
     geom.push_back(&spg);
     geom.push_back(&spb);
+
+    Geometry** geom_array = (Geometry**)util::hostdev_alloc(geom.size() * sizeof(Geometry*), args.gpu);
+    copy(geom.begin(), geom.end(), geom_array);
 
     // Initalize OpenGL
     int w, h;
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
     texture_id = gl_create_texture(w, h);
     if (args.gpu) {
         buffer_id = gl_create_buffer(w, h);
-        cuda_init(texture_id, buffer_id, geom); 
+        cuda_init(texture_id, buffer_id); 
     }
 
     // prepare CPU pixel buffer
@@ -160,11 +162,11 @@ int main(int argc, char *argv[]) {
         // do raytracing
         if (args.gpu) {
             // GPU rendering mode
-            cuda_render(buffer_id, w, h, camera, geom, iteration);
+            cuda_render(buffer_id, w, h, camera, geom_array, geom.size(), iteration);
             gl_buf2tex(w, h, buffer_id, texture_id);  // copy buffer to texture
         } else {
             // CPU rendering mode
-            cpu_render(pixels, w, h, camera, geom, iteration, args.threads);
+            cpu_render(pixels, w, h, camera, geom_array, geom_array + geom.size(), iteration, args.threads);
             gl_data2tex(w, h, pixels, texture_id);  // copy buffer to texture
         }
 
@@ -220,6 +222,8 @@ int main(int argc, char *argv[]) {
     // Once finished with OpenGL functions, the SDL_GLContext can be deleted.
     SDL_GL_DeleteContext(glcontext);
     sdl_check();
+
+    util::hostdev_free(geom_array, args.gpu);
 
     // deallocate materials
     for (auto it = mats.begin(); it != mats.end(); ++it)

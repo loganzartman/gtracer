@@ -27,8 +27,8 @@ TRACER_OBJ = $(TRACER_SRC:%.c++=%.o)
 
 # cuda variables
 NVCC     = nvcc
-CUDA_SRC = cuda_render.cu
-CUDA_HH  = cuda_render.cuh
+CUDA_SRC = cuda_util.cu cuda_render.cu
+CUDA_HH  = cuda_util.hh cuda_util.cuh cuda_render.cuh
 CUDA_OBJ = $(CUDA_SRC:%.cu=%.cu.o)
 NVFLAGS  = -std=c++11 -arch=sm_52 -O0 -G -g
 

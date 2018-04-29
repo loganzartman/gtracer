@@ -20,18 +20,18 @@
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                vector<Geometry *> geom, unsigned iteration,
+                Geometry** geom_b, Geometry** geom_e, unsigned iteration,
                 unsigned n_threads) {
     // construct uniform grid
-    AABB bounds = geometry_bounds(geom.begin(), geom.end());
-    Int3 res = UniformGrid::resolution(bounds, geom.size());
+    AABB bounds = geometry_bounds(geom_b, geom_e);
+    Int3 res = UniformGrid::resolution(bounds, geom_e - geom_b);
     size_t n_data = UniformGrid::data_size(res);
     size_t n_pairs =
-        UniformGrid::count_pairs(res, bounds, geom.begin(), geom.end());
+        UniformGrid::count_pairs(res, bounds, geom_b, geom_e);
     ugrid_data_t *grid_data = new ugrid_data_t[n_data];
     ugrid_pair_t *grid_pairs = new ugrid_pair_t[n_pairs];
-    UniformGrid grid(res, bounds, grid_data, grid_pairs, n_pairs, geom.begin(),
-                     geom.end());
+    UniformGrid grid(res, bounds, grid_data, grid_pairs, n_pairs, geom_b,
+                     geom_e);
 
     // spawn threads
     CPUThreadArgs **args = new CPUThreadArgs *[n_threads];
@@ -40,7 +40,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
         const unsigned pitch = n_threads;
         const unsigned offset = i;
         args[i] = new CPUThreadArgs{w,    h,      pitch, offset,    camera,
-                                    geom, bounds, grid,  iteration, pixels};
+                                    bounds, grid,  iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -91,7 +91,7 @@ void *cpu_render_thread(void *thread_arg) {
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += cpu_trace(origin, ray_dir, args.geom, args.bounds,
+            color += cpu_trace(origin, ray_dir, args.bounds,
                                args.grid, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
@@ -125,7 +125,7 @@ void *cpu_render_thread(void *thread_arg) {
  * @return Color computed for this primary ray
  */
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
-                 vector<Geometry *> geom, AABB world_bounds,
+                 AABB world_bounds,
                  const UniformGrid &grid, int depth) {
     Float3 color = 1.0;
     Float3 light = 0.0;

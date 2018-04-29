@@ -14,7 +14,6 @@ struct CPUThreadArgs {
     size_t pitch;
     size_t offset;
     Mat4f &camera;
-    std::vector<Geometry *> &geom;
     AABB bounds;
     const UniformGrid &grid;
     unsigned iteration;
@@ -22,10 +21,10 @@ struct CPUThreadArgs {
 };
 
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
-                 std::vector<Geometry *> geom, AABB world_bounds,
+                AABB world_bounds,
                  const UniformGrid &grid, int depth);
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                std::vector<Geometry *> geom, unsigned iteration,
+                Geometry** geom_b, Geometry** geom_e, unsigned iteration,
                 unsigned n_threads);
 void *cpu_render_thread(void *thread_arg);
 bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,

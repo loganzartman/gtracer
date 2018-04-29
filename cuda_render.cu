@@ -17,7 +17,7 @@
  * @param texture_id ID of the GL texture
  * @param buffer_id  ID of the GL buffer
  */
-void cuda_init(GLuint texture_id, GLuint buffer_id, const std::vector<Geometry*>& geom) {
+void cuda_init(GLuint texture_id, GLuint buffer_id) {
     // register GL buffer and texture as CUDA resources
     cudaGraphicsGLRegisterBuffer(&cuda_buffer, buffer_id,
                                  cudaGraphicsRegisterFlagsNone);
@@ -33,7 +33,7 @@ void cuda_init(GLuint texture_id, GLuint buffer_id, const std::vector<Geometry*>
 }
 
 void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
-                 std::vector<Geometry *> geom, unsigned iteration) {
+                 Geometry** geom, size_t geom_len, unsigned iteration) {
     using namespace std;
 
     const size_t size_pixels = w * h;
@@ -46,29 +46,10 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                                          cuda_buffer);
     //assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
 
-    Geometry **dev_geom;
-    cudaMallocManaged(&dev_geom, geom.size());
-
-    cuda_update_geometry(geom, dev_geom);
-
     // run kernel
-    CUDAKernelArgs args = {w, h, iteration, mem_ptr, dev_geom};
+    CUDAKernelArgs args = {w, h, iteration, mem_ptr, geom, geom_len};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
-}
-
-/**
- * @brief Copies a new set of Geometry to the GPU
- * @detail allocates memory and uses kernel to construct Geometries on GPU
- * 
- * @param geom the vector of geometry to copy
- */
-void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom) {
-    Geometry *x;
-    for (size_t i = 0; i < geom.size(); ++i) {
-        cudaMallocManaged(&x, sizeof(decltype(*geom[i])));
-        dev_geom[i] = x;
-    }
 }
 
 /**

@@ -19,7 +19,8 @@ struct CUDAKernelArgs {
     // const UniformGrid &grid;
     unsigned iteration;
     float *pixels;
-    Geometry **dev_geom;
+    Geometry **geom;
+    size_t geom_len;
 };
 
 void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom);
