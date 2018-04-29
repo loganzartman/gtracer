@@ -3,11 +3,24 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <cmath>
+#include <memory>
+#include <stdexcept>
+
 #include "cuda_render.cuh"
 #include "Geometry.hh"
+#include "UniformGrid.hh"
+#include "Mat.hh"
+#include "Material.hh"
+#include "Vec3.hh"
+#include "transform.hh"
+#include "util.hh"
 #include "Sphere.hh"
 #include "Tri.hh"
 #include "Box.hh"
+
+#define PRIMARY_RAYS 1
 
 /**
  * @brief Initializes CUDA resources.
@@ -71,15 +84,52 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     const size_t index = blockIdx.x * blockDim.x + threadIdx.x;
     const size_t stride = blockDim.x * gridDim.x;
 
+    float inv_w = 1 / float(args.w);
+    float inv_h = 1 / float(args.h);
+    float fov = 30;
+    float aspect_ratio = float(args.w) / float(args.h);
+    float angle = tan(0.5 * M_PI * fov / 180.0);
+
+    Mat4f dir_camera = transform_clear_translate(args.camera);
+    Float3 origin = args.camera * Float3();
+
     const size_t len = args.w * args.h;
     for (size_t i = index; i < len; i += stride) {
         const size_t idx = i * 4;
         const size_t x = i % args.w;
         const size_t y = i / args.w;
-        float fx = (float)x / args.w, fy = (float)y / args.h;
-        args.pixels[idx + 0] = sin(fx + args.iteration * 0.1f);
-        args.pixels[idx + 1] = cos(fy + args.iteration * 0.02f);
-        args.pixels[idx + 2] = 0.f;
-        args.pixels[idx + 3] = 1.f;
+
+        Float3 color;
+        for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
+            float v_x =
+                (2 * ((x + util::randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
+            float v_y = (1 - 2 * ((y + util::randf(0, 1)) * inv_h)) * angle;
+            Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
+            ray_dir.normalize();
+
+            color += cuda_trace(origin, ray_dir, args.geom, args.bounds,
+                               args.grid, 8);
+        }
+        color *= 1.f / PRIMARY_RAYS;
+
+        // compute all-time average color
+        Float3 dst = Float3(args.pixels[idx], args.pixels[idx + 1],
+                            args.pixels[idx + 2]);
+        float f = 1;
+        if (args.iteration > 0)
+            f = 1.f / args.iteration;
+        Float3 blended = color * f + dst * (1 - f);
+
+        // write color
+        args.pixels[idx] = blended.x;
+        args.pixels[idx + 1] = blended.y;
+        args.pixels[idx + 2] = blended.z;
+        args.pixels[idx + 3] = 1;  // alpha
     }
+}
+
+__device__ Float3 cuda_trace(float *ray_orig, float *ray_dir,
+                 Geometry **geom, AABB world_bounds,
+                 const UniformGrid &grid, int depth) {
+    return Float3(1);
 }

@@ -15,7 +15,9 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+
 #define PRIMARY_RAYS 1
+#define SKY_COLOR Float3(0) 
 
 using namespace std;
 
@@ -138,7 +140,7 @@ Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
         Geometry *hit_geom;
         if (!cpu_ray_intersect(origin, direction, world_bounds, grid,
                                intersection, hit_geom)) {
-            light += Float3(0) * color;
+            light += SKY_COLOR * color;
             break;
         }
 

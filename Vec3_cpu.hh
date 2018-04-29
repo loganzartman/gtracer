@@ -47,7 +47,6 @@ struct Vec3 {
         return result;
     }
 
-    // shouldn't use fabs because we want to keep this generic
     friend Vec3<T> vabs(const Vec3<T> &v) {
         Vec3<T> result = v;
         if (v.x < 0)
