@@ -121,7 +121,7 @@ __host__ __device__ struct Vec3<int> {
      */
     template <typename E>
     __host__ __device__ explicit Vec3(const Vec3<E> &other)
-        : x((int)other.x), y((int)other.y), z((int)other.z) {}
+        : i(make_int3((int)other.x, (int)other.y, (int)other.z)) {}
 
     __host__ __device__ Vec3<int> &operator=(const Vec3<int> &other) {
         i = other.i;
@@ -153,7 +153,7 @@ __host__ __device__ struct Vec3<float> {
      */
     template <typename E>
     __host__ __device__ explicit Vec3(const Vec3<E> &other)
-        : x((float)other.x), y((float)other.y), z((float)other.z) {}
+        : f(make_float3((float)other.x, (float)other.y, (float)other.z)) {}
 
     __host__ __device__ Vec3<float> &operator=(const Vec3<float> &other) {
         f = other.f;

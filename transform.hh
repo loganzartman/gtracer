@@ -3,6 +3,7 @@
 
 #include "Mat.hh"
 #include "Vec3.hh"
+#include "util.hh"
 
 /**
  * @brief Produce a transformation matrix for a given translation.
@@ -11,7 +12,7 @@
  * @return The resulting transformation matrix
  */
 template <typename T>
-Mat<T, 4, 4> transform_translate(const Vec3<T> &v) {
+HOSTDEV Mat<T, 4, 4> transform_translate(const Vec3<T> &v) {
     Mat<T, 4, 4> result = Mat<T, 4, 4>::identity();
     result(0, 3) = v.x;
     result(1, 3) = v.y;
@@ -26,7 +27,7 @@ Mat<T, 4, 4> transform_translate(const Vec3<T> &v) {
  * @return The resulting transformation matrix.
  */
 template <typename T>
-Mat<T, 4, 4> transform_scale(const Vec3<T> &v) {
+HOSTDEV Mat<T, 4, 4> transform_scale(const Vec3<T> &v) {
     Mat<T, 4, 4> result;
     result(0, 0) = v.x;
     result(1, 1) = v.y;
@@ -44,7 +45,7 @@ Mat<T, 4, 4> transform_scale(const Vec3<T> &v) {
  * @return The resulting transformation matrix.
  */
 template <typename T>
-Mat<T, 4, 4> transform_rotateX(const T &t) {
+HOSTDEV Mat<T, 4, 4> transform_rotateX(const T &t) {
     Mat<T, 4, 4> result = Mat<T, 4, 4>::identity();
     result(1, 1) = cos(t);
     result(1, 2) = -sin(t);
@@ -62,7 +63,7 @@ Mat<T, 4, 4> transform_rotateX(const T &t) {
  * @return The resulting transformation matrix.
  */
 template <typename T>
-Mat<T, 4, 4> transform_rotateY(const T &t) {
+HOSTDEV Mat<T, 4, 4> transform_rotateY(const T &t) {
     Mat<T, 4, 4> result = Mat<T, 4, 4>::identity();
     result(0, 0) = cos(t);
     result(0, 2) = -sin(t);
@@ -80,7 +81,7 @@ Mat<T, 4, 4> transform_rotateY(const T &t) {
  * @return The resulting transformation matrix.
  */
 template <typename T>
-Mat<T, 4, 4> transform_rotateZ(const T &t) {
+HOSTDEV Mat<T, 4, 4> transform_rotateZ(const T &t) {
     Mat<T, 4, 4> result = Mat<T, 4, 4>::identity();
     result(0, 0) = cos(t);
     result(0, 1) = -sin(t);
@@ -98,7 +99,7 @@ Mat<T, 4, 4> transform_rotateZ(const T &t) {
  * @return The resulting transformation matrix
  */
 template <typename T>
-Mat<T, 4, 4> transform_rotate(const Vec3<T> &v) {
+HOSTDEV Mat<T, 4, 4> transform_rotate(const Vec3<T> &v) {
     Mat<T, 4, 4> result = Mat<T, 4, 4>::identity();
     result(0, 0) = cos(v.y) * cos(v.z);
     result(0, 1) = cos(v.y) * sin(v.z);
@@ -123,7 +124,7 @@ Mat<T, 4, 4> transform_rotate(const Vec3<T> &v) {
  * @return A copy of the transformation matrix with no translation
  */
 template <typename T>
-Mat<T, 4, 4> transform_clear_translate(const Mat<T, 4, 4> &a) {
+HOSTDEV Mat<T, 4, 4> transform_clear_translate(const Mat<T, 4, 4> &a) {
     Mat<T, 4, 4> result = a;
     result(0, 3) = 0;
     result(1, 3) = 0;

@@ -6,6 +6,7 @@
 
 #include "Geometry.hh"
 #include "Tri.hh"
+#include "Sphere.hh"
 #include "Vec3.hh"
 #include "loader.hh"
 

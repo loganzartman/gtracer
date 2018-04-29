@@ -46,7 +46,7 @@ void cuda_init(GLuint texture_id, GLuint buffer_id) {
 }
 
 void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
-                 Geometry** geom, size_t geom_len, unsigned iteration) {
+    Geometry** geom, size_t geom_len, unsigned iteration){
     using namespace std;
 
     const size_t size_pixels = w * h;
@@ -59,10 +59,26 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                                          cuda_buffer);
     //assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
 
+    // construct uniform grid
+    AABB bounds = geometry_bounds(geom, geom + geom_len);
+    Int3 res = UniformGrid::resolution(bounds, geom_len);
+    size_t n_data = UniformGrid::data_size(res);
+    size_t n_pairs =
+        UniformGrid::count_pairs(res, bounds, geom, geom + geom_len);
+    ugrid_data_t *grid_data;
+    ugrid_pair_t *grid_pairs;
+    cudaMallocManaged(&grid_data, n_data * sizeof(ugrid_data_t));
+    cudaMallocManaged(&grid_pairs, n_pairs * sizeof(ugrid_pair_t));
+    UniformGrid grid(res, bounds, grid_data, grid_pairs, n_pairs, geom,
+                     geom + geom_len);
+
     // run kernel
-    CUDAKernelArgs args = {w, h, iteration, mem_ptr, geom, geom_len};
+    CUDAKernelArgs args = {w, h, camera, bounds, grid, iteration, mem_ptr, geom, geom_len};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
+
+    cudaFree(grid_data);
+    cudaFree(grid_pairs);
 }
 
 /**
@@ -128,7 +144,7 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     }
 }
 
-__device__ Float3 cuda_trace(float *ray_orig, float *ray_dir,
+__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir,
                  Geometry **geom, AABB world_bounds,
                  const UniformGrid &grid, int depth) {
     return Float3(1);

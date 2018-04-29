@@ -5,6 +5,7 @@
 
 #include "cuda_render.hh"
 #include "Geometry.hh"
+#include "UniformGrid.hh"
 #define BLOCK_SIZE 256
 
 cudaGraphicsResource_t cuda_buffer;
@@ -14,7 +15,7 @@ cudaStream_t cuda_stream;
 struct CUDAKernelArgs {
     size_t w;
     size_t h;
-    Mat4f &camera;
+    const Mat4f &camera;
     AABB bounds;
     const UniformGrid &grid;
     unsigned iteration;
@@ -26,7 +27,7 @@ struct CUDAKernelArgs {
 void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom);
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args);
-__device__ Float3 cuda_trace(float *ray_orig, float *ray_dir,
+__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir,
                  Geometry **geom, AABB world_bounds,
                  const UniformGrid &grid, int depth);
 #endif

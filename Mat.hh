@@ -1,10 +1,10 @@
 #ifndef MAT_HH
 #define MAT_HH
 
-#include <algorithm>
-#include <array>
+#include <initializer_list>
 #include <cstddef>
 #include "Vec3.hh"
+#include "util.hh"
 
 template <typename T, size_t N, size_t M>
 class Mat {
@@ -15,7 +15,10 @@ class Mat {
     /**
      * @brief Construct a zero matrix
      */
-    Mat() { std::fill_n(el, N * M, 0); }
+    HOSTDEV Mat() { 
+        for (size_t i = 0; i < N * M; ++i)
+            el[i] = 0;
+    }
 
     /**
      * @brief Construct a matrix from an array of elements.
@@ -24,10 +27,16 @@ class Mat {
      * [1 2]
      * [3 4]
      *
-     * @param elems Array of row-vectors
+     * @param elems Array of packed row-vectors
      */
-    Mat(std::array<T, N * M> elems) {
-        std::copy(elems.begin(), elems.end(), el);
+    HOSTDEV Mat(std::initializer_list<T> elems) {
+        T* dst = el;
+        const T* src = elems.begin();
+        while (src != elems.end()) {
+            *dst = *src;
+            ++dst;
+            ++src;
+        }
     }
 
     /**
@@ -36,7 +45,7 @@ class Mat {
      * @param a The second matrix
      * @return A new matrix representing the sum
      */
-    Mat<T, N, M> operator+(const Mat<T, N, M>& a) {
+    HOSTDEV Mat<T, N, M> operator+(const Mat<T, N, M>& a) const {
         Mat<T, N, M> out = *this;
         for (size_t i = 0; i < N; ++i) {
             for (size_t j = 0; j < M; ++j) {
@@ -53,7 +62,7 @@ class Mat {
      * @return A new matrix representing the product
      */
     template <size_t X>
-    Mat<T, N, X> operator*(const Mat<T, M, X>& b) {
+    HOSTDEV Mat<T, N, X> operator*(const Mat<T, M, X>& b) const {
         Mat<T, N, X> out;
         for (size_t r = 0; r < N; ++r) {
             for (size_t c = 0; c < X; ++c) {
@@ -73,15 +82,15 @@ class Mat {
      * @param b The vec3 to multiply on the right.
      * @return A new matrix representing the product
      */
-    Vec3<T> operator*(const Vec3<T>& b) {
+    HOSTDEV Vec3<T> operator*(const Vec3<T>& b) const {
         Mat<T, 4, 1> b_vec{{b.x, b.y, b.z, 1}};
         Mat<T, 4, 1> result = (*this) * b_vec;
         const T iw = 1 / result(3, 0);
         return Vec3<T>(result(0, 0), result(1, 0), result(2, 0)) * iw;
     }
 
-    T& operator()(size_t row, size_t col) { return el[row * M + col]; }
-    const T& operator()(size_t row, size_t col) const {
+    HOSTDEV T& operator()(size_t row, size_t col) { return el[row * M + col]; }
+    HOSTDEV const T& operator()(size_t row, size_t col) const {
         return el[row * M + col];
     }
 
@@ -89,7 +98,7 @@ class Mat {
      * @brief Produce an identity matrix. Dimensions must be equal.
      * @return The identity matrix
      */
-    static Mat<T, N, M> identity() {
+    HOSTDEV static Mat<T, N, M> identity() {
         static_assert(N == M, "Identity matrix must be square");
         Mat<T, N, M> m;
         for (size_t i = 0; i < N; ++i)

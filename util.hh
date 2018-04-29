@@ -1,11 +1,13 @@
 #ifndef UTIL_HH
 #define UTIL_HH
-#include <random>
 #include "cuda_util.hh"
 
 #if __CUDACC__
+#include <thrust/random/uniform_real_distribution.h>
+#include <thrust/random/linear_congruential_engine.h>
 #define HOSTDEV __host__ __device__
 #else
+#include <random>
 #define HOSTDEV
 #endif
 
@@ -22,12 +24,20 @@ namespace util {
 
     HOSTDEV static float mix(float a, float b, float ratio) { return a * ratio + b * (1 - ratio); }
 
+    #if __CUDACC__
+    HOSTDEV static float randf(float lo, float hi) {
+        thrust::minstd_rand rng;
+        thrust::uniform_real_distribution<float> dist(0,1);
+        return dist(rng) * (hi - lo) + lo;
+    }
+    #else
     static float randf(float lo, float hi) {
         using namespace std;
         static random_device rd;
         static mt19937 mt(rd());
         return (float)mt() / mt.max() * (hi - lo) + lo;
     }
+    #endif
 
     /**
      * @brief Allocate bytes either on CPU or GPU managed memory
