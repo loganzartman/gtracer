@@ -126,7 +126,7 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += gpu_trace(origin, ray_dir, args.geom, args.bounds,
+            color += cuda_trace(origin, ray_dir, args.geom, args.bounds,
                                args.grid, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
