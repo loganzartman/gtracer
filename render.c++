@@ -21,7 +21,7 @@ using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
                 Geometry *geom_b, Geometry *geom_e, unsigned iteration,
-                unsigned n_threads) {
+                unsigned n_threads, bool accel) {
     // construct uniform grid
     AABB bounds = geometry_bounds(geom_b, geom_e);
     Int3 res = UniformGrid::resolution(bounds, geom_e - geom_b);
@@ -39,7 +39,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
         const unsigned pitch = n_threads;
         const unsigned offset = i;
         args[i] = new CPUThreadArgs{w,      h,    pitch,     offset, camera,
-                                    bounds, grid, iteration, pixels};
+                                    bounds, grid, iteration, pixels, accel};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -90,7 +90,7 @@ void *cpu_render_thread(void *thread_arg) {
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += cpu_trace(origin, ray_dir, args.bounds, args.grid, 8);
+            color += cpu_trace(origin, ray_dir, args.bounds, args.grid, args.accel, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -123,7 +123,8 @@ void *cpu_render_thread(void *thread_arg) {
  * @return Color computed for this primary ray
  */
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
-                 AABB world_bounds, const UniformGrid &grid, int depth) {
+                 AABB world_bounds, const UniformGrid &grid,
+                 const bool &accel, int depth) {
     Float3 color = 1.0;
     Float3 light = 0.0;
 
@@ -133,8 +134,18 @@ Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
         // cast ray
         Float3 intersection;
         Geometry *hit_geom;
-        if (!cpu_ray_intersect(origin, direction, world_bounds, grid,
-                               intersection, hit_geom)) {
+        bool intersect;
+
+        // use the accelerated version (uniform grid) if accel is true
+        if (accel) {
+            intersect = cpu_ray_intersect(origin, direction, world_bounds,
+                    grid, intersection, hit_geom);
+        } else {
+            intersect = cpu_ray_intersect_items(origin, direction,
+                    grid.first(), grid.last(), intersection, hit_geom);
+        }
+
+        if (!intersect) {
             light += SKY_COLOR * color;
             break;
         }
