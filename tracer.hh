@@ -44,6 +44,9 @@ void gl_draw_fullscreen();
     })
 
 void output_bmp(float *pixels, int w, int h, std::string outfile);
+void output_time(double total_time, unsigned iteration, size_t geom_size,
+                 unsigned long rays_cast, bool gpu, bool accel);
+
 #define sdl_check()                       \
     ({                                    \
         const char *err = SDL_GetError(); \

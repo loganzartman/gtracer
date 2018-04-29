@@ -17,9 +17,6 @@
 #include <memory>
 #include <stdexcept>
 
-#define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(1)
-
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,

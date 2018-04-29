@@ -22,6 +22,7 @@ struct TracerArgs {
     bool gpu;
     bool csv;
     bool time;
+    bool accel;
 };
 
 void print_usage() {
@@ -36,6 +37,9 @@ void print_usage() {
     cout << " -g, --gpu        use GPU acceleration" << endl;
     cout << " -c, --csv        output machine-readable CSV data" << endl;
     cout << " -j, --time       output timing data" << endl;
+    cout << " -d, --daccel     disable acceleration structures used to speed "
+            "up path tracing"
+         << endl;
 }
 
 void print_banner(const TracerArgs &opts) {
@@ -60,14 +64,16 @@ TracerArgs parse_args(int argc, char *argv[]) {
         {"gpu", no_argument, NULL, 'g'},
         {"csv", no_argument, NULL, 'c'},
         {"time", no_argument, NULL, 'j'},
+        {"daccel", no_argument, NULL, 'd'},
         {"help", no_argument, NULL, '?'}};
 
     const unsigned thread_count = thread::hardware_concurrency();
-    TracerArgs opts = {"", "", false, 640, 480, 0, 0, false, false, false};
+    TracerArgs opts = {"", "",    false, 640,   480, 0,
+                       0,  false, false, false, true};
 
     int longindex = 0;
     char flag = 0;
-    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:gcj", longopts,
+    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:gcjd", longopts,
                                &longindex)) != -1) {
         switch (flag) {
             case 'o':
@@ -94,6 +100,9 @@ TracerArgs parse_args(int argc, char *argv[]) {
                 break;
             case 'j':
                 opts.time = true;
+                break;
+            case 'd':
+                opts.accel = false;
                 break;
             case '?':
             default:

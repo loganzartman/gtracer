@@ -106,6 +106,8 @@ int main(int argc, char *argv[]) {
     }
 
     unsigned iteration = 0;
+    auto start_time = chrono::high_resolution_clock::now();
+
     while (running) {
         auto t0 = chrono::high_resolution_clock::now();
         Mat4f camera = Mat4f::identity();
@@ -119,6 +121,7 @@ int main(int argc, char *argv[]) {
                 float y = event.motion.y;
                 if (event.motion.state & SDL_BUTTON_LMASK) {
                     iteration = 0;  // reset progress
+                    start_time = chrono::high_resolution_clock::now();
                     orbit_pos +=
                         (Float3(y, x, 0) - Float3(mouse_y, mouse_x, 0)) * 0.005;
                 }
@@ -126,6 +129,7 @@ int main(int argc, char *argv[]) {
                 mouse_y = y;
             } else if (event.type == SDL_MOUSEWHEEL) {
                 iteration = 0;  // reset progress
+                start_time = chrono::high_resolution_clock::now();
                 orbit_zoom -= event.wheel.y * 2;
             } else if (event.type == SDL_KEYDOWN) {
                 bool reset = true;
@@ -148,6 +152,7 @@ int main(int argc, char *argv[]) {
                 }
                 if (reset)
                     iteration = 0;  // reset progress
+                start_time = chrono::high_resolution_clock::now();
             }
         }
 
@@ -202,9 +207,16 @@ int main(int argc, char *argv[]) {
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
-        cout << "\e[1G\e[0K"
+        cout << "\e[A\e[1G\e[0K"
              << "iteration " << iteration << ". " << (1000.f / dt) << "fps"
-             << flush;
+             << flush << endl;
+
+        auto dtotal =
+            chrono::duration_cast<chrono::milliseconds>(t1 - start_time)
+                .count();
+        cout << "\e[1G\e[0K"
+             << "average time per frame: " << (dtotal / iteration) << flush;
+
         SDL_Delay(util::max(0l, 1000 / TARGET_FPS - dt));
     }
 
@@ -215,6 +227,16 @@ int main(int argc, char *argv[]) {
             assert(false);
         }
         output_bmp(pixels, w, h, args.outfile);
+    }
+
+    if (args.time) {
+        auto end_time = chrono::high_resolution_clock::now();
+        auto total_time =
+            chrono::duration_cast<chrono::milliseconds>(end_time - start_time)
+                .count();
+        output_time(total_time, iteration, geom.size(),
+                    PRIMARY_RAYS * args.width * args.height * iteration,
+                    args.gpu, args.accel);
     }
 
     // GPU teardown
@@ -390,4 +412,28 @@ void output_bmp(float *pixels, int w, int h, string outfile) {
 
     SDL_FreeSurface(surf);
     sdl_check();
+}
+
+/**
+ * @brief Output timing data in csv format
+ *
+ * @param[in] total_time total time elapsed
+ * @param[in] iteration total number of iterations
+ * @param[in] geom_size number of geometries that are being tracing in the scene
+ * @param[in] rays_cast total number of primary rays cast
+ * @param[in] gpu whether or not the gpu is being used in tracing
+ * @param[in] accel whether or not the acceleration structures are being used in
+ * tracing
+ */
+void output_time(double total_time, unsigned iteration, size_t geom_size,
+                 unsigned long rays_cast, bool gpu, bool accel) {
+    double avg_time = total_time / iteration;
+
+    cout << gpu << endl;
+    cout << accel << endl;
+    cout << total_time << endl;
+    cout << iteration << endl;
+    cout << avg_time << endl;
+    cout << geom_size << endl;
+    cout << rays_cast << endl;
 }
