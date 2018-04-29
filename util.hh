@@ -34,7 +34,7 @@ HOSTDEV static float mix(float a, float b, float ratio) {
 }
 
 #if __CUDACC__
-__device__ size_t _rand_n = 0; 
+__device__ size_t _rand_n = 0;
 __host__ __device__ static float randf(float lo, float hi) {
     thrust::minstd_rand rng;
     thrust::uniform_real_distribution<float> dist(0, 1);

@@ -19,7 +19,8 @@ struct Geometry {
     const Material* mat;
 
     Geometry(const Geometry& geom) = default;
-    HOSTDEV Geometry(GeomType type, GeomData data, const Material* mat = nullptr)
+    HOSTDEV Geometry(GeomType type, GeomData data,
+                     const Material* mat = nullptr)
         : data(data), type(type), mat(mat) {}
     HOSTDEV Geometry(SphereData data, const Material* mat = nullptr)
         : data(data), type(GeomType::Sphere), mat(mat) {}

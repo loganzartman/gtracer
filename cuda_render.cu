@@ -17,9 +17,9 @@
 #include "UniformGrid.hh"
 #include "Vec3.hh"
 #include "cuda_render.cuh"
+#include "raytracing.hh"
 #include "transform.hh"
 #include "util.hh"
-#include "raytracing.hh"
 
 #define PRIMARY_RAYS 1
 #define SKY_COLOR Float3(1)
@@ -157,7 +157,8 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
  * @return Color computed for this primary ray
  */
 __device__ Float3 cuda_trace(const Float3 &ray_orig, const Float3 &ray_dir,
-                 AABB world_bounds, const UniformGrid &grid, int depth) {
+                             AABB world_bounds, const UniformGrid &grid,
+                             int depth) {
     Float3 color = 1.0;
     Float3 light = 0.0;
 
@@ -168,7 +169,7 @@ __device__ Float3 cuda_trace(const Float3 &ray_orig, const Float3 &ray_dir,
         Float3 intersection;
         Geometry *hit_geom;
         if (!cuda_ray_intersect(origin, direction, world_bounds, grid,
-                               intersection, hit_geom)) {
+                                intersection, hit_geom)) {
             light += SKY_COLOR * color;
             break;
         }
@@ -231,9 +232,10 @@ __device__ Float3 cuda_trace(const Float3 &ray_orig, const Float3 &ray_dir,
  * @param[out] hit_geom The geometry that was intersected
  * @return Whether there was an intersection
  */
-__device__ bool cuda_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
-                       AABB world_bounds, const UniformGrid &grid,
-                       Float3 &intersection, Geometry *&hit_geom) {
+__device__ bool cuda_ray_intersect(const Float3 &ray_orig,
+                                   const Float3 &ray_dir, AABB world_bounds,
+                                   const UniformGrid &grid,
+                                   Float3 &intersection, Geometry *&hit_geom) {
     // find ray entry point into world bounds
     const Geometry bbox(BoxData{world_bounds});
     Float3 ray_entry;
@@ -289,7 +291,7 @@ __device__ bool cuda_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir
         auto e = grid.last(voxel_pos);
         if (b != e) {
             if (cuda_ray_intersect_items(ray_orig, ray_dir, b, e, intersection,
-                                        hit_geom)) {
+                                         hit_geom)) {
                 return true;
             }
         }
@@ -341,9 +343,10 @@ __device__ bool cuda_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir
  * @return Whether there was an intersection
  */
 template <typename II>
-__device__ bool cuda_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
-                             II b, II e, Float3 &intersection,
-                             Geometry *&hit_geom) {
+__device__ bool cuda_ray_intersect_items(const Float3 &ray_orig,
+                                         const Float3 &ray_dir, II b, II e,
+                                         Float3 &intersection,
+                                         Geometry *&hit_geom) {
     float near_t = INFINITY;
     Geometry *near_geom = nullptr;
 

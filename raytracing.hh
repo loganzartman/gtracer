@@ -1,7 +1,7 @@
 #ifndef RAYTRACING_HH
 #define RAYTRACING_HH
-#include "util.hh"
 #include "Vec3.hh"
+#include "util.hh"
 
 namespace raytracing {
 HOSTDEV static float fresnel(Float3 dir, Float3 normal, float ior) {
@@ -22,6 +22,6 @@ HOSTDEV static float fresnel(Float3 dir, Float3 normal, float ior) {
     float Rp = ((n1 * cosi) - (n2 * cost)) / ((n1 * cosi) + (n2 * cost));
     return (Rs * Rs + Rp * Rp) / 2;
 }
-}
+}  // namespace raytracing
 
 #endif

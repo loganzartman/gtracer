@@ -23,13 +23,16 @@ struct CUDAKernelArgs {
 };
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args);
-__device__ Float3 cuda_trace(const Float3& ray_orig, const Float3& ray_dir, AABB world_bounds,
-                             const UniformGrid &grid, int depth);
-__device__ bool cuda_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
-                       AABB world_bounds, const UniformGrid &grid,
-                       Float3 &intersection, Geometry *&hit_geom);
+__device__ Float3 cuda_trace(const Float3 &ray_orig, const Float3 &ray_dir,
+                             AABB world_bounds, const UniformGrid &grid,
+                             int depth);
+__device__ bool cuda_ray_intersect(const Float3 &ray_orig,
+                                   const Float3 &ray_dir, AABB world_bounds,
+                                   const UniformGrid &grid,
+                                   Float3 &intersection, Geometry *&hit_geom);
 template <typename II>
-__device__ bool cuda_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
-                             II b, II e, Float3 &intersection,
-                             Geometry *&hit_geom);
+__device__ bool cuda_ray_intersect_items(const Float3 &ray_orig,
+                                         const Float3 &ray_dir, II b, II e,
+                                         Float3 &intersection,
+                                         Geometry *&hit_geom);
 #endif

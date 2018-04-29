@@ -87,47 +87,58 @@ class UniformGrid {
         const ugrid_pair_t* gc;
 
        public:
-        HOSTDEV iterator(size_t index, ugrid_pair_t* gc) : index(index), gc(gc) {}
+        HOSTDEV iterator(size_t index, ugrid_pair_t* gc)
+            : index(index), gc(gc) {}
         iterator(const iterator& it) = default;
 
-        HOSTDEV friend bool operator==(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator==(const iterator& lhs,
+                                       const iterator& rhs) {
             return lhs.index == rhs.index;
         }
-        HOSTDEV friend bool operator!=(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator!=(const iterator& lhs,
+                                       const iterator& rhs) {
             return !(lhs == rhs);
         }
-        HOSTDEV friend bool operator<(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator<(const iterator& lhs,
+                                      const iterator& rhs) {
             return lhs.index < rhs.index;
         }
-        HOSTDEV friend bool operator>(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator>(const iterator& lhs,
+                                      const iterator& rhs) {
             return lhs.index > rhs.index;
         }
-        HOSTDEV friend bool operator<=(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator<=(const iterator& lhs,
+                                       const iterator& rhs) {
             return lhs.index <= rhs.index;
         }
-        HOSTDEV friend bool operator>=(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator>=(const iterator& lhs,
+                                       const iterator& rhs) {
             return lhs.index >= rhs.index;
         }
 
-        HOSTDEV friend iterator operator+(const iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator operator+(const iterator& lhs,
+                                          difference_type rhs) {
             iterator result(lhs);
             return result += rhs;
         }
-        HOSTDEV friend iterator operator-(const iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator operator-(const iterator& lhs,
+                                          difference_type rhs) {
             iterator result(lhs);
             return result -= rhs;
         }
-        HOSTDEV friend iterator& operator+=(iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator& operator+=(iterator& lhs,
+                                            difference_type rhs) {
             lhs.index += rhs;
             return lhs;
         }
-        HOSTDEV friend iterator& operator-=(iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator& operator-=(iterator& lhs,
+                                            difference_type rhs) {
             lhs.index -= rhs;
             return lhs;
         }
 
         HOSTDEV friend difference_type operator-(const iterator& lhs,
-                                         const iterator& rhs) {
+                                                 const iterator& rhs) {
             return lhs.index - rhs.index;
         }
 

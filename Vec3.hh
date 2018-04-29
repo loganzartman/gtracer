@@ -37,7 +37,9 @@ struct Vec3 {
         return *this;
     }
 
-    HOSTDEV T dot(const Vec3<T> &o) const { return x * o.x + y * o.y + z * o.z; }
+    HOSTDEV T dot(const Vec3<T> &o) const {
+        return x * o.x + y * o.y + z * o.z;
+    }
 
     HOSTDEV Vec3<T> cross(const Vec3<T> &o) const {
         Vec3<T> result;

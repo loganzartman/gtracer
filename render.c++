@@ -5,9 +5,9 @@
 #include "Sphere.hh"
 #include "UniformGrid.hh"
 #include "Vec3.hh"
+#include "raytracing.hh"
 #include "transform.hh"
 #include "util.hh"
-#include "raytracing.hh"
 
 #include <pthread.h>
 #include <algorithm>
