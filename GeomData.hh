@@ -2,6 +2,7 @@
 #define GEOMDATA_HH
 #include "AABB.hh"
 #include "Vec3.hh"
+#include "util.hh"
 
 struct SphereData {
     Float3 center;
@@ -21,9 +22,9 @@ struct GeomData {
     TriData tri;
     BoxData box;
 
-    GeomData(const SphereData& data) : sphere(data) {}
-    GeomData(const TriData& data) : tri(data) {}
-    GeomData(const BoxData& data) : box(data) {}
+    HOSTDEV GeomData(const SphereData& data) : sphere(data) {}
+    HOSTDEV GeomData(const TriData& data) : tri(data) {}
+    HOSTDEV GeomData(const BoxData& data) : box(data) {}
 };
 
 #endif

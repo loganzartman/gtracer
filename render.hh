@@ -33,6 +33,5 @@ template <typename II>
 bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
                              II b, II e, Float3 &intersection,
                              Geometry *&hit_geom);
-float fresnel(Float3 dir, Float3 normal, float ior);
 
 #endif

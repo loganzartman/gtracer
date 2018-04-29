@@ -23,7 +23,7 @@ class UniformGrid {
     ugrid_pair_t* geom_cell;
     const size_t n_pairs;
 
-    size_t data_index(Int3 coord) const {
+    HOSTDEV size_t data_index(Int3 coord) const {
         return coord.z * res.y * res.x + coord.y * res.x + coord.x;
     }
 
@@ -87,67 +87,67 @@ class UniformGrid {
         const ugrid_pair_t* gc;
 
        public:
-        iterator(size_t index, ugrid_pair_t* gc) : index(index), gc(gc) {}
+        HOSTDEV iterator(size_t index, ugrid_pair_t* gc) : index(index), gc(gc) {}
         iterator(const iterator& it) = default;
 
-        friend bool operator==(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator==(const iterator& lhs, const iterator& rhs) {
             return lhs.index == rhs.index;
         }
-        friend bool operator!=(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator!=(const iterator& lhs, const iterator& rhs) {
             return !(lhs == rhs);
         }
-        friend bool operator<(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator<(const iterator& lhs, const iterator& rhs) {
             return lhs.index < rhs.index;
         }
-        friend bool operator>(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator>(const iterator& lhs, const iterator& rhs) {
             return lhs.index > rhs.index;
         }
-        friend bool operator<=(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator<=(const iterator& lhs, const iterator& rhs) {
             return lhs.index <= rhs.index;
         }
-        friend bool operator>=(const iterator& lhs, const iterator& rhs) {
+        HOSTDEV friend bool operator>=(const iterator& lhs, const iterator& rhs) {
             return lhs.index >= rhs.index;
         }
 
-        friend iterator operator+(const iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator operator+(const iterator& lhs, difference_type rhs) {
             iterator result(lhs);
             return result += rhs;
         }
-        friend iterator operator-(const iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator operator-(const iterator& lhs, difference_type rhs) {
             iterator result(lhs);
             return result -= rhs;
         }
-        friend iterator& operator+=(iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator& operator+=(iterator& lhs, difference_type rhs) {
             lhs.index += rhs;
             return lhs;
         }
-        friend iterator& operator-=(iterator& lhs, difference_type rhs) {
+        HOSTDEV friend iterator& operator-=(iterator& lhs, difference_type rhs) {
             lhs.index -= rhs;
             return lhs;
         }
 
-        friend difference_type operator-(const iterator& lhs,
+        HOSTDEV friend difference_type operator-(const iterator& lhs,
                                          const iterator& rhs) {
             return lhs.index - rhs.index;
         }
 
-        iterator& operator++() {
+        HOSTDEV iterator& operator++() {
             ++index;
             return *this;
         }
-        iterator& operator--() {
+        HOSTDEV iterator& operator--() {
             --index;
             return *this;
         }
-        Geometry& operator*() const { return *gc[index].first; }
+        HOSTDEV Geometry& operator*() const { return *gc[index].first; }
     };
 
-    iterator first(Int3 coord) const {
+    HOSTDEV iterator first(Int3 coord) const {
         // return iterator(0, geom_cell);
         return iterator(data[data_index(coord)].first, geom_cell);
     }
 
-    iterator last(Int3 coord) const {
+    HOSTDEV iterator last(Int3 coord) const {
         // return iterator(n_pairs, geom_cell);
         return iterator(data[data_index(coord)].second, geom_cell);
     }

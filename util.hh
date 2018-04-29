@@ -22,6 +22,13 @@ HOSTDEV static T max(T a, T b) {
     return a < b ? b : a;
 }
 
+template <typename T>
+HOSTDEV void swap(T& t1, T& t2) {
+    T tmp(t1);
+    t1 = t2;
+    t2 = tmp;
+}
+
 HOSTDEV static float mix(float a, float b, float ratio) {
     return a * ratio + b * (1 - ratio);
 }

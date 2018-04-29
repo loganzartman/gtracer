@@ -19,13 +19,13 @@ struct Geometry {
     const Material* mat;
 
     Geometry(const Geometry& geom) = default;
-    Geometry(GeomType type, GeomData data, const Material* mat = nullptr)
+    HOSTDEV Geometry(GeomType type, GeomData data, const Material* mat = nullptr)
         : data(data), type(type), mat(mat) {}
-    Geometry(SphereData data, const Material* mat = nullptr)
+    HOSTDEV Geometry(SphereData data, const Material* mat = nullptr)
         : data(data), type(GeomType::Sphere), mat(mat) {}
-    Geometry(TriData data, const Material* mat = nullptr)
+    HOSTDEV Geometry(TriData data, const Material* mat = nullptr)
         : data(data), type(GeomType::Tri), mat(mat) {}
-    Geometry(BoxData data, const Material* mat = nullptr)
+    HOSTDEV Geometry(BoxData data, const Material* mat = nullptr)
         : data(data), type(GeomType::Box), mat(mat) {}
 
     Geometry& operator=(const Geometry& geom) = default;

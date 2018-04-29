@@ -7,6 +7,7 @@
 #include "Vec3.hh"
 #include "transform.hh"
 #include "util.hh"
+#include "raytracing.hh"
 
 #include <pthread.h>
 #include <algorithm>
@@ -152,7 +153,7 @@ Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
         Float3 normal = hit_geom->normal(ray_dir, intersection);
 
         if (hit_geom->material()->transparency > util::randf(0, 1)) {
-            float fresneleffect = fresnel(direction, normal, 1.1f);
+            float fresneleffect = raytracing::fresnel(direction, normal, 1.1f);
             if (util::randf(0, 1) < fresneleffect) {
                 // reflective material
                 direction = direction.reflect(normal);
@@ -341,22 +342,3 @@ bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
 template bool cpu_ray_intersect_items<vector<Geometry>::iterator>(
     const Float3 &, const Float3 &, vector<Geometry>::iterator,
     vector<Geometry>::iterator, Float3 &, Geometry *&);
-
-float fresnel(Float3 dir, Float3 normal, float ior) {
-    float cosi = dir.dot(normal);
-    float n1 = 1;
-    float n2 = ior;
-    if (cosi > 0.f)
-        swap(n1, n2);
-
-    float sint = (n1 / n2) * sqrt(util::max(0.f, 1.f - cosi * cosi));
-    if (sint >= 1.f)  // total internal relfection
-        return 1.f;
-
-    float cost = sqrt(util::max(0.f, 1.f - sint * sint));
-    cosi = abs(cosi);
-
-    float Rs = ((n2 * cosi) - (n1 * cost)) / ((n2 * cosi) + (n1 * cost));
-    float Rp = ((n1 * cosi) - (n2 * cost)) / ((n1 * cosi) + (n2 * cost));
-    return (Rs * Rs + Rp * Rp) / 2;
-}
