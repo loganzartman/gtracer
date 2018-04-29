@@ -14,15 +14,18 @@ cudaStream_t cuda_stream;
 struct CUDAKernelArgs {
     size_t w;
     size_t h;
-    // Mat4f &camera;
-    // AABB bounds;
-    // const UniformGrid &grid;
+    Mat4f &camera;
+    AABB bounds;
+    const UniformGrid &grid;
     unsigned iteration;
     float *pixels;
-    Geometry **dev_geom;
+    Geometry **geom;
 };
 
 void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom);
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args);
+__device__ Float3 gpu_trace(float *ray_orig, float *ray_dir,
+                 Geometry **geom, AABB world_bounds,
+                 const UniformGrid &grid, int depth);
 #endif
