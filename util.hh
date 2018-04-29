@@ -6,9 +6,11 @@
 #include <thrust/random/linear_congruential_engine.h>
 #include <thrust/random/uniform_real_distribution.h>
 #define HOSTDEV __host__ __device__
+#define DEVICE __device__
 #else
 #include <random>
 #define HOSTDEV
+#define DEVICE
 #endif
 
 namespace util {
@@ -36,12 +38,13 @@ HOSTDEV static float mix(float a, float b, float ratio) {
 */
 
 #if __CUDACC__
-__device__ size_t _rand_n = 0;
-__host__ __device__ static float randf(float lo, float hi) {
+__device__ unsigned _rand_n = 0;
+__device__ static float randf(float lo, float hi) {
     thrust::minstd_rand rng;
-    thrust::uniform_real_distribution<float> dist(0, 1);
-    rng.discard(++util::_rand_n);
-    return dist(rng) * (hi - lo) + lo;
+    thrust::uniform_real_distribution<float> dist(lo, hi);
+    atomicAdd(&util::_rand_n, 1l);
+    rng.discard(util::_rand_n);
+    return dist(rng);
 }
 #else
 static float randf(float lo, float hi) {
