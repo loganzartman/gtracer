@@ -207,8 +207,10 @@ class UniformGrid {
         size_t cx1 = ceil(c1.x);
         size_t cy1 = ceil(c1.y);
         size_t cz1 = ceil(c1.z);
-        x0 = util::min(cx0, cx1), y0 = util::min(cy0, cy1), z0 = util::min(cz0, cz1);
-        x1 = util::max(cx0, cx1), y1 = util::max(cy0, cy1), z1 = util::max(cz0, cz1);
+        x0 = util::min(cx0, cx1), y0 = util::min(cy0, cy1),
+        z0 = util::min(cz0, cz1);
+        x1 = util::max(cx0, cx1), y1 = util::max(cy0, cy1),
+        z1 = util::max(cz0, cz1);
     }
 
     /**

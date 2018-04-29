@@ -1,8 +1,8 @@
 #ifndef MAT_HH
 #define MAT_HH
 
-#include <initializer_list>
 #include <cstddef>
+#include <initializer_list>
 #include "Vec3.hh"
 #include "util.hh"
 
@@ -15,7 +15,7 @@ class Mat {
     /**
      * @brief Construct a zero matrix
      */
-    HOSTDEV Mat() { 
+    HOSTDEV Mat() {
         for (size_t i = 0; i < N * M; ++i)
             el[i] = 0;
     }

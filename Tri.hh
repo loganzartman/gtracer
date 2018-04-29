@@ -7,7 +7,8 @@
 #include "Vec3.hh"
 
 struct Tri {
-    HOSTDEV static bool intersect(const TriData &data, const Float3& r_orig, const Float3& r_dir, float& t) {
+    HOSTDEV static bool intersect(const TriData& data, const Float3& r_orig,
+                                  const Float3& r_dir, float& t) {
         // edges between points
         const Float3 ab = data.b - data.a;
         const Float3 ac = data.c - data.a;
@@ -40,14 +41,15 @@ struct Tri {
         return true;
     }
 
-    HOSTDEV static Float3 normal(const TriData &data, const Float3& r_dir, const Float3& intersection) {
+    HOSTDEV static Float3 normal(const TriData& data, const Float3& r_dir,
+                                 const Float3& intersection) {
         const Float3 ab = data.b - data.a;
         const Float3 ac = data.c - data.a;
 
         return ab.cross(ac).normalize();
     }
 
-    HOSTDEV static AABB bounds(const TriData &data) {
+    HOSTDEV static AABB bounds(const TriData& data) {
         Float3 min_corner(vmin(vmin(data.a, data.b), data.c));
         Float3 max_corner(vmax(vmax(data.a, data.b), data.c));
         return AABB(min_corner, max_corner);

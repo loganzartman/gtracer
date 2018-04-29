@@ -10,6 +10,4 @@ void cuda_malloc_managed(void** ptr, size_t bytes) {
 /**
  * @brief Wrapper around cudaFree available to non-Cuda code.
  */
-void cuda_free(void* ptr) {
-    cudachk(cudaFree(ptr));
-}
+void cuda_free(void* ptr) { cudachk(cudaFree(ptr)); }

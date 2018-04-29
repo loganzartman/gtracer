@@ -19,7 +19,7 @@ union GeomData {
     SphereData sphere;
     TriData tri;
     BoxData box;
-    
+
     GeomData(const SphereData& data) : sphere(data) {}
     GeomData(const TriData& data) : tri(data) {}
     GeomData(const BoxData& data) : box(data) {}

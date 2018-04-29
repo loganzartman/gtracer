@@ -3,19 +3,15 @@
 
 #include <cassert>
 #include "AABB.hh"
+#include "Box.hh"
+#include "GeomData.hh"
 #include "Material.hh"
 #include "Sphere.hh"
-#include "GeomData.hh"
 #include "Tri.hh"
-#include "Box.hh"
 #include "Vec3.hh"
 #include "util.hh"
 
-enum class GeomType {
-    Sphere,
-    Tri,
-    Box
-};
+enum class GeomType { Sphere, Tri, Box };
 
 class Geometry {
    public:
@@ -23,17 +19,19 @@ class Geometry {
     GeomData data;
     const Material* mat;
 
-    Geometry(GeomType type, GeomData data, const Material* mat = nullptr) : type(type), data(data), mat(mat) {}
-    Geometry(SphereData data, const Material* mat = nullptr) : type(GeomType::Sphere), data(data), mat(mat) {}
-    Geometry(TriData data, const Material* mat = nullptr) : type(GeomType::Tri), data(data), mat(mat) {}
-    Geometry(BoxData data, const Material* mat = nullptr) : type(GeomType::Box), data(data), mat(mat) {}
+    Geometry(GeomType type, GeomData data, const Material* mat = nullptr)
+        : type(type), data(data), mat(mat) {}
+    Geometry(SphereData data, const Material* mat = nullptr)
+        : type(GeomType::Sphere), data(data), mat(mat) {}
+    Geometry(TriData data, const Material* mat = nullptr)
+        : type(GeomType::Tri), data(data), mat(mat) {}
+    Geometry(BoxData data, const Material* mat = nullptr)
+        : type(GeomType::Box), data(data), mat(mat) {}
 
-    HOSTDEV const Material* material() const {
-        return mat;
-    }
+    HOSTDEV const Material* material() const { return mat; }
 
-    HOSTDEV bool intersect(const Float3 &r_orig, const Float3 &r_dir,
-                           float &t) const {
+    HOSTDEV bool intersect(const Float3& r_orig, const Float3& r_dir,
+                           float& t) const {
         switch (type) {
             case GeomType::Sphere:
                 return Sphere::intersect(data.sphere, r_orig, r_dir, t);
@@ -45,9 +43,9 @@ class Geometry {
                 assert(false);
         }
     }
-    
-    HOSTDEV Float3 normal(const Float3 &r_dir,
-                          const Float3 &intersection) const {
+
+    HOSTDEV Float3 normal(const Float3& r_dir,
+                          const Float3& intersection) const {
         switch (type) {
             case GeomType::Sphere:
                 return Sphere::normal(data.sphere, r_dir, intersection);
@@ -59,7 +57,7 @@ class Geometry {
                 assert(false);
         }
     }
-    
+
     HOSTDEV AABB bounds() const {
         switch (type) {
             case GeomType::Sphere:

@@ -14,12 +14,14 @@ struct Vec3<int>;
 
 template <typename T>
 __host__ __device__ Vec3<T> vmin(const Vec3<T> &a, const Vec3<T> &b) {
-    return Vec3<T>(util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z));
+    return Vec3<T>(util::min(a.x, b.x), util::min(a.y, b.y),
+                   util::min(a.z, b.z));
 }
 
 template <typename T>
 __host__ __device__ Vec3<T> vmax(const Vec3<T> &a, const Vec3<T> &b) {
-    return Vec3<T>(util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z));
+    return Vec3<T>(util::max(a.x, b.x), util::max(a.y, b.y),
+                   util::max(a.z, b.z));
 }
 
 template <typename T>

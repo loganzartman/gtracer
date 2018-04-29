@@ -3,9 +3,9 @@
 #include <GL/glew.h>
 #include <cuda_gl_interop.h>
 
-#include "cuda_render.hh"
 #include "Geometry.hh"
 #include "UniformGrid.hh"
+#include "cuda_render.hh"
 #define BLOCK_SIZE 256
 
 cudaGraphicsResource_t cuda_buffer;
@@ -24,10 +24,11 @@ struct CUDAKernelArgs {
     size_t geom_len;
 };
 
-void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom);
+void cuda_update_geometry(const std::vector<Geometry *> &geom,
+                          Geometry **dev_geom);
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args);
-__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir,
-                 Geometry **geom, AABB world_bounds,
-                 const UniformGrid &grid, int depth);
+__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir, Geometry **geom,
+                             AABB world_bounds, const UniformGrid &grid,
+                             int depth);
 #endif

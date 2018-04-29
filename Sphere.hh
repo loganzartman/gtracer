@@ -11,7 +11,8 @@
 #include "util.hh"
 
 struct Sphere {
-    HOSTDEV static bool intersect(const SphereData& data, const Float3 &r_orig, const Float3 &r_dir, float &t) {
+    HOSTDEV static bool intersect(const SphereData &data, const Float3 &r_orig,
+                                  const Float3 &r_dir, float &t) {
         // draw a line between the center of the sphere and ray origin
         Float3 line = data.center - r_orig;
 
@@ -21,7 +22,8 @@ struct Sphere {
             return false;
 
         float dist2 = line.dot(line) - tca * tca;
-        if (dist2 > data.radius * data.radius)  // the radius is too short to span dist
+        if (dist2 >
+            data.radius * data.radius)  // the radius is too short to span dist
             return false;
 
         // to get the radius of intersection, compute how much
@@ -41,11 +43,12 @@ struct Sphere {
         return true;
     }
 
-    HOSTDEV static Float3 normal(const SphereData& data, const Float3 &r_dir, const Float3 &intersection) {
+    HOSTDEV static Float3 normal(const SphereData &data, const Float3 &r_dir,
+                                 const Float3 &intersection) {
         return (intersection - data.center).normalize();
     }
 
-    HOSTDEV static AABB bounds(const SphereData& data) {
+    HOSTDEV static AABB bounds(const SphereData &data) {
         const Float3 offset(data.radius);
         return AABB(data.center - offset, data.center + offset);
     }

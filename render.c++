@@ -17,19 +17,18 @@
 #include <stdexcept>
 
 #define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(0) 
+#define SKY_COLOR Float3(0)
 
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                Geometry** geom_b, Geometry** geom_e, unsigned iteration,
+                Geometry **geom_b, Geometry **geom_e, unsigned iteration,
                 unsigned n_threads) {
     // construct uniform grid
     AABB bounds = geometry_bounds(geom_b, geom_e);
     Int3 res = UniformGrid::resolution(bounds, geom_e - geom_b);
     size_t n_data = UniformGrid::data_size(res);
-    size_t n_pairs =
-        UniformGrid::count_pairs(res, bounds, geom_b, geom_e);
+    size_t n_pairs = UniformGrid::count_pairs(res, bounds, geom_b, geom_e);
     ugrid_data_t *grid_data = new ugrid_data_t[n_data];
     ugrid_pair_t *grid_pairs = new ugrid_pair_t[n_pairs];
     UniformGrid grid(res, bounds, grid_data, grid_pairs, n_pairs, geom_b,
@@ -41,8 +40,8 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,    h,      pitch, offset,    camera,
-                                    bounds, grid,  iteration, pixels};
+        args[i] = new CPUThreadArgs{w,      h,    pitch,     offset, camera,
+                                    bounds, grid, iteration, pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -87,14 +86,13 @@ void *cpu_render_thread(void *thread_arg) {
         Float3 color;
         for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
             //  compute the x and y magnitude of each vector
-            float v_x =
-                (2 * ((x + util::randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
+            float v_x = (2 * ((x + util::randf(0, 1)) * inv_w) - 1) * angle *
+                        aspect_ratio;
             float v_y = (1 - 2 * ((y + util::randf(0, 1)) * inv_h)) * angle;
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += cpu_trace(origin, ray_dir, args.bounds,
-                               args.grid, 8);
+            color += cpu_trace(origin, ray_dir, args.bounds, args.grid, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -127,8 +125,7 @@ void *cpu_render_thread(void *thread_arg) {
  * @return Color computed for this primary ray
  */
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
-                 AABB world_bounds,
-                 const UniformGrid &grid, int depth) {
+                 AABB world_bounds, const UniformGrid &grid, int depth) {
     Float3 color = 1.0;
     Float3 light = 0.0;
 
@@ -220,7 +217,7 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
     const Float3 world_size = world_bounds.xmax - world_bounds.xmin;
     Float3 relative_entry = ray_entry - world_bounds.xmin;
     relative_entry = vmax(Float3(0), relative_entry);
-    relative_entry = vmin(world_size - 1e-5, relative_entry); // good tolerance
+    relative_entry = vmin(world_size - 1e-5, relative_entry);  // good tolerance
 
     // compute voxel parameters
     Int3 voxel_pos(floor(relative_entry.x / (grid.cell_size.x)),
@@ -294,7 +291,7 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
         assert(voxel_pos.x >= 0 && voxel_pos.y >= 0 && voxel_pos.z >= 0);
         assert(voxel_pos.x < grid.res.x && voxel_pos.y < grid.res.y &&
                voxel_pos.z < grid.res.z);
-    } while (++i < 10000); // arbitrary traversal length limit
+    } while (++i < 10000);  // arbitrary traversal length limit
 
     return false;
 }

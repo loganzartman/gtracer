@@ -1,24 +1,24 @@
 #include <GL/glew.h>
 #include <cuda_gl_interop.h>
-#include <cassert>
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
-#include "cuda_render.cuh"
+#include "Box.hh"
 #include "Geometry.hh"
-#include "UniformGrid.hh"
 #include "Mat.hh"
 #include "Material.hh"
-#include "Vec3.hh"
-#include "transform.hh"
-#include "util.hh"
 #include "Sphere.hh"
 #include "Tri.hh"
-#include "Box.hh"
+#include "UniformGrid.hh"
+#include "Vec3.hh"
+#include "cuda_render.cuh"
+#include "transform.hh"
+#include "util.hh"
 
 #define PRIMARY_RAYS 1
 
@@ -26,7 +26,7 @@
  * @brief Initializes CUDA resources.
  * @detail Called once upon program start. Registers GL texture and buffer
  * for CUDA/GL interop; creates stream and maps buffer and texture to stream.
- * 
+ *
  * @param texture_id ID of the GL texture
  * @param buffer_id  ID of the GL buffer
  */
@@ -46,7 +46,7 @@ void cuda_init(GLuint texture_id, GLuint buffer_id) {
 }
 
 void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
-    Geometry** geom, size_t geom_len, unsigned iteration){
+                 Geometry **geom, size_t geom_len, unsigned iteration) {
     using namespace std;
 
     const size_t size_pixels = w * h;
@@ -57,7 +57,7 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
     cudaGraphicsResourceGetMappedPointer((void **)&mem_ptr, &size_mapped,
                                          cuda_buffer);
-    //assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
+    // assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
 
     // construct uniform grid
     AABB bounds = geometry_bounds(geom, geom + geom_len);
@@ -73,7 +73,8 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                      geom + geom_len);
 
     // run kernel
-    CUDAKernelArgs args = {w, h, camera, bounds, grid, iteration, mem_ptr, geom, geom_len};
+    CUDAKernelArgs args = {w,         h,       camera, bounds,  grid,
+                           iteration, mem_ptr, geom,   geom_len};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
 
@@ -83,7 +84,7 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
 
 /**
  * @brief Destroy resource
- * 
+ *
  */
 void cuda_destroy() {
     // unmap resources
@@ -94,7 +95,7 @@ void cuda_destroy() {
 
 /**
  * @brief Path tracing kernel
- * @param args current state 
+ * @param args current state
  */
 __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     const size_t index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -117,14 +118,14 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
 
         Float3 color;
         for (size_t i = 0; i < PRIMARY_RAYS; ++i) {
-            float v_x =
-                (2 * ((x + util::randf(0, 1)) * inv_w) - 1) * angle * aspect_ratio;
+            float v_x = (2 * ((x + util::randf(0, 1)) * inv_w) - 1) * angle *
+                        aspect_ratio;
             float v_y = (1 - 2 * ((y + util::randf(0, 1)) * inv_h)) * angle;
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
             color += cuda_trace(origin, ray_dir, args.geom, args.bounds,
-                               args.grid, 8);
+                                args.grid, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -144,8 +145,8 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     }
 }
 
-__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir,
-                 Geometry **geom, AABB world_bounds,
-                 const UniformGrid &grid, int depth) {
+__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir, Geometry **geom,
+                             AABB world_bounds, const UniformGrid &grid,
+                             int depth) {
     return Float3(1);
 }

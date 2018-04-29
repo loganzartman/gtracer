@@ -81,7 +81,8 @@ int main(int argc, char *argv[]) {
     geom.push_back(&spg);
     geom.push_back(&spb);
 
-    Geometry** geom_array = (Geometry**)util::hostdev_alloc(geom.size() * sizeof(Geometry*), args.gpu);
+    Geometry **geom_array = (Geometry **)util::hostdev_alloc(
+        geom.size() * sizeof(Geometry *), args.gpu);
     copy(geom.begin(), geom.end(), geom_array);
 
     // Initalize OpenGL
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     texture_id = gl_create_texture(w, h);
     if (args.gpu) {
         buffer_id = gl_create_buffer(w, h);
-        cuda_init(texture_id, buffer_id); 
+        cuda_init(texture_id, buffer_id);
     }
 
     // prepare CPU pixel buffer
@@ -151,7 +152,8 @@ int main(int argc, char *argv[]) {
         }
 
         // limit orbit controls
-        orbit_pos.x = util::max(-(float)M_PI / 2, util::min((float)M_PI / 2, orbit_pos.x));
+        orbit_pos.x = util::max(-(float)M_PI / 2,
+                                util::min((float)M_PI / 2, orbit_pos.x));
 
         // compute orbit camera transform
         camera = camera * transform_translate(Float3(trans.x, 0, trans.z));
@@ -162,11 +164,13 @@ int main(int argc, char *argv[]) {
         // do raytracing
         if (args.gpu) {
             // GPU rendering mode
-            cuda_render(buffer_id, w, h, camera, geom_array, geom.size(), iteration);
+            cuda_render(buffer_id, w, h, camera, geom_array, geom.size(),
+                        iteration);
             gl_buf2tex(w, h, buffer_id, texture_id);  // copy buffer to texture
         } else {
             // CPU rendering mode
-            cpu_render(pixels, w, h, camera, geom_array, geom_array + geom.size(), iteration, args.threads);
+            cpu_render(pixels, w, h, camera, geom_array,
+                       geom_array + geom.size(), iteration, args.threads);
             gl_data2tex(w, h, pixels, texture_id);  // copy buffer to texture
         }
 

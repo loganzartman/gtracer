@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "Geometry.hh"
 #include "GeomData.hh"
-#include "Tri.hh"
+#include "Geometry.hh"
 #include "Sphere.hh"
+#include "Tri.hh"
 #include "Vec3.hh"
 #include "loader.hh"
 
@@ -52,8 +52,10 @@ const vector<Geometry*>& load(string filename, vector<Geometry*>& objs,
             ssthree >> three;
 
             // create triangle
-            Geometry* obj = new Geometry(TriData{vertices[one - 1], vertices[two - 1],
-                                    vertices[three - 1]}, mat);
+            Geometry* obj =
+                new Geometry(TriData{vertices[one - 1], vertices[two - 1],
+                                     vertices[three - 1]},
+                             mat);
             objs.push_back(obj);
         } else if (command == "sphere") {
             // sphere: sphere x y z r
@@ -61,7 +63,8 @@ const vector<Geometry*>& load(string filename, vector<Geometry*>& objs,
             file >> one >> two >> three >> r;
 
             // create sphere
-            Geometry* obj = new Geometry(SphereData{Float3(one, two, three), r}, mat);
+            Geometry* obj =
+                new Geometry(SphereData{Float3(one, two, three), r}, mat);
         } else {
             // noop
         }
