@@ -14,19 +14,19 @@
 enum class GeomType { Sphere, Tri, Box };
 
 struct Geometry {
-    GeomType type;
     GeomData data;
+    GeomType type;
     const Material* mat;
 
     Geometry(const Geometry& geom) = default;
     Geometry(GeomType type, GeomData data, const Material* mat = nullptr)
-        : type(type), data(data), mat(mat) {}
+        : data(data), type(type), mat(mat) {}
     Geometry(SphereData data, const Material* mat = nullptr)
-        : type(GeomType::Sphere), data(data), mat(mat) {}
+        : data(data), type(GeomType::Sphere), mat(mat) {}
     Geometry(TriData data, const Material* mat = nullptr)
-        : type(GeomType::Tri), data(data), mat(mat) {}
+        : data(data), type(GeomType::Tri), mat(mat) {}
     Geometry(BoxData data, const Material* mat = nullptr)
-        : type(GeomType::Box), data(data), mat(mat) {}
+        : data(data), type(GeomType::Box), mat(mat) {}
 
     Geometry& operator=(const Geometry& geom) = default;
 

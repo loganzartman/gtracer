@@ -13,8 +13,6 @@ struct AABB {
     HOSTDEV AABB(const Float3 &a, const Float3 &b)
         : xmin(vmin(a, b)), xmax(vmax(a, b)) {}
 
-    HOSTDEV AABB(const AABB &other) = default;
-
     HOSTDEV AABB &operator=(const AABB &other) {
         xmin = other.xmin;
         xmax = other.xmax;

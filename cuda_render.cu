@@ -49,6 +49,8 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                  Geometry *geom, size_t geom_len, unsigned iteration) {
     using namespace std;
 
+    cout << sizeof(Geometry) << endl;
+
     const size_t size_pixels = w * h;
     float *mem_ptr;
     cudaArray *array_ptr;
@@ -69,6 +71,7 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     ugrid_pair_t *grid_pairs;
     cudaMallocManaged(&grid_data, n_data * sizeof(ugrid_data_t));
     cudaMallocManaged(&grid_pairs, n_pairs * sizeof(ugrid_pair_t));
+    cudaDeviceSynchronize();
     UniformGrid grid(res, bounds, grid_data, grid_pairs, n_pairs, geom,
                      geom + geom_len);
 
@@ -76,8 +79,8 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     CUDAKernelArgs args = {w, h, camera, bounds, grid, iteration, mem_ptr};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
-    cudaDeviceSynchronize();
 
+    cudaDeviceSynchronize();
     cudaFree(grid_data);
     cudaFree(grid_pairs);
 }

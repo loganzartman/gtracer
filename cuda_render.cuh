@@ -15,9 +15,9 @@ cudaStream_t cuda_stream;
 struct CUDAKernelArgs {
     size_t w;
     size_t h;
-    const Mat4f &camera;
+    Mat4f camera;
     AABB bounds;
-    const UniformGrid &grid;
+    UniformGrid grid;
     unsigned iteration;
     float *pixels;
 };
