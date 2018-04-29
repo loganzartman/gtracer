@@ -1,6 +1,7 @@
 #ifndef GEOMDATA_HH
 #define GEOMDATA_HH
 #include "Vec3.hh"
+#include "AABB.hh"
 
 struct SphereData {
     Float3 center;
