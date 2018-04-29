@@ -47,7 +47,7 @@ class UniformGrid {
             for (size_t x = x0; x < x1; ++x) {
                 for (size_t y = y0; y < y1; ++y) {
                     for (size_t z = z0; z < z1; ++z) {
-                        Geometry* g = *b;
+                        Geometry* g = &*b;
                         pair->first = g;
                         pair->second = data_index(Int3(x, y, z));
                         ++pair;
@@ -139,7 +139,7 @@ class UniformGrid {
             --index;
             return *this;
         }
-        Geometry* operator*() const { return gc[index].first; }
+        Geometry& operator*() const { return *gc[index].first; }
     };
 
     iterator first(Int3 coord) const {
@@ -191,10 +191,10 @@ class UniformGrid {
      * @param y1[out] coordinate
      * @param z1[out] coordinate
      */
-    static void geom_cell_hits(Int3 resolution, AABB scene_bounds, Geometry* g,
-                               size_t& x0, size_t& y0, size_t& z0, size_t& x1,
-                               size_t& y1, size_t& z1) {
-        AABB bounds = g->bounds();
+    static void geom_cell_hits(Int3 resolution, AABB scene_bounds,
+                               const Geometry& g, size_t& x0, size_t& y0,
+                               size_t& z0, size_t& x1, size_t& y1, size_t& z1) {
+        AABB bounds = g.bounds();
         AABB rel_bounds(bounds.xmin - scene_bounds.xmin,
                         bounds.xmax - scene_bounds.xmin);
         Float3 size = scene_bounds.xmax - scene_bounds.xmin;
@@ -228,7 +228,7 @@ class UniformGrid {
 
         // compute geometry -> cell mappings
         while (b != e) {
-            Geometry* geom = *b;
+            const Geometry& geom = *b;
             size_t x0, y0, z0, x1, y1, z1;
             geom_cell_hits(resolution, scene_bounds, geom, x0, y0, z0, x1, y1,
                            z1);

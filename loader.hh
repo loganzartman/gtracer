@@ -10,8 +10,8 @@
 #include "Material.hh"
 #include "Vec3.hh"
 
-const std::vector<Geometry*>& load(std::string filename,
-                                   std::vector<Geometry*>& objs, float scale,
-                                   const Material* mat);
+const std::vector<Geometry>& load(std::string filename,
+                                  std::vector<Geometry>& objs, float scale,
+                                  const Material* mat);
 
 #endif

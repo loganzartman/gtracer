@@ -1,7 +1,7 @@
 #ifndef GEOMDATA_HH
 #define GEOMDATA_HH
-#include "Vec3.hh"
 #include "AABB.hh"
+#include "Vec3.hh"
 
 struct SphereData {
     Float3 center;
@@ -16,7 +16,7 @@ struct BoxData {
     AABB box;
 };
 
-union GeomData {
+struct GeomData {
     SphereData sphere;
     TriData tri;
     BoxData box;

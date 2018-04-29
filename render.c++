@@ -22,7 +22,7 @@
 using namespace std;
 
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                Geometry **geom_b, Geometry **geom_e, unsigned iteration,
+                Geometry *geom_b, Geometry *geom_e, unsigned iteration,
                 unsigned n_threads) {
     // construct uniform grid
     AABB bounds = geometry_bounds(geom_b, geom_e);
@@ -296,11 +296,6 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
     return false;
 }
 
-// unfortunate workaround to force template instantiation for tests
-template bool cpu_ray_intersect_items<vector<Geometry *>::iterator>(
-    const Float3 &, const Float3 &, vector<Geometry *>::iterator,
-    vector<Geometry *>::iterator, Float3 &, Geometry *&);
-
 /**
  * @brief Classic, grid-free brute-force ray intersection
  * @details This is used as a component of cpu_ray_intersect
@@ -321,15 +316,15 @@ bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
     Geometry *near_geom = nullptr;
 
     while (b != e) {
-        Geometry *g = *b;
+        Geometry &g = *b;
         float t;
-        if (!g->intersect(ray_orig, ray_dir, t)) {
+        if (!g.intersect(ray_orig, ray_dir, t)) {
             ++b;
             continue;
         }
         if (t < near_t) {
             near_t = t;
-            near_geom = g;
+            near_geom = &g;
         }
         ++b;
     }
@@ -341,6 +336,11 @@ bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
     }
     return false;
 }
+
+// unfortunate workaround to force template instantiation for tests
+template bool cpu_ray_intersect_items<vector<Geometry>::iterator>(
+    const Float3 &, const Float3 &, vector<Geometry>::iterator,
+    vector<Geometry>::iterator, Float3 &, Geometry *&);
 
 float fresnel(Float3 dir, Float3 normal, float ior) {
     float cosi = dir.dot(normal);

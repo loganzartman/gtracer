@@ -3,8 +3,8 @@
 /**
  * @brief Wrapper around cudaMallocManaged available to non-Cuda code.
  */
-void cuda_malloc_managed(void** ptr, size_t bytes) {
-    cudachk(cudaMallocManaged(ptr, bytes));
+void cuda_malloc_managed(void*& ptr, size_t bytes) {
+    cudachk(cudaMallocManaged(&ptr, bytes));
 }
 
 /**

@@ -13,8 +13,8 @@
 
 using namespace std;
 
-const vector<Geometry*>& load(string filename, vector<Geometry*>& objs,
-                              float scale, const Material* mat) {
+const vector<Geometry>& load(string filename, vector<Geometry>& objs,
+                             float scale, const Material* mat) {
     ifstream file(filename);
     string s;
 
@@ -52,10 +52,10 @@ const vector<Geometry*>& load(string filename, vector<Geometry*>& objs,
             ssthree >> three;
 
             // create triangle
-            Geometry* obj =
-                new Geometry(TriData{vertices[one - 1], vertices[two - 1],
-                                     vertices[three - 1]},
-                             mat);
+            Geometry obj =
+                Geometry(TriData{vertices[one - 1], vertices[two - 1],
+                                 vertices[three - 1]},
+                         mat);
             objs.push_back(obj);
         } else if (command == "sphere") {
             // sphere: sphere x y z r
@@ -63,8 +63,9 @@ const vector<Geometry*>& load(string filename, vector<Geometry*>& objs,
             file >> one >> two >> three >> r;
 
             // create sphere
-            Geometry* obj =
-                new Geometry(SphereData{Float3(one, two, three), r}, mat);
+            Geometry obj =
+                Geometry(SphereData{Float3(one, two, three), r}, mat);
+            objs.push_back(obj);
         } else {
             // noop
         }

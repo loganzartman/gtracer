@@ -47,7 +47,7 @@ static float randf(float lo, float hi) {
 static void* hostdev_alloc(size_t bytes, bool gpu) {
     if (gpu) {
         void* mem;
-        cuda_malloc_managed(&mem, bytes);
+        cuda_malloc_managed(mem, bytes);
         return mem;
     }
     return (void*)new char[bytes];

@@ -23,7 +23,7 @@ struct CPUThreadArgs {
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
                  AABB world_bounds, const UniformGrid &grid, int depth);
 void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
-                Geometry **geom_b, Geometry **geom_e, unsigned iteration,
+                Geometry *geom_b, Geometry *geom_e, unsigned iteration,
                 unsigned n_threads);
 void *cpu_render_thread(void *thread_arg);
 bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,

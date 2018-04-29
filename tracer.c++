@@ -57,32 +57,27 @@ int main(int argc, char *argv[]) {
     Float3 trans(0);
 
     // surface color, transparency, reflectivity, emission color
-    unordered_map<string, Material *> mats = {
-        {"ground", new Material(Float3(0.8, 0.8, 0.9), 0, 0.0, Float3(0))},
-        {"wood", new Material(Float3(0.545, 0.271, 0.075), 0, 0.0, Float3(0))},
-        {"red", new Material(Float3(0.618, 0.213, 0.175), 0, 0.0, Float3(0))},
-        {"white", new Material(Float3(0.950, 0.950, 0.950), 0, 0.0, Float3(0))},
-        {"metal", new Material(Float3(0.377, 0.377, 0.377), 0, 0.0, Float3(0))},
-        {"mirror", new Material(Float3(0.8, 0.8, 1.0), 0, 1.0, Float3(0))},
-        {"lens", new Material(Float3(0.8, 0.8, 1.0), 1.0, 1.0, Float3(0))},
-        {"light", new Material(Float3(1, 0, 0), 0, 0, Float3(20))},
-        {"lightr", new Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0))},
-        {"lightg", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0))},
-        {"lightb", new Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))}};
+    vector<Material> mats{
+        Material(Float3(0.950, 0.950, 0.950), 0, 0.0, Float3(0)),  // white
+        Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0)),         // lightr
+        Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),         // lightg
+        Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))          // lightb
+    };
+    Material *mat_array = (Material *)util::hostdev_alloc(
+        mats.size() * sizeof(Material), args.gpu);
+    copy(mats.begin(), mats.end(), mat_array);
 
     // load geometry
     unsigned long last_modified = 0;
-    vector<Geometry *> geom;
-    load(args.infile, geom, 100, mats["white"]);
-    Geometry spr(SphereData{Float3(-20, 20, -20), 7}, mats["lightr"]);
-    Geometry spg(SphereData{Float3(0, 20, 20), 7}, mats["lightg"]);
-    Geometry spb(SphereData{Float3(20, 20, 20), 7}, mats["lightb"]);
-    geom.push_back(&spr);
-    geom.push_back(&spg);
-    geom.push_back(&spb);
+    vector<Geometry> geom;
+    load(args.infile, geom, 100, &mat_array[0]);
+    geom.push_back(
+        Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[1]));
+    geom.push_back(Geometry(SphereData{Float3(0, 20, 20), 7}, &mat_array[2]));
+    geom.push_back(Geometry(SphereData{Float3(20, 20, 20), 7}, &mat_array[3]));
 
-    Geometry **geom_array = (Geometry **)util::hostdev_alloc(
-        geom.size() * sizeof(Geometry *), args.gpu);
+    Geometry *geom_array = (Geometry *)util::hostdev_alloc(
+        geom.size() * sizeof(Geometry), args.gpu);
     copy(geom.begin(), geom.end(), geom_array);
 
     // Initalize OpenGL
@@ -193,11 +188,9 @@ int main(int argc, char *argv[]) {
                 last_modified = time;
                 vector<Float3> nv;
                 geom.clear();
-                load(args.infile, geom, 100, mats["white"]);
-
-                geom.push_back(&spr);
-                geom.push_back(&spg);
-                geom.push_back(&spb);
+                load(args.infile, geom, 100, &mat_array[0]);
+                copy(geom.begin(), geom.end(), geom_array);
+                // TODO: fix lights
             }
         }
 
@@ -227,12 +220,8 @@ int main(int argc, char *argv[]) {
     SDL_GL_DeleteContext(glcontext);
     sdl_check();
 
+    util::hostdev_free(mat_array, args.gpu);
     util::hostdev_free(geom_array, args.gpu);
-
-    // deallocate materials
-    for (auto it = mats.begin(); it != mats.end(); ++it)
-        delete it->second;
-
     delete[] pixels;
 
     return 0;

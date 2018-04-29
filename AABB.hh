@@ -8,8 +8,12 @@ struct AABB {
     Float3 xmin;
     Float3 xmax;
 
+    HOSTDEV AABB() : xmin(0), xmax(0) {}
+
     HOSTDEV AABB(const Float3 &a, const Float3 &b)
         : xmin(vmin(a, b)), xmax(vmax(a, b)) {}
+
+    HOSTDEV AABB(const AABB &other) = default;
 
     HOSTDEV AABB &operator=(const AABB &other) {
         xmin = other.xmin;

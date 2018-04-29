@@ -46,7 +46,7 @@ void cuda_init(GLuint texture_id, GLuint buffer_id) {
 }
 
 void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
-                 Geometry **geom, size_t geom_len, unsigned iteration) {
+                 Geometry *geom, size_t geom_len, unsigned iteration) {
     using namespace std;
 
     const size_t size_pixels = w * h;
@@ -73,10 +73,10 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                      geom + geom_len);
 
     // run kernel
-    CUDAKernelArgs args = {w,         h,       camera, bounds,  grid,
-                           iteration, mem_ptr, geom,   geom_len};
+    CUDAKernelArgs args = {w, h, camera, bounds, grid, iteration, mem_ptr};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
+    cudaDeviceSynchronize();
 
     cudaFree(grid_data);
     cudaFree(grid_pairs);
@@ -124,8 +124,7 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += cuda_trace(origin, ray_dir, args.geom, args.bounds,
-                                args.grid, 8);
+            color += cuda_trace(origin, ray_dir, args.bounds, args.grid, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -145,8 +144,7 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     }
 }
 
-__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir, Geometry **geom,
-                             AABB world_bounds, const UniformGrid &grid,
-                             int depth) {
+__device__ Float3 cuda_trace(Float3 ray_orig, Float3 ray_dir, AABB world_bounds,
+                             const UniformGrid &grid, int depth) {
     return Float3(1);
 }
