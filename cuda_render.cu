@@ -147,7 +147,7 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
     }
 }
 
-__device__ Float3 gpu_trace(float *ray_orig, float *ray_dir,
+__device__ Float3 cuda_trace(float *ray_orig, float *ray_dir,
                  Geometry **geom, AABB world_bounds,
                  const UniformGrid &grid, int depth) {
     return Float3(1);
