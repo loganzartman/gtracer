@@ -4,6 +4,7 @@
 #include <cuda_gl_interop.h>
 
 #include "cuda_render.hh"
+#include "Geometry.hh"
 #define BLOCK_SIZE 256
 
 cudaGraphicsResource_t cuda_buffer;
@@ -18,9 +19,10 @@ struct CUDAKernelArgs {
     // const UniformGrid &grid;
     unsigned iteration;
     float *pixels;
+    Geometry **dev_geom;
 };
 
-void cuda_update_geometry(std::vector<Geometry*> geom);
+void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom);
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args);
 #endif

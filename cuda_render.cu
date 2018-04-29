@@ -46,8 +46,13 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                                          cuda_buffer);
     //assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
 
+    Geometry **dev_geom;
+    cudaMallocManaged(&dev_geom, geom.size());
+
+    cuda_update_geometry(geom, dev_geom);
+
     // run kernel
-    CUDAKernelArgs args = {w, h, iteration, mem_ptr};
+    CUDAKernelArgs args = {w, h, iteration, mem_ptr, dev_geom};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
 }
@@ -58,8 +63,12 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
  * 
  * @param geom the vector of geometry to copy
  */
-void cuda_update_geometry(std::vector<Geometry*> geom) {
-
+void cuda_update_geometry(const std::vector<Geometry*>& geom, Geometry** dev_geom) {
+    Geometry *x;
+    for (size_t i = 0; i < geom.size(); ++i) {
+        cudaMallocManaged(&x, sizeof(decltype(*geom[i])));
+        dev_geom[i] = x;
+    }
 }
 
 /**
