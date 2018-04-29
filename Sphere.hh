@@ -43,7 +43,7 @@ struct Sphere {
         return true;
     }
 
-    HOSTDEV static Float3 normal(const SphereData &data, const Float3 &r_dir,
+    HOSTDEV static Float3 normal(const SphereData &data, const Float3 &,
                                  const Float3 &intersection) {
         return (intersection - data.center).normalize();
     }

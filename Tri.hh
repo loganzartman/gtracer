@@ -41,8 +41,8 @@ struct Tri {
         return true;
     }
 
-    HOSTDEV static Float3 normal(const TriData& data, const Float3& r_dir,
-                                 const Float3& intersection) {
+    HOSTDEV static Float3 normal(const TriData& data, const Float3&,
+                                 const Float3&) {
         const Float3 ab = data.b - data.a;
         const Float3 ac = data.c - data.a;
 

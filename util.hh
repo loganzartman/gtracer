@@ -29,9 +29,11 @@ HOSTDEV void swap(T& t1, T& t2) {
     t2 = tmp;
 }
 
+/*
 HOSTDEV static float mix(float a, float b, float ratio) {
     return a * ratio + b * (1 - ratio);
 }
+*/
 
 #if __CUDACC__
 __device__ size_t _rand_n = 0;

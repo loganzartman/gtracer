@@ -57,7 +57,7 @@ struct Box {
         return true;
     }
 
-    HOSTDEV static Float3 normal(const BoxData &data, const Float3 &r_dir,
+    HOSTDEV static Float3 normal(const BoxData &data, const Float3 &,
                                  const Float3 &intersection) {
         const Float3 x_axis = Float3(1, 0, 0);
         const Float3 y_axis = Float3(0, 1, 0);
