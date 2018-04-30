@@ -124,7 +124,7 @@ void *cpu_render_thread(void *thread_arg) {
  */
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
                  AABB world_bounds, const UniformGrid &grid,
-                 const bool &accel, int depth) {
+                bool accel, int depth) {
     Float3 color = 1.0;
     Float3 light = 0.0;
 
