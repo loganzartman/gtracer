@@ -10,7 +10,7 @@ struct SphereData {
 };
 
 struct TriData {
-    Float3 a, b, c;
+    Float3 a, b, c, n;
 };
 
 struct BoxData {
