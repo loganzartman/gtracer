@@ -52,9 +52,12 @@ const vector<Geometry>& load(string filename, vector<Geometry>& objs,
             ssthree >> three;
 
             // create triangle
+            TriData tri = TriData{vertices[one - 1], vertices[two - 1],
+                                 vertices[three - 1], 0};
+            tri.n = Tri::normal(tri, vertices[one - 1], vertices[two - 1]);
+
             Geometry obj =
-                Geometry(TriData{vertices[one - 1], vertices[two - 1],
-                                 vertices[three - 1]},
+                Geometry(tri,
                          mat);
             objs.push_back(obj);
         } else if (command == "sphere") {

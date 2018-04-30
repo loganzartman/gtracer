@@ -175,7 +175,8 @@ int main(int argc, char *argv[]) {
         } else {
             // CPU rendering mode
             cpu_render(pixels, w, h, camera, geom_array,
-                       geom_array + geom.size(), iteration, args.threads);
+                       geom_array + geom.size(), iteration, args.threads,
+                       args.accel);
             gl_data2tex(w, h, pixels, texture_id);  // copy buffer to texture
         }
 

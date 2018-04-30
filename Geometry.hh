@@ -52,7 +52,7 @@ struct Geometry {
             case GeomType::Sphere:
                 return Sphere::normal(data.sphere, r_dir, intersection);
             case GeomType::Tri:
-                return Tri::normal(data.tri, r_dir, intersection);
+                return data.tri.n;
             case GeomType::Box:
                 return Box::normal(data.box, r_dir, intersection);
         }
