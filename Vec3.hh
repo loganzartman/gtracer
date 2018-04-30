@@ -146,8 +146,8 @@ struct Vec3 {
     HOSTDEV T length2() const { return x * x + y * y + z * z; }
 
     HOSTDEV T length() const { return sqrt(length2()); }
-
-    HOSTDEV static Vec3<T> random_spherical() {
+    
+    DEVICE static Vec3<T> random_spherical() {
         Vec3<T> result;
         T phi = util::randf(0., M_PI * 2);
         T costheta = util::randf(-1., 1.);
