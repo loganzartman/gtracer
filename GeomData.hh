@@ -17,7 +17,7 @@ struct BoxData {
     AABB box;
 };
 
-struct GeomData {
+union GeomData {
     SphereData sphere;
     TriData tri;
     BoxData box;
