@@ -256,7 +256,9 @@ bool cpu_ray_intersect(const Float3 &ray_orig, const Float3 &ray_dir,
         if (b != e) {
             if (cpu_ray_intersect_items(ray_orig, ray_dir, b, e, intersection,
                                         hit_geom)) {
-                return true;
+                Float3 cell_pos = world_bounds.xmin + Float3(voxel_pos) * grid.cell_size;
+                if (AABB(cell_pos - 1e-5, cell_pos + grid.cell_size + 1e-5).contains(intersection))
+                    return true;
             }
         }
 
