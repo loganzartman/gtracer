@@ -37,7 +37,4 @@ bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
                              II b, II e, Float3 &intersection,
                              Geometry *&hit_geom);
 
-#define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(1)
-
 #endif

@@ -18,6 +18,7 @@ struct CUDAKernelArgs {
     Mat4f camera;
     AABB bounds;
     UniformGrid grid;
+    bool accel;
     unsigned iteration;
     float *pixels;
 };

@@ -31,6 +31,7 @@
 #include "tracer.hh"
 #include "transform.hh"
 #include "util.hh"
+#include "raytracing.hh"
 
 using namespace std;
 
@@ -170,7 +171,7 @@ int main(int argc, char *argv[]) {
         if (args.gpu) {
             // GPU rendering mode
             cuda_render(buffer_id, w, h, camera, geom_array, geom.size(),
-                        iteration);
+                        iteration, args.accel);
             gl_buf2tex(w, h, buffer_id, texture_id);  // copy buffer to texture
         } else {
             // CPU rendering mode
