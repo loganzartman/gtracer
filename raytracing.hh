@@ -41,7 +41,8 @@ DEVICE static float fresnel(Float3 dir, Float3 normal, float ior) {
     return (Rs * Rs + Rp * Rp) / 2;
 }
 
-DEVICE static Float3 tonemap(Float3 color, float gamma = 0.85f, float alpha = 1.1f);
+DEVICE static Float3 tonemap(Float3 color, float gamma = 0.85f,
+                             float alpha = 1.1f);
 }  // namespace raytracing
 
 /**
@@ -287,7 +288,8 @@ DEVICE static bool raytracing::ray_intersect_items(const Float3 &ray_orig,
  * @param[in] color the HDR color
  * @param[in] gamma
  */
-DEVICE static Float3 raytracing::tonemap(Float3 color, float gamma, float alpha) {
+DEVICE static Float3 raytracing::tonemap(Float3 color, float gamma,
+                                         float alpha) {
     Float3 ldr = color / (color + Float3(1));
     ldr = pow(ldr, 1.0f / gamma) * alpha;
     return ldr;

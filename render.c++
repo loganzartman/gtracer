@@ -19,9 +19,9 @@
 
 using namespace std;
 
-void cpu_render(float *pixels, float *display_pixels, size_t w, size_t h, Mat4f camera,
-                Geometry *geom_b, Geometry *geom_e, unsigned iteration,
-                unsigned n_threads, bool accel) {
+void cpu_render(float *pixels, float *display_pixels, size_t w, size_t h,
+                Mat4f camera, Geometry *geom_b, Geometry *geom_e,
+                unsigned iteration, unsigned n_threads, bool accel) {
     // construct uniform grid
     AABB bounds = geometry_bounds(geom_b, geom_e);
     Int3 res = UniformGrid::resolution(bounds, geom_e - geom_b);
@@ -38,8 +38,9 @@ void cpu_render(float *pixels, float *display_pixels, size_t w, size_t h, Mat4f 
     for (unsigned i = 0; i < n_threads; ++i) {
         const unsigned pitch = n_threads;
         const unsigned offset = i;
-        args[i] = new CPUThreadArgs{w,      h,    pitch,     offset, camera,
-                                    bounds, grid, accel, iteration, pixels, display_pixels};
+        args[i] = new CPUThreadArgs{w,         h,      pitch,         offset,
+                                    camera,    bounds, grid,          accel,
+                                    iteration, pixels, display_pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -90,7 +91,8 @@ void *cpu_render_thread(void *thread_arg) {
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += raytracing::trace(origin, ray_dir, args.bounds, args.grid, args.accel, 8);
+            color += raytracing::trace(origin, ray_dir, args.bounds, args.grid,
+                                       args.accel, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 

@@ -68,7 +68,6 @@ struct Vec3 {
         return result;
     }
 
-
     HOSTDEV Vec3<T> reflect(const Vec3<T> &normal) const {
         return *this - normal * (2 * (this->dot(normal)));
     }
@@ -155,7 +154,7 @@ struct Vec3 {
     HOSTDEV T length2() const { return x * x + y * y + z * z; }
 
     HOSTDEV T length() const { return sqrt(length2()); }
-    
+
     DEVICE static Vec3<T> random_spherical() {
         Vec3<T> result;
         T phi = util::randf(0., M_PI * 2);

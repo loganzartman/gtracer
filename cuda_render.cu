@@ -47,8 +47,8 @@ void cuda_init(GLuint texture_id, GLuint buffer_id, GLuint display_buffer_id) {
     cudaGraphicsMapResources(1, &cuda_texture, cuda_stream);
 }
 
-void cuda_render(size_t w, size_t h, const Mat4f &camera,
-                 Geometry *geom, size_t geom_len, unsigned iteration, bool accel) {
+void cuda_render(size_t w, size_t h, const Mat4f &camera, Geometry *geom,
+                 size_t geom_len, unsigned iteration, bool accel) {
     using namespace std;
 
     const size_t size_pixels = w * h;
@@ -58,8 +58,8 @@ void cuda_render(size_t w, size_t h, const Mat4f &camera,
     size_t size_mapped;
     cudaGraphicsResourceGetMappedPointer((void **)&buf_ptr, &size_mapped,
                                          cuda_buffer);
-    cudaGraphicsResourceGetMappedPointer((void **)&display_buf_ptr, &size_mapped,
-                                         cuda_display_buffer);
+    cudaGraphicsResourceGetMappedPointer((void **)&display_buf_ptr,
+                                         &size_mapped, cuda_display_buffer);
     // assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
 
     // construct uniform grid
@@ -77,7 +77,8 @@ void cuda_render(size_t w, size_t h, const Mat4f &camera,
                      geom + geom_len);
 
     // run kernel
-    CUDAKernelArgs args = {w, h, camera, bounds, grid, accel, iteration, buf_ptr, display_buf_ptr};
+    CUDAKernelArgs args = {w,     h,         camera,  bounds,         grid,
+                           accel, iteration, buf_ptr, display_buf_ptr};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
     cuda_tonemap_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
@@ -129,7 +130,8 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
             Float3 ray_dir = dir_camera * Float3(v_x, v_y, -1);
             ray_dir.normalize();
 
-            color += raytracing::trace(origin, ray_dir, args.bounds, args.grid, args.accel, 8);
+            color += raytracing::trace(origin, ray_dir, args.bounds, args.grid,
+                                       args.accel, 8);
         }
         color *= 1.f / PRIMARY_RAYS;
 
@@ -160,7 +162,8 @@ __global__ void cuda_tonemap_kernel(CUDAKernelArgs args) {
     const size_t len = args.w * args.h;
     for (size_t i = index; i < len; i += stride) {
         const size_t idx = i * 4;
-        Float3 hdr = Float3(args.pixels[idx], args.pixels[idx + 1], args.pixels[idx + 2]);
+        Float3 hdr = Float3(args.pixels[idx], args.pixels[idx + 1],
+                            args.pixels[idx + 2]);
         Float3 ldr = raytracing::tonemap(hdr);
         args.display_pixels[idx] = ldr.x;
         args.display_pixels[idx + 1] = ldr.y;

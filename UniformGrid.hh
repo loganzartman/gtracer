@@ -163,14 +163,9 @@ class UniformGrid {
         return iterator(data[data_index(coord)].second, geom_cell);
     }
 
-    HOSTDEV iterator first() const {
-        return iterator(0, geom_cell);
-    }
+    HOSTDEV iterator first() const { return iterator(0, geom_cell); }
 
-    HOSTDEV iterator last() const {
-        return iterator(n_pairs, geom_cell);
-    }
-
+    HOSTDEV iterator last() const { return iterator(n_pairs, geom_cell); }
 
     /**
      * @brief Compute heuristic for grid resolution

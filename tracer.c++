@@ -27,11 +27,11 @@
 #include "cuda_render.hh"
 #include "loader.hh"
 #include "options.hh"
+#include "raytracing.hh"
 #include "render.hh"
 #include "tracer.hh"
 #include "transform.hh"
 #include "util.hh"
-#include "raytracing.hh"
 
 using namespace std;
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     vector<Material> mats{
         Material(Float3(0.990, 0.990, 0.990), 0.0, 0.0, Float3(0)),  // white
         Material(Float3(0.950, 0.123, 0.098), 0.0, 0.0, Float3(0)),  // red
-        Material(Float3(1, 0, 0), 0, 0, Float3(30, 30, 30)),           // lightr
+        Material(Float3(1, 0, 0), 0, 0, Float3(30, 30, 30)),         // lightr
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),           // lightg
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))            // lightb
     };
@@ -176,15 +176,17 @@ int main(int argc, char *argv[]) {
         // do raytracing
         if (args.gpu) {
             // GPU rendering mode
-            cuda_render(w, h, camera, geom_array, geom.size(),
-                        iteration, args.accel);
-            gl_buf2tex(w, h, display_buffer_id, texture_id);  // copy buffer to texture
+            cuda_render(w, h, camera, geom_array, geom.size(), iteration,
+                        args.accel);
+            gl_buf2tex(w, h, display_buffer_id,
+                       texture_id);  // copy buffer to texture
         } else {
             // CPU rendering mode
             cpu_render(pixels, display_pixels, w, h, camera, geom_array,
                        geom_array + geom.size(), iteration, args.threads,
                        args.accel);
-            gl_data2tex(w, h, display_pixels, texture_id);  // copy buffer to texture
+            gl_data2tex(w, h, display_pixels,
+                        texture_id);  // copy buffer to texture
         }
 
         gl_draw_tex(texture_id);    // render buffer
@@ -261,7 +263,6 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
 
 /**
  * @brief Initalizes the viewport
