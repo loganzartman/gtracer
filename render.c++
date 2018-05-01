@@ -121,7 +121,7 @@ void *cpu_render_thread(void *thread_arg) {
  */
 void reinhard(float *pixels, size_t w, size_t h) {
     const float gamma = 2.2;
-    for (size_t i = 0; i < w * h - 2; ++i) {
+    for (size_t i = 0; i < w * h - 2; i+=4) {
         Float3 color(pixels[i], pixels[i+1], pixels[i+2]);
         Float3 ldr = color / (color + Float3(1));
         ldr = pow(ldr, 1.0 / gamma);
