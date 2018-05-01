@@ -5,7 +5,7 @@
 #include "util.hh"
 
 #define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(1)
+#define SKY_COLOR Float3(0)
 
 namespace raytracing {
 DEVICE static Float3 trace(const Float3 &ray_orig, const Float3 &ray_dir,
@@ -40,6 +40,8 @@ DEVICE static float fresnel(Float3 dir, Float3 normal, float ior) {
     float Rp = ((n1 * cosi) - (n2 * cost)) / ((n1 * cosi) + (n2 * cost));
     return (Rs * Rs + Rp * Rp) / 2;
 }
+
+static void reinhard(float *pixels, size_t w, size_t h);
 }  // namespace raytracing
 
 /**
@@ -280,4 +282,22 @@ DEVICE static bool raytracing::ray_intersect_items(const Float3 &ray_orig,
     return false;
 }
 
+/**
+ * @brief Use Reinhard HDR algorithm to transform pixels
+ * @param[in] pixels the pixels to transform
+ * @param[in] w the width of the screen
+ * @param[in] h the height of the screen
+ */
+static void raytracing::reinhard(float *pixels, size_t w, size_t h) {
+    const float gamma = 2.2;
+    for (size_t i = 0; i < w * h; ++i) {
+        const int idx = i * 4;
+        Float3 color(pixels[idx], pixels[idx+1], pixels[idx+2]);
+        Float3 ldr = color / (color + Float3(1));
+        ldr = pow(ldr, 1.0 / gamma);
+        pixels[idx] = ldr.x;
+        pixels[idx+1] = ldr.y;
+        pixels[idx+2] = ldr.z;
+    }
+}
 #endif

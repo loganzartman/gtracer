@@ -77,8 +77,6 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
 
-    reinhard(mem_ptr, w, h);
-
     cudaDeviceSynchronize();
     cudaFree(grid_data);
     cudaFree(grid_pairs);

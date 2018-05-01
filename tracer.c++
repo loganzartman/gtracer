@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 
     // surface color, transparency, reflectivity, emission color
     vector<Material> mats{
-        Material(Float3(0.950, 0.950, 0.950), 0.0, 0.0, Float3(0)),  // white
-        Material(Float3(0.950, 0.123, 0.098), 0.0, 0.0, Float3(0)),  // red
+        Material(Float3(0.990, 0.990, 0.990), 0.0, 0.0, Float3(0)),  // white
+        Material(Float3(0.950, 0.123, 0.098), 0.5, 0.0, Float3(0)),  // red
         Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0)),           // lightr
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),           // lightg
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))            // lightb
@@ -100,10 +100,13 @@ int main(int argc, char *argv[]) {
 
     // prepare CPU pixel buffer
     float *pixels = nullptr;
+    float *pixels_tmp = nullptr;
     if (!args.gpu) {
         size_t n_pixels = w * h * 4;
         pixels = new float[n_pixels];
         fill_n(pixels, n_pixels, 0);
+        pixels_tmp = new float[n_pixels];
+        fill_n(pixels_tmp, n_pixels, 0);
     }
 
     unsigned iteration = 0;
@@ -178,8 +181,9 @@ int main(int argc, char *argv[]) {
             cpu_render(pixels, w, h, camera, geom_array,
                        geom_array + geom.size(), iteration, args.threads,
                        args.accel);
-            reinhard(pixels, w, h);
-            gl_data2tex(w, h, pixels, texture_id);  // copy buffer to texture
+            copy_n(pixels, w*h*4, pixels_tmp);
+            raytracing::reinhard(pixels_tmp, w, h);
+            gl_data2tex(w, h, pixels_tmp, texture_id);  // copy buffer to texture
         }
 
         gl_draw_tex(texture_id);    // render buffer
