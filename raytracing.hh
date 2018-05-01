@@ -41,7 +41,7 @@ DEVICE static float fresnel(Float3 dir, Float3 normal, float ior) {
     return (Rs * Rs + Rp * Rp) / 2;
 }
 
-static void reinhard(float *pixels, size_t w, size_t h);
+DEVICE static Float3 tonemap(Float3 color, float gamma = 2.2f);
 }  // namespace raytracing
 
 /**
@@ -283,21 +283,14 @@ DEVICE static bool raytracing::ray_intersect_items(const Float3 &ray_orig,
 }
 
 /**
- * @brief Use Reinhard HDR algorithm to transform pixels
+ * @brief Use Reinhard HDR tonemapping algorithm to transform pixels
  * @param[in] pixels the pixels to transform
  * @param[in] w the width of the screen
  * @param[in] h the height of the screen
  */
-static void raytracing::reinhard(float *pixels, size_t w, size_t h) {
-    const float gamma = 2.2;
-    for (size_t i = 0; i < w * h; ++i) {
-        const int idx = i * 4;
-        Float3 color(pixels[idx], pixels[idx+1], pixels[idx+2]);
-        Float3 ldr = color / (color + Float3(1));
-        ldr = pow(ldr, 1.0 / gamma);
-        pixels[idx] = ldr.x;
-        pixels[idx+1] = ldr.y;
-        pixels[idx+2] = ldr.z;
-    }
+DEVICE static Float3 raytracing::tonemap(Float3 color, float gamma) {
+    Float3 ldr = color / (color + Float3(1));
+    ldr = pow(ldr, 1.0f / gamma);
+    return ldr;
 }
 #endif

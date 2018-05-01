@@ -9,6 +9,7 @@
 #define BLOCK_SIZE 64
 
 cudaGraphicsResource_t cuda_buffer;
+cudaGraphicsResource_t cuda_display_buffer;
 cudaGraphicsResource_t cuda_texture;
 cudaStream_t cuda_stream;
 
@@ -21,9 +22,11 @@ struct CUDAKernelArgs {
     bool accel;
     unsigned iteration;
     float *pixels;
+    float *display_pixels;
 };
 
 __global__ void cuda_render_kernel(CUDAKernelArgs args);
+__global__ void cuda_tonemap_kernel(CUDAKernelArgs args);
 __device__ Float3 cuda_trace(const Float3 &ray_orig, const Float3 &ray_dir,
                              AABB world_bounds, const UniformGrid &grid,
                              int depth);

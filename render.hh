@@ -16,16 +16,17 @@ struct CPUThreadArgs {
     Mat4f &camera;
     AABB bounds;
     const UniformGrid &grid;
+    bool accel;
     unsigned iteration;
     float *pixels;
-    bool accel;
+    float *display_pixels;
 };
 
 Float3 cpu_trace(const Float3 &ray_orig, const Float3 &ray_dir,
                  AABB world_bounds, const UniformGrid &grid,
                  bool accel, int depth);
 
-void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
+void cpu_render(float *pixels, float *display_pixels, size_t w, size_t h, Mat4f camera,
                 Geometry *geom_b, Geometry *geom_e, unsigned iteration,
                 unsigned n_threads, bool accel);
 void *cpu_render_thread(void *thread_arg);
@@ -36,6 +37,5 @@ template <typename II>
 bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
                              II b, II e, Float3 &intersection,
                              Geometry *&hit_geom);
-void reinhard(float *pixels, size_t w, size_t h);
 
 #endif

@@ -29,9 +29,11 @@
  * @param texture_id ID of the GL texture
  * @param buffer_id  ID of the GL buffer
  */
-void cuda_init(GLuint texture_id, GLuint buffer_id) {
+void cuda_init(GLuint texture_id, GLuint buffer_id, GLuint display_buffer_id) {
     // register GL buffer and texture as CUDA resources
     cudaGraphicsGLRegisterBuffer(&cuda_buffer, buffer_id,
+                                 cudaGraphicsRegisterFlagsNone);
+    cudaGraphicsGLRegisterBuffer(&cuda_display_buffer, display_buffer_id,
                                  cudaGraphicsRegisterFlagsNone);
     cudaGraphicsGLRegisterImage(&cuda_texture, texture_id, GL_TEXTURE_2D,
                                 cudaGraphicsRegisterFlagsNone);
@@ -41,21 +43,25 @@ void cuda_init(GLuint texture_id, GLuint buffer_id) {
 
     // map resources
     cudaGraphicsMapResources(1, &cuda_buffer, cuda_stream);
+    cudaGraphicsMapResources(1, &cuda_display_buffer, cuda_stream);
     cudaGraphicsMapResources(1, &cuda_texture, cuda_stream);
 }
 
-void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
+void cuda_render(size_t w, size_t h, const Mat4f &camera,
                  Geometry *geom, size_t geom_len, unsigned iteration, bool accel) {
     using namespace std;
 
     const size_t size_pixels = w * h;
-    float *mem_ptr;
+    float *buf_ptr;
+    float *display_buf_ptr;
     cudaArray *array_ptr;
 
     size_t size_mapped;
-    cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
-    cudaGraphicsResourceGetMappedPointer((void **)&mem_ptr, &size_mapped,
+    // cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
+    cudaGraphicsResourceGetMappedPointer((void **)&buf_ptr, &size_mapped,
                                          cuda_buffer);
+    cudaGraphicsResourceGetMappedPointer((void **)&display_buf_ptr, &size_mapped,
+                                         cuda_display_buffer);
     // assert(size_mapped == size_pixels * 4 * sizeof(float));  // RGBA32F
 
     // construct uniform grid
@@ -73,9 +79,10 @@ void cuda_render(GLuint buffer_id, size_t w, size_t h, const Mat4f &camera,
                      geom + geom_len);
 
     // run kernel
-    CUDAKernelArgs args = {w, h, camera, bounds, grid, accel, iteration, mem_ptr};
+    CUDAKernelArgs args = {w, h, camera, bounds, grid, accel, iteration, buf_ptr, display_buf_ptr};
     const int num_blocks = (size_pixels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     cuda_render_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
+    cuda_tonemap_kernel<<<num_blocks, BLOCK_SIZE>>>(args);
 
     cudaDeviceSynchronize();
     cudaFree(grid_data);
@@ -141,5 +148,24 @@ __global__ void cuda_render_kernel(CUDAKernelArgs args) {
         args.pixels[idx + 1] = blended.y;
         args.pixels[idx + 2] = blended.z;
         args.pixels[idx + 3] = 1;  // alpha
+    }
+}
+
+/**
+ * @brief Tone mapping kernel
+ * @param args current state
+ */
+__global__ void cuda_tonemap_kernel(CUDAKernelArgs args) {
+    const size_t index = blockIdx.x * blockDim.x + threadIdx.x;
+    const size_t stride = blockDim.x * gridDim.x;
+
+    const size_t len = args.w * args.h;
+    for (size_t i = index; i < len; i += stride) {
+        const size_t idx = i * 4;
+        Float3 hdr = Float3(args.pixels[idx], args.pixels[idx + 1], args.pixels[idx + 2]);
+        Float3 ldr = raytracing::tonemap(hdr);
+        args.display_pixels[idx] = ldr.x;
+        args.display_pixels[idx + 1] = ldr.y;
+        args.display_pixels[idx + 2] = ldr.z;
     }
 }

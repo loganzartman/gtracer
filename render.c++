@@ -19,7 +19,7 @@
 
 using namespace std;
 
-void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
+void cpu_render(float *pixels, float *display_pixels, size_t w, size_t h, Mat4f camera,
                 Geometry *geom_b, Geometry *geom_e, unsigned iteration,
                 unsigned n_threads, bool accel) {
     // construct uniform grid
@@ -39,7 +39,7 @@ void cpu_render(float *pixels, size_t w, size_t h, Mat4f camera,
         const unsigned pitch = n_threads;
         const unsigned offset = i;
         args[i] = new CPUThreadArgs{w,      h,    pitch,     offset, camera,
-                                    bounds, grid, iteration, pixels, accel};
+                                    bounds, grid, accel, iteration, pixels, display_pixels};
 
         if (n_threads > 1) {
             pthread_create(&threads[i], NULL, cpu_render_thread, args[i]);
@@ -108,25 +108,13 @@ void *cpu_render_thread(void *thread_arg) {
         args.pixels[idx + 1] = blended.y;
         args.pixels[idx + 2] = blended.z;
         args.pixels[idx + 3] = 1;  // alpha
+
+        // tonemapping
+        Float3 ldr = raytracing::tonemap(blended);
+        args.display_pixels[idx] = ldr.x;
+        args.display_pixels[idx + 1] = ldr.y;
+        args.display_pixels[idx + 2] = ldr.z;
     }
 
     return nullptr;
-}
-
-/**
- * @brief Use Reinhard HDR algorithm to transform pixels
- * @param[in] pixels the pixels to transform
- * @param[in] w the width of the screen
- * @param[in] h the height of the screen
- */
-void reinhard(float *pixels, size_t w, size_t h) {
-    const float gamma = 2.2;
-    for (size_t i = 0; i < w * h - 2; i+=4) {
-        Float3 color(pixels[i], pixels[i+1], pixels[i+2]);
-        Float3 ldr = color / (color + Float3(1));
-        ldr = pow(ldr, 1.0 / gamma);
-        pixels[i] = ldr.x;
-        pixels[i+1] = ldr.y;
-        pixels[i+2] = ldr.z;
-    }
 }

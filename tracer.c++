@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
     // surface color, transparency, reflectivity, emission color
     vector<Material> mats{
         Material(Float3(0.990, 0.990, 0.990), 0.0, 0.0, Float3(0)),  // white
-        Material(Float3(0.950, 0.123, 0.098), 0.5, 0.0, Float3(0)),  // red
-        Material(Float3(1, 0, 0), 0, 0, Float3(30, 0, 0)),           // lightr
+        Material(Float3(0.950, 0.123, 0.098), 0.0, 0.0, Float3(0)),  // red
+        Material(Float3(1, 0, 0), 0, 0, Float3(30, 30, 30)),           // lightr
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),           // lightg
         Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))            // lightb
     };
@@ -72,10 +72,10 @@ int main(int argc, char *argv[]) {
     // load geometry
     unsigned long last_modified = 0;
     vector<Geometry> geom;
-    load(args.infile, geom, 100, &mat_array[0]);
+    load(args.infile, geom, 100, &mat_array[1]);
     geom.push_back(
         Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
-                 &mat_array[1]));
+                 &mat_array[0]));
     // geom.push_back(
     //     Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
     // geom.push_back(Geometry(SphereData{Float3(0, 20, 20), 7},
@@ -91,22 +91,25 @@ int main(int argc, char *argv[]) {
     SDL_GetWindowSize(window, &w, &h);
     glewInit();
     gl_init_viewport(w, h);
-    GLuint buffer_id = 0, texture_id = 0;
+
+    // initialize GL buffers, textures, Cuda interop
+    GLuint buffer_id = 0, display_buffer_id = 0, texture_id = 0;
     texture_id = gl_create_texture(w, h);
     if (args.gpu) {
         buffer_id = gl_create_buffer(w, h);
-        cuda_init(texture_id, buffer_id);
+        display_buffer_id = gl_create_buffer(w, h);
+        cuda_init(texture_id, buffer_id, display_buffer_id);
     }
 
-    // prepare CPU pixel buffer
+    // initialize CPU pixel buffers
     float *pixels = nullptr;
-    float *pixels_tmp = nullptr;
+    float *display_pixels = nullptr;
     if (!args.gpu) {
         size_t n_pixels = w * h * 4;
         pixels = new float[n_pixels];
         fill_n(pixels, n_pixels, 0);
-        pixels_tmp = new float[n_pixels];
-        fill_n(pixels_tmp, n_pixels, 0);
+        display_pixels = new float[n_pixels];
+        fill_n(display_pixels, n_pixels, 0);
     }
 
     unsigned iteration = 0;
@@ -173,17 +176,15 @@ int main(int argc, char *argv[]) {
         // do raytracing
         if (args.gpu) {
             // GPU rendering mode
-            cuda_render(buffer_id, w, h, camera, geom_array, geom.size(),
+            cuda_render(w, h, camera, geom_array, geom.size(),
                         iteration, args.accel);
-            gl_buf2tex(w, h, buffer_id, texture_id);  // copy buffer to texture
+            gl_buf2tex(w, h, display_buffer_id, texture_id);  // copy buffer to texture
         } else {
             // CPU rendering mode
-            cpu_render(pixels, w, h, camera, geom_array,
+            cpu_render(pixels, display_pixels, w, h, camera, geom_array,
                        geom_array + geom.size(), iteration, args.threads,
                        args.accel);
-            copy_n(pixels, w*h*4, pixels_tmp);
-            raytracing::reinhard(pixels_tmp, w, h);
-            gl_data2tex(w, h, pixels_tmp, texture_id);  // copy buffer to texture
+            gl_data2tex(w, h, display_pixels, texture_id);  // copy buffer to texture
         }
 
         gl_draw_tex(texture_id);    // render buffer
