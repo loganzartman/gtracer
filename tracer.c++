@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
     geom.push_back(
         Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
                  &mat_array[0]));
-    // geom.push_back(
-    //     Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
+    geom.push_back(
+        Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
     // geom.push_back(Geometry(SphereData{Float3(0, 20, 20), 7},
     // &mat_array[3])); geom.push_back(Geometry(SphereData{Float3(20, 20, 20),
     // 7}, &mat_array[4]));

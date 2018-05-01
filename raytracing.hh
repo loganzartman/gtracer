@@ -5,7 +5,7 @@
 #include "util.hh"
 
 #define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(1)
+#define SKY_COLOR Float3(0)
 
 namespace raytracing {
 DEVICE static Float3 trace(const Float3 &ray_orig, const Float3 &ray_dir,
@@ -41,7 +41,7 @@ DEVICE static float fresnel(Float3 dir, Float3 normal, float ior) {
     return (Rs * Rs + Rp * Rp) / 2;
 }
 
-DEVICE static Float3 tonemap(Float3 color, float gamma = 2.2f);
+DEVICE static Float3 tonemap(Float3 color, float gamma = 1.f);
 }  // namespace raytracing
 
 /**
@@ -120,7 +120,7 @@ DEVICE static Float3 raytracing::trace(const Float3 &ray_orig,
                 direction *= -1;
         }
         direction.normalize();
-        origin += normal * 1e-5;
+        origin += normal * 1e-4;
     }
 
     return light;
