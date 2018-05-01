@@ -3,6 +3,9 @@
 #include <cassert>
 #include "Vec3.hh"
 #include "util.hh"
+#include "UniformGrid.hh"
+#include "AABB.hh"
+#include "Geometry.hh"
 
 #define PRIMARY_RAYS 1
 #define SKY_COLOR Float3(0.5)
