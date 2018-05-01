@@ -112,3 +112,21 @@ void *cpu_render_thread(void *thread_arg) {
 
     return nullptr;
 }
+
+/**
+ * @brief Use Reinhard HDR algorithm to transform pixels
+ * @param[in] pixels the pixels to transform
+ * @param[in] w the width of the screen
+ * @param[in] h the height of the screen
+ */
+void reinhard(float *pixels, size_t w, size_t h) {
+    const float gamma = 2.2;
+    for (size_t i = 0; i < w * h - 2; ++i) {
+        Float3 color(pixels[i], pixels[i+1], pixels[i+2]);
+        Float3 ldr = color / (color + Float3(1));
+        ldr = pow(ldr, 1.0 / gamma);
+        pixels[i] = ldr.x;
+        pixels[i+1] = ldr.y;
+        pixels[i+2] = ldr.z;
+    }
+}

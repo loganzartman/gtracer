@@ -36,5 +36,6 @@ template <typename II>
 bool cpu_ray_intersect_items(const Float3 &ray_orig, const Float3 &ray_dir,
                              II b, II e, Float3 &intersection,
                              Geometry *&hit_geom);
+void reinhard(float *pixels, size_t w, size_t h);
 
 #endif

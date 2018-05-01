@@ -29,7 +29,6 @@
 #define HEIGHT 480
 #define ERRINFO __FILE__ << ":" << __func__ << ":" << __LINE__
 
-void reinhard(float *pixels, size_t w, size_t h);
 void gl_init_viewport(int w, int h);
 GLuint gl_create_buffer(int w, int h);
 GLuint gl_create_texture(int w, int h);
