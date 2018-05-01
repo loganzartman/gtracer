@@ -5,7 +5,7 @@
 #include "util.hh"
 
 #define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(0)
+#define SKY_COLOR Float3(1)
 
 namespace raytracing {
 DEVICE static Float3 trace(const Float3 &ray_orig, const Float3 &ray_dir,
@@ -120,7 +120,7 @@ DEVICE static Float3 raytracing::trace(const Float3 &ray_orig,
                 direction *= -1;
         }
         direction.normalize();
-        origin += normal * 1e-6;
+        origin += normal * 1e-5;
     }
 
     return light;
