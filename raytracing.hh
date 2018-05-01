@@ -100,6 +100,7 @@ DEVICE static Float3 raytracing::trace(const Float3 &ray_orig,
             if (util::randf(0, 1) < fresneleffect) {
                 // reflective material
                 direction = direction.reflect(normal);
+                origin += normal * 1e-4; // fudge
             } else {
                 float refr_i;
                 if (direction.dot(normal) > 0)
@@ -112,9 +113,11 @@ DEVICE static Float3 raytracing::trace(const Float3 &ray_orig,
                     direction * refr_i + normal * (refr_i * angle - sqrt(k));
                 refraction_dir.normalize();
                 direction = refraction_dir;
+                origin += direction * 1e-4; // fudge
             }
         } else if (hit_geom->material()->reflection > util::randf(0, 1)) {
             direction = direction.reflect(normal);
+            origin += normal * 1e-4; // fudge
         } else {
             // diffuse material
             // generate random number on a sphere, but we want only
@@ -122,9 +125,9 @@ DEVICE static Float3 raytracing::trace(const Float3 &ray_orig,
             direction = Float3::random_spherical();
             if (direction.dot(normal) < 0)
                 direction *= -1;
+            origin += normal * 1e-4; // fudge
         }
         direction.normalize();
-        origin += normal * 1e-4;
     }
 
     return light;
