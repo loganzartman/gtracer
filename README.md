@@ -3,10 +3,13 @@
 
 Austin Atchley, Logan Zartman
 
+![visorman](img/visorman.png)
+*Visorman*
+
 ## Dependencies
 * SDL2
 * GLEW
-* CUDA
+* Cuda
 * Google Test
 
 ## Building
@@ -16,7 +19,7 @@ Austin Atchley, Logan Zartman
 * `./tracer`
 
 ## Use
-To view flags, run the binary with the `-?` flag
+To view flags, run the binary with no arguments.
 
 Give the tracer an object file as an argument.
 
@@ -24,4 +27,4 @@ After running, you can use the mouse and arrow keys to rotate and translate the 
 
 If you specify an output location, the tracer will save a `.bmp` to that path after you exit the program
 
-As the tracer runs, it will give FPS, iterations, and average milliseconds per frame counters. For each iteration, the tracer averages each image together, and the render becomes more clear over time. This is due to the randomness of path tracing (as opposed to ray tracing).
+As the tracer runs, it will report FPS, iterations, and average milliseconds per frame. For each iteration, the tracer averages each image together, and the render becomes more accurate over time. This is due to the randomness of Monte-Carlo path tracing (as opposed to ray tracing).
