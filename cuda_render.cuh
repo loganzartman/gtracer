@@ -6,7 +6,7 @@
 #include "Geometry.hh"
 #include "UniformGrid.hh"
 #include "cuda_render.hh"
-#define BLOCK_SIZE 256
+#define BLOCK_SIZE 64
 
 cudaGraphicsResource_t cuda_buffer;
 cudaGraphicsResource_t cuda_texture;
