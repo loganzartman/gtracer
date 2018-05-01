@@ -42,8 +42,8 @@ __device__ unsigned _rand_n = 0;
 __device__ static float randf(float lo, float hi) {
     thrust::minstd_rand rng;
     thrust::uniform_real_distribution<float> dist(lo, hi);
-    atomicAdd(&util::_rand_n, 1l);
-    rng.discard(util::_rand_n);
+    ++util::_rand_n;
+    rng.discard(util::_rand_n * blockDim.x + threadIdx.x);
     return dist(rng);
 }
 #else
