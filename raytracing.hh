@@ -283,10 +283,9 @@ DEVICE static bool raytracing::ray_intersect_items(const Float3 &ray_orig,
 }
 
 /**
- * @brief Use Reinhard HDR tonemapping algorithm to transform pixels
- * @param[in] pixels the pixels to transform
- * @param[in] w the width of the screen
- * @param[in] h the height of the screen
+ * @brief Use Reinhard HDR tonemapping algorithm to transform a color
+ * @param[in] color the HDR color
+ * @param[in] gamma
  */
 DEVICE static Float3 raytracing::tonemap(Float3 color, float gamma) {
     Float3 ldr = color / (color + Float3(1));

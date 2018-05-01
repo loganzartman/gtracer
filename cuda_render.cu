@@ -54,10 +54,8 @@ void cuda_render(size_t w, size_t h, const Mat4f &camera,
     const size_t size_pixels = w * h;
     float *buf_ptr;
     float *display_buf_ptr;
-    cudaArray *array_ptr;
 
     size_t size_mapped;
-    // cudaGraphicsSubResourceGetMappedArray(&array_ptr, cuda_texture, 0, 0);
     cudaGraphicsResourceGetMappedPointer((void **)&buf_ptr, &size_mapped,
                                          cuda_buffer);
     cudaGraphicsResourceGetMappedPointer((void **)&display_buf_ptr, &size_mapped,

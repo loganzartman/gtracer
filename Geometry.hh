@@ -44,6 +44,7 @@ struct Geometry {
                 return Box::intersect(data.box, r_orig, r_dir, t);
         }
         assert(false);
+        return false;
     }
 
     HOSTDEV Float3 normal(const Float3& r_dir,
@@ -57,6 +58,7 @@ struct Geometry {
                 return Box::normal(data.box, r_dir, intersection);
         }
         assert(false);
+        return Float3();
     }
 
     HOSTDEV AABB bounds() const {
@@ -69,6 +71,7 @@ struct Geometry {
                 return Box::bounds(data.box);
         }
         assert(false);
+        return AABB();
     }
 };
 
