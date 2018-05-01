@@ -60,6 +60,15 @@ struct Vec3 {
         return result;
     }
 
+    HOSTDEV friend Vec3<T> pow(const Vec3<T> &v, T e) {
+        Vec3<T> result = v;
+        result.x = pow(result.x, e);
+        result.y = pow(result.y, e);
+        result.z = pow(result.z, e);
+        return result;
+    }
+
+
     HOSTDEV Vec3<T> reflect(const Vec3<T> &normal) const {
         return *this - normal * (2 * (this->dot(normal)));
     }
