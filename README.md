@@ -3,8 +3,10 @@
 
 Austin Atchley, Logan Zartman
 
-![visorman](img/visorman.png)
-*Visorman*
+<center>
+<img src="img/visorman.png" width="400px">
+<i>Visorman</i>
+</center>
 
 ## Dependencies
 * SDL2
