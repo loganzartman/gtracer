@@ -29,6 +29,9 @@
 #define HEIGHT 480
 #define ERRINFO __FILE__ << ":" << __func__ << ":" << __LINE__
 
+void reload_geometry(const TracerArgs &args, std::vector<Geometry> &geom,
+                     std::vector<Material> &mats, Geometry *&geom_array,
+                     Material *&mat_array);
 void gl_init_viewport(int w, int h);
 GLuint gl_create_buffer(int w, int h);
 GLuint gl_create_texture(int w, int h);

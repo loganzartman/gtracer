@@ -57,34 +57,13 @@ int main(int argc, char *argv[]) {
     float orbit_zoom = 30;
     Float3 trans(0);
 
-    // surface color, transparency, reflectivity, emission color
-    vector<Material> mats{
-        Material(Float3(0.990, 0.990, 0.990), 0.0, 0.0, Float3(0)),  // white
-        Material(Float3(0.950, 0.123, 0.098), 0.0, 0.0, Float3(0)),  // red
-        Material(Float3(1, 0, 0), 0, 0, Float3(30, 30, 30)),         // lightr
-        Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),           // lightg
-        Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))            // lightb
-    };
-    Material *mat_array = (Material *)util::hostdev_alloc(
-        mats.size() * sizeof(Material), args.gpu);
-    copy(mats.begin(), mats.end(), mat_array);
-
     // load geometry
     unsigned long last_modified = 0;
     vector<Geometry> geom;
-    load(args.infile, geom, 100, &mat_array[1]);
-    geom.push_back(
-        Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
-                 &mat_array[0]));
-    geom.push_back(
-        Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
-    // geom.push_back(Geometry(SphereData{Float3(0, 20, 20), 7},
-    // &mat_array[3])); geom.push_back(Geometry(SphereData{Float3(20, 20, 20),
-    // 7}, &mat_array[4]));
-
-    Geometry *geom_array = (Geometry *)util::hostdev_alloc(
-        geom.size() * sizeof(Geometry), args.gpu);
-    copy(geom.begin(), geom.end(), geom_array);
+    vector<Material> mats;
+    Geometry *geom_array;
+    Material *mat_array;
+    reload_geometry(args, geom, mats, geom_array, mat_array);
 
     // Initalize OpenGL
     int w, h;
@@ -206,11 +185,8 @@ int main(int argc, char *argv[]) {
                 cout << "Updating assets! " << last_modified << " -> " << time
                      << endl;
                 last_modified = time;
-                vector<Float3> nv;
-                geom.clear();
-                load(args.infile, geom, 100, &mat_array[0]);
-                copy(geom.begin(), geom.end(), geom_array);
-                // TODO: fix lights
+                iteration = 1;
+                reload_geometry(args, geom, mats, geom_array, mat_array);
             }
         }
 
@@ -262,6 +238,46 @@ int main(int argc, char *argv[]) {
     delete[] pixels;
 
     return 0;
+}
+
+void reload_geometry(const TracerArgs &args, vector<Geometry> &geom,
+                     vector<Material> &mats, Geometry *&geom_array,
+                     Material *&mat_array) {
+    // clear existing data
+    geom.clear();
+    mats.clear();
+    if (geom_array != nullptr)
+        util::hostdev_free(geom_array, args.gpu);
+    if (mat_array != nullptr)
+        util::hostdev_free(mat_array, args.gpu);
+
+    // pre-loaded materials
+    // surface color, transparency, reflectivity, emission color
+    mats = vector<Material>{
+        Material(Float3(0.990, 0.990, 0.990), 0.0, 0.0, Float3(0)),  // white
+        Material(Float3(0.950, 0.123, 0.098), 0.0, 0.0, Float3(0)),  // red
+        Material(Float3(1, 0, 0), 0, 0, Float3(30, 30, 30)),         // lightr
+        Material(Float3(1, 0, 0), 0, 0, Float3(0, 30, 0)),           // lightg
+        Material(Float3(1, 0, 0), 0, 0, Float3(0, 0, 30))            // lightb
+    };
+
+    // move materials to managed memory
+    mat_array = (Material *)util::hostdev_alloc(
+        mats.size() * sizeof(Material), args.gpu);
+    copy(mats.begin(), mats.end(), mat_array);
+
+    // load geometry
+    load(args.infile, geom, 100, &mat_array[1]);
+    geom.push_back(
+        Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
+                 &mat_array[0]));
+    geom.push_back(
+        Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
+
+    // move geometry to managed memory
+    geom_array = (Geometry *)util::hostdev_alloc(
+        geom.size() * sizeof(Geometry), args.gpu);
+    copy(geom.begin(), geom.end(), geom_array);
 }
 
 /**
