@@ -39,11 +39,11 @@ def main():
             make_tris()
 
     for i in range(0, verts, 3):
-        print("f " + str(i+1) + "/" + str(i+2) + "/" + str(i+3))
+        print("f " + str(i+1) + " " + str(i+2) + " " + str(i+3))
 
 def make_spheres():
     x = (random.random() * 2 * max_x) - max_x
-    y = (random.random() * 2 * max_x) - max_x
+    y = (random.random() * 2 * max_y) - max_y
     z = (random.random() * 2 * max_z) - max_z
     r = (random.random() * 2 * max_r) - max_r
 
@@ -52,13 +52,16 @@ def make_spheres():
 def make_tris():
     global verts
     
+    x = (random.random() * 2 * max_x) - max_x
+    y = (random.random() * 2 * max_y) - max_y
+    z = (random.random() * 2 * max_z) - max_z
     for _ in range(3):
-        x = (random.random() * 2 * max_x) - max_x
-        y = (random.random() * 2 * max_y) - max_y
-        z = (random.random() * 2 * max_z) - max_z
+        dx = random.uniform(-1, 1)
+        dy = random.uniform(-1, 1)
+        dz = random.uniform(-1, 1)
 
         verts+=1
-        print("v", x, y, z)
+        print("v", x + dx, y + dy, z + dz)
 
 
 main()
