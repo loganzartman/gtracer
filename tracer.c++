@@ -193,15 +193,16 @@ int main(int argc, char *argv[]) {
         // limit framerate
         auto t1 = chrono::high_resolution_clock::now();
         auto dt = chrono::duration_cast<chrono::milliseconds>(t1 - t0).count();
-        cout << "\e[A\e[1G\e[0K"
-             << "iteration " << iteration << ". " << (1000.f / dt) << "fps"
-             << flush << endl;
-
         auto dtotal =
             chrono::duration_cast<chrono::milliseconds>(t1 - start_time)
                 .count();
-        cout << "\e[1G\e[0K"
-             << "average time per frame: " << (dtotal / iteration) << flush;
+        if (!args.stats) {
+            cout << "\e[A\e[1G\e[0K"
+                 << "iteration " << iteration << ". " << (1000.f / dt) << "fps"
+                 << flush << endl;
+            cout << "\e[1G\e[0K"
+                 << "average time per frame: " << (dtotal / iteration) << flush;
+        }
 
         SDL_Delay(util::max(0l, 1000 / TARGET_FPS - dt));
     }
@@ -215,7 +216,7 @@ int main(int argc, char *argv[]) {
         output_bmp(pixels, w, h, args.outfile);
     }
 
-    if (args.time) {
+    if (args.stats) {
         auto end_time = chrono::high_resolution_clock::now();
         auto total_time =
             chrono::duration_cast<chrono::milliseconds>(end_time - start_time)
@@ -455,11 +456,9 @@ void output_time(double total_time, unsigned iteration, size_t geom_size,
                  unsigned long rays_cast, bool gpu, bool accel) {
     double avg_time = total_time / iteration;
 
-    cout << gpu << endl;
-    cout << accel << endl;
-    cout << total_time << endl;
-    cout << iteration << endl;
-    cout << avg_time << endl;
-    cout << geom_size << endl;
-    cout << rays_cast << endl;
+    cout << "statistics" << endl;
+    cout << "gpu_enabled,accel_enabled,total_time_ms,iterations,avg_time_ms," 
+         << "geom_size,rays_cast" << endl;
+    cout << gpu << "," << accel << "," << total_time << "," << iteration << "," 
+         << avg_time << "," << geom_size << "," << rays_cast << endl;
 }

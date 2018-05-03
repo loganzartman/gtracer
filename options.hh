@@ -22,8 +22,7 @@ struct TracerArgs {
     size_t iterations;
     unsigned threads;
     bool gpu;
-    bool csv;
-    bool time;
+    bool stats;
     bool accel;
     float scale;
     Float3 translate;
@@ -39,8 +38,7 @@ void print_usage() {
     cout << " -t, --threads    number of CPU threads (default autodetected)"
          << endl;
     cout << " -g, --gpu        use GPU acceleration" << endl;
-    cout << " -c, --csv        output machine-readable CSV data" << endl;
-    cout << " -j, --time       output timing data" << endl;
+    cout << " -s, --stats      output timing data + statistics" << endl;
     cout << " -d, --daccel     disable acceleration structures used to speed "
          << "up path tracing" << endl;
     cout << " -S, --scale      scale factor for model (default 100)" << endl;
@@ -68,7 +66,7 @@ TracerArgs parse_args(int argc, char *argv[]) {
         {"threads", optional_argument, NULL, 't'},
         {"gpu", no_argument, NULL, 'g'},
         {"csv", no_argument, NULL, 'c'},
-        {"time", no_argument, NULL, 'j'},
+        {"stats", no_argument, NULL, 's'},
         {"daccel", no_argument, NULL, 'd'},
         {"scale", optional_argument, NULL, 'S'},
         {"translate", optional_argument, NULL, 'T'},
@@ -76,11 +74,11 @@ TracerArgs parse_args(int argc, char *argv[]) {
 
     const unsigned thread_count = thread::hardware_concurrency();
     TracerArgs opts = {"", "",    false, 640,   480, 0,
-                       0,  false, false, false, true, 100.f, Float3()};
+                       0,  false, false, true, 100.f, Float3()};
 
     int longindex = 0;
     char flag = 0;
-    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:gcjdS:T:", longopts,
+    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:gsdS:T:", longopts,
                                &longindex)) != -1) {
         stringstream s(optarg == nullptr ? "" : optarg);
         switch (flag) {
@@ -103,11 +101,8 @@ TracerArgs parse_args(int argc, char *argv[]) {
             case 'g':
                 opts.gpu = true;
                 break;
-            case 'c':
-                opts.csv = true;
-                break;
-            case 'j':
-                opts.time = true;
+            case 's':
+                opts.stats = true;
                 break;
             case 'd':
                 opts.accel = false;
@@ -146,7 +141,7 @@ TracerArgs parse_args(int argc, char *argv[]) {
         exit(-1);
     }
 
-    if (!opts.csv)
+    if (!opts.stats)
         print_banner(opts);
     return opts;
 }
