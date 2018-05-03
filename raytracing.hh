@@ -8,7 +8,7 @@
 #include "Geometry.hh"
 
 #define PRIMARY_RAYS 1
-#define SKY_COLOR Float3(0.5)
+#define SKY_COLOR Float3(1)
 
 namespace raytracing {
 DEVICE static Float3 trace(const Float3 &ray_orig, const Float3 &ray_dir,

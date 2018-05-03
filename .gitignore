@@ -1,5 +1,7 @@
 .*.swp
 .*.py
+__pycache__
+.vscode
 
 # binaries
 *.o
@@ -8,3 +10,4 @@ test_tracer
 
 # images
 *.bmp
+*.png

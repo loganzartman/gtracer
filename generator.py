@@ -21,12 +21,12 @@ def main():
 
         n = int(args[1])
 
-        max_x = int(args[2])
-        max_y = int(args[3])
-        max_z = int(args[4])
+        max_x = float(args[2])
+        max_y = float(args[3])
+        max_z = float(args[4])
 
         if len(args) >= 6:
-            max_r = int(args[5])
+            max_r = float(args[5])
 
     except:
         print("Usage: generator.py [type geom (s or t)] [num geoms] [max_x] [max_y] [max_z] [max_r]", file=sys.stderr)
@@ -56,9 +56,9 @@ def make_tris():
     y = (random.random() * 2 * max_y) - max_y
     z = (random.random() * 2 * max_z) - max_z
     for _ in range(3):
-        dx = random.uniform(-1, 1)
-        dy = random.uniform(-1, 1)
-        dz = random.uniform(-1, 1)
+        dx = random.uniform(-max_r, max_r)
+        dy = random.uniform(-max_r, max_r)
+        dz = random.uniform(-max_r, max_r)
 
         verts+=1
         print("v", x + dx, y + dy, z + dz)

@@ -269,11 +269,11 @@ void reload_geometry(const TracerArgs &args, vector<Geometry> &geom,
 
     // load geometry
     load(args.infile, geom, args.scale, args.translate, &mat_array[1]);
-    geom.push_back(
-        Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
-                 &mat_array[0]));
-    geom.push_back(
-        Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
+    // geom.push_back(
+    //     Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
+    //              &mat_array[0]));
+    // geom.push_back(
+    //     Geometry(SphereData{Float3(-20, 20, -20), 7}, &mat_array[2]));
 
     // move geometry to managed memory
     geom_array = (Geometry *)util::hostdev_alloc(
