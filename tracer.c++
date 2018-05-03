@@ -267,7 +267,7 @@ void reload_geometry(const TracerArgs &args, vector<Geometry> &geom,
     copy(mats.begin(), mats.end(), mat_array);
 
     // load geometry
-    load(args.infile, geom, 100, &mat_array[1]);
+    load(args.infile, geom, args.scale, args.translate, &mat_array[1]);
     geom.push_back(
         Geometry(BoxData{AABB(Float3(-12, 2, -12), Float3(12, 1.8, 12))},
                  &mat_array[0]));

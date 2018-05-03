@@ -14,7 +14,7 @@
 using namespace std;
 
 const vector<Geometry>& load(string filename, vector<Geometry>& objs,
-                             float scale, const Material* mat) {
+                             float scale, Float3 translate, const Material* mat) {
     ifstream file(filename);
     string s;
 
@@ -37,7 +37,7 @@ const vector<Geometry>& load(string filename, vector<Geometry>& objs,
             float one, two, three;
             file >> one >> two >> three;
             Float3 vertex(one, two, three);
-            vertices.push_back(vertex * scale);
+            vertices.push_back(vertex * scale + translate);
         } else if (command == "f") {
             // face: f v1 v2 v3
             string sone, stwo, sthree;
@@ -65,7 +65,7 @@ const vector<Geometry>& load(string filename, vector<Geometry>& objs,
 
             // create sphere
             Geometry obj =
-                Geometry(SphereData{Float3(one, two, three), r}, mat);
+                Geometry(SphereData{Float3(one, two, three) * scale + translate, r * scale}, mat);
             objs.push_back(obj);
         } else {
             // noop

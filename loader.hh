@@ -11,7 +11,7 @@
 #include "Vec3.hh"
 
 const std::vector<Geometry>& load(std::string filename,
-                                  std::vector<Geometry>& objs, float scale,
+                                  std::vector<Geometry>& objs, float scale, Float3 translate,
                                   const Material* mat);
 
 #endif

@@ -2,8 +2,10 @@
 #include <cstddef>
 #include <ctime>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <thread>
+#include "Vec3.hh"
 
 const static std::string COLOR_RED = "\e[31m";
 const static std::string COLOR_GREEN = "\e[32m";
@@ -23,6 +25,8 @@ struct TracerArgs {
     bool csv;
     bool time;
     bool accel;
+    float scale;
+    Float3 translate;
 };
 
 void print_usage() {
@@ -38,8 +42,9 @@ void print_usage() {
     cout << " -c, --csv        output machine-readable CSV data" << endl;
     cout << " -j, --time       output timing data" << endl;
     cout << " -d, --daccel     disable acceleration structures used to speed "
-            "up path tracing"
-         << endl;
+         << "up path tracing" << endl;
+    cout << " -S, --scale      scale factor for model (default 100)" << endl;
+    cout << " -T, --translate  translate model coordinates (\"x y z\")" << endl;
 }
 
 void print_banner(const TracerArgs &opts) {
@@ -65,16 +70,19 @@ TracerArgs parse_args(int argc, char *argv[]) {
         {"csv", no_argument, NULL, 'c'},
         {"time", no_argument, NULL, 'j'},
         {"daccel", no_argument, NULL, 'd'},
+        {"scale", optional_argument, NULL, 'S'},
+        {"translate", optional_argument, NULL, 'T'},
         {"help", no_argument, NULL, '?'}};
 
     const unsigned thread_count = thread::hardware_concurrency();
     TracerArgs opts = {"", "",    false, 640,   480, 0,
-                       0,  false, false, false, true};
+                       0,  false, false, false, true, 100.f, Float3()};
 
     int longindex = 0;
     char flag = 0;
-    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:gcjd", longopts,
+    while ((flag = getopt_long(argc, argv, "o:n:h:w:t:gcjdS:T:", longopts,
                                &longindex)) != -1) {
+        stringstream s(optarg == nullptr ? "" : optarg);
         switch (flag) {
             case 'o':
                 opts.output = true;
@@ -103,6 +111,14 @@ TracerArgs parse_args(int argc, char *argv[]) {
                 break;
             case 'd':
                 opts.accel = false;
+                break;
+            case 'S':
+                opts.scale = stof(optarg);
+                break;
+            case 'T':
+                float x, y, z;
+                s >> x >> y >> z;
+                opts.translate = Float3(x, y, z);
                 break;
             case '?':
             default:
