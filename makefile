@@ -30,7 +30,7 @@ NVCC     = nvcc
 CUDA_SRC = cuda_util.cu cuda_render.cu
 CUDA_HH  = cuda_util.hh cuda_util.cuh cuda_render.cuh
 CUDA_OBJ = $(CUDA_SRC:%.cu=%.cu.o)
-NVFLAGS  = -std=c++11 -arch=sm_52 -O3
+NVFLAGS  = -std=c++11 -arch=sm_52 -Xcompiler="-fPIC" -O3
 
 all: tracer
 
