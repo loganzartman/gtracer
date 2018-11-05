@@ -1,12 +1,22 @@
 # gtracer
 *GPU-accelerated path tracing*
 
+[Development Log](https://paper.dropbox.com/doc/Raytracing--ARAdoX7pwsdC1meXk9FasGKjAQ-3VDT8vLCTEFx3XvIYLlTU)
+
 Austin Atchley, Logan Zartman
 
 <center>
 <img src="img/visorman.png" width="400px">
 <i>Visorman</i>
 </center>
+
+## Features
+* CPU multithreading and CUDA modes
+* Intersection testing acceleration using Uniform Grids
+* Loading of OBJ-format triangle meshes
+* Reflection and refraction
+
+<img src="img/turtle.png" width="50%"><img src="img/balls.png" width="50%">
 
 ## Dependencies
 * SDL2
